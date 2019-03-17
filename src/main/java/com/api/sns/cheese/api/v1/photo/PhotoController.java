@@ -34,6 +34,17 @@ public class PhotoController {
 		return photo;
 	}
 
+	/**
+	 * 写真一覧取得
+	 */
+	@GetMapping
+	public List<PhotoResource> findList() {
+		List<PhotoResource> photoList = new ArrayList<>();
+		photoList.add(photo);
+
+		return photoList;
+	}
+
 	/** アカウントテストデータ */
 	private AccountResource account = new AccountResource(
 			Long.valueOf(1),
