@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,9 +37,12 @@ public class PhotoController {
 
 	/**
 	 * 写真一覧取得
+	 *
+	 * @param loginId ログインID
+	 * @param pageable ページ情報
 	 */
 	@GetMapping
-	public List<PhotoResource> findList() {
+	public List<PhotoResource> findList(String loginId, Pageable pageable) {
 		List<PhotoResource> photoList = new ArrayList<>();
 		photoList.add(photo);
 
