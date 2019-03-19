@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.sns.cheese.form.PhotoCommentForm;
+import com.api.sns.cheese.form.PhotoForm;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.resources.CommentResource;
 import com.api.sns.cheese.resources.PhotoResource;
@@ -56,6 +57,20 @@ public class PhotoController {
 
 		// TODO Pageを返却
 		return photoList;
+	}
+
+	/**
+	 * 写真登録
+	 *
+	 * @param 写真フォーム
+	 * @return 写真情報
+	 */
+	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
+	public PhotoResource create(@Validated PhotoForm form) {
+
+		// 登録した写真情報を返却
+		return photo;
 	}
 
 	/**
