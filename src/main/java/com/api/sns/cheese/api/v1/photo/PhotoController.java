@@ -77,6 +77,30 @@ public class PhotoController {
 		return true;
 	}
 
+	/**
+	 * コメントにいいねをする
+	 *
+	 * @param cd コード
+	 * @param commentCd コメントコード
+	 */
+	@PostMapping("/{cd}/comment/{commentCd}/like")
+	@ResponseStatus(HttpStatus.CREATED)
+	public boolean likeComment(@PathVariable("cd") String cd, @PathVariable("commentCd") String commentCd) {
+		return true;
+	}
+
+	/**
+	 * コメントのいいねを解除する
+	 *
+	 * @param cd コード
+	 * @param commentCd コメントコード
+	 */
+	@PostMapping("/{cd}/comment/{commentCd}/dislike")
+	@ResponseStatus(HttpStatus.CREATED)
+	public boolean dislikeComment(@PathVariable("cd") String cd, @PathVariable("commentCd") String commentCd) {
+		return true;
+	}
+
 	/** アカウントテストデータ */
 	private AccountResource account = new AccountResource(
 			Long.valueOf(1),
