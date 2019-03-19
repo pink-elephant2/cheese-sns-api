@@ -6,13 +6,16 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.api.sns.cheese.form.PhotoCommentForm;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.resources.CommentResource;
 import com.api.sns.cheese.resources.PhotoResource;
@@ -75,6 +78,21 @@ public class PhotoController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public boolean dislike(@PathVariable("cd") String cd) {
 		return true;
+	}
+
+	/**
+	 * コメントする
+	 *
+	 * @param cd コード
+	 * @param comment コメント
+	 * @return コメント情報
+	 */
+	@PostMapping("/{cd}/comment")
+	@ResponseStatus(HttpStatus.CREATED)
+	public CommentResource comment(@PathVariable("cd") String cd, @RequestBody @Validated PhotoCommentForm form) {
+
+		// 登録したコメント情報を返却
+		return new CommentResource(Long.valueOf(1), "aaa", form.getComment(), new Date(), account, true);
 	}
 
 	/**
