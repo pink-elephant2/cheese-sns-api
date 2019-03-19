@@ -5,9 +5,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.sns.cheese.resources.AccountResource;
@@ -28,6 +31,7 @@ public class PhotoController {
 	 * @return
 	 */
 	@GetMapping("/{cd}")
+	@ResponseStatus(HttpStatus.OK)
 	public PhotoResource find(@PathVariable("cd") String cd) {
 		List<CommentResource> comments = new ArrayList<>();
 		comments.add(new CommentResource(Long.valueOf(1), "aaa", "おいしそう😍", new Date(), account, true));
@@ -42,11 +46,24 @@ public class PhotoController {
 	 * @param pageable ページ情報
 	 */
 	@GetMapping
+	@ResponseStatus(HttpStatus.OK)
 	public List<PhotoResource> findList(String loginId, Pageable pageable) {
 		List<PhotoResource> photoList = new ArrayList<>();
 		photoList.add(photo);
 
+		// TODO Pageを返却
 		return photoList;
+	}
+
+	/**
+	 * 写真にいいねをする
+	 *
+	 * @param cd コード
+	 */
+	@PostMapping("/{cd}/like")
+	@ResponseStatus(HttpStatus.CREATED)
+	public boolean like(@PathVariable("cd") String cd) {
+		return true;
 	}
 
 	/** アカウントテストデータ */
