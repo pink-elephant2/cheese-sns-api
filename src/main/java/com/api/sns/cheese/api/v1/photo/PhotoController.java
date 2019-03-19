@@ -66,6 +66,17 @@ public class PhotoController {
 		return true;
 	}
 
+	/**
+	 * 写真のいいねを解除する
+	 *
+	 * @param cd コード
+	 */
+	@PostMapping("/{cd}/dislike")
+	@ResponseStatus(HttpStatus.CREATED)
+	public boolean dislike(@PathVariable("cd") String cd) {
+		return true;
+	}
+
 	/** アカウントテストデータ */
 	private AccountResource account = new AccountResource(
 			Long.valueOf(1),
