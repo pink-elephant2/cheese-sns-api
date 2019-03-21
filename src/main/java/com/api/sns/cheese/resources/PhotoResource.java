@@ -8,20 +8,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 写真APIレスポンス
  */
 @Data
+@RequiredArgsConstructor
 @AllArgsConstructor
 public class PhotoResource {
 
 	/** ID */
-	private Long id;
+	private final Long id;
 
 	/** コード */
 	@JsonProperty("cd")
-	private String code;
+	private final String code;
 
 	/** 説明 */
 	private String caption;
@@ -41,6 +43,7 @@ public class PhotoResource {
 	private Integer likeCount;
 
 	/** 自分がいいねしたか */
+	@JsonProperty("isLike")
 	private boolean isLike;
 
 	/** コメント */
