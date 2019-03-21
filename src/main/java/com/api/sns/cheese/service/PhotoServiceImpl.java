@@ -2,10 +2,8 @@ package com.api.sns.cheese.service;
 
 import static java.util.Comparator.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,12 +14,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.api.sns.cheese.form.PhotoForm;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.resources.CommentResource;
 import com.api.sns.cheese.resources.PhotoResource;
+import com.api.sns.cheese.util.ImageUtils;
 
 /**
  * 写真サービス
@@ -33,13 +31,14 @@ public class PhotoServiceImpl implements PhotoService {
 	/** アカウントテストデータ */
 	private List<AccountResource> accountList = new ArrayList<>(Arrays.asList(
 			// テストデータ1
-			new AccountResource(Long.valueOf(1), "my_melody", "マイメロディ", "おはよう♪　あさごはん　ちゃんとたべた〜？　いっしゅうかん　がんばろうね♪", null,
-					null, "Melody_Mariland", null),
+			new AccountResource(Long.valueOf(1), "my_melody", "マイメロディ", "おはよう♪　あさごはん　ちゃんとたべた〜？　いっしゅうかん　がんばろうね♪",
+					"assets/images/my_melody.png", null, null, "Melody_Mariland", null),
 			// テストデータ2
-			new AccountResource(Long.valueOf(2), "ki_ri_mi", "KIRIMIちゃん", "ラブ！サーモン！>°))))◁", null, null,
-					"kirimi_sanrio", null),
+			new AccountResource(Long.valueOf(2), "ki_ri_mi", "KIRIMIちゃん", "ラブ！サーモン！>°))))◁",
+					"assets/images/ki_ri_mi.png", null, null, "kirimi_sanrio", null),
 			// テストデータ3
-			new AccountResource(Long.valueOf(1), "gudetama", "ぐでたま", "だるい", null, null, "gudetama_sanrio", null)));
+			new AccountResource(Long.valueOf(1), "gudetama", "ぐでたま", "だるい", "assets/images/gudetama.png", null, null,
+					"gudetama_sanrio", null)));
 
 	/** コメントテストデータ */
 	private List<CommentResource> commentList = new ArrayList<>(Arrays.asList(
@@ -129,7 +128,7 @@ public class PhotoServiceImpl implements PhotoService {
 
 		PhotoResource photo = new PhotoResource(id, cd);
 		photo.setCaption(form.getCaption());
-		photo.setImageUrl(getDataUrl(form.getUpfile()));
+		photo.setImageUrl(ImageUtils.getDataUrl(form.getUpfile()));
 		photo.setCreateAt(new Date());
 		photo.setAccount(accountList.get(0));
 
@@ -137,26 +136,6 @@ public class PhotoServiceImpl implements PhotoService {
 		photoList.add(photo);
 
 		return photo;
-	}
-
-	/** data URLを生成する */
-	private String getDataUrl(MultipartFile upfile) {
-		StringBuilder sb = new StringBuilder();
-
-		try {
-			byte[] data = upfile.getBytes();
-			String base64str = Base64.getEncoder().encodeToString(data);
-
-			sb.append("data:");
-			sb.append(upfile.getContentType());
-			sb.append(";base64,");
-			sb.append(base64str);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		// data:[<MIME-type>][;charset=<encoding>][;base64],<data>
-		return sb.toString();
 	}
 
 	/**
