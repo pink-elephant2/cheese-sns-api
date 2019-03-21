@@ -1,4 +1,4 @@
-package com.api.sns.cheese.api.v1.photo;
+package com.api.sns.cheese.api.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
