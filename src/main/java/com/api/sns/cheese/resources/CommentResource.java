@@ -3,6 +3,7 @@ package com.api.sns.cheese.resources;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,5 +32,6 @@ public class CommentResource {
 	private AccountResource account;
 
 	/** 自分がいいねしたか */
+	@JsonProperty("isLike")
 	private boolean isLike;
 }
