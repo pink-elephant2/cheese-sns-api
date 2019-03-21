@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,10 +53,10 @@ public class PhotoServiceImpl implements PhotoService {
 	 *            ページ情報
 	 * @param 写真一覧
 	 */
-	public List<PhotoResource> findList(String loginId, Pageable pageable) {
+	public Page<PhotoResource> findList(String loginId, Pageable pageable) {
 		List<PhotoResource> photoList = new ArrayList<>();
 		photoList.add(photo);
-		return photoList;
+		return new PageImpl<>(photoList);
 	}
 
 	/**

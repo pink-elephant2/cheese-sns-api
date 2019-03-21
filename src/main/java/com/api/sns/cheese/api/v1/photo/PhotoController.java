@@ -1,8 +1,7 @@
 package com.api.sns.cheese.api.v1.photo;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -53,8 +52,8 @@ public class PhotoController {
 	 */
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public List<PhotoResource> findList(String loginId, Pageable pageable) {
-		// 写真一覧を取得する TODO Pageを返却
+	public Page<PhotoResource> findList(String loginId, Pageable pageable) {
+		// 写真一覧を取得する
 		return photoService.findList(loginId, pageable);
 	}
 

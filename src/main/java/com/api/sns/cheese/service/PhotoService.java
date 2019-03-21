@@ -1,7 +1,6 @@
 package com.api.sns.cheese.service;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.api.sns.cheese.form.PhotoForm;
@@ -31,7 +30,7 @@ public interface PhotoService {
 	 *            ページ情報
 	 * @param 写真一覧
 	 */
-	public List<PhotoResource> findList(String loginId, Pageable pageable);
+	public Page<PhotoResource> findList(String loginId, Pageable pageable);
 
 	/**
 	 * 写真を登録する
