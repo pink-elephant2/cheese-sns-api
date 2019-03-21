@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.api.sns.cheese.form.AccountForm;
 import com.api.sns.cheese.resources.AccountResource;
+import com.api.sns.cheese.util.ImageUtils;
 
 /**
  * アカウントサービス
@@ -23,15 +24,16 @@ public class AccountServiceImpl implements AccountService {
 	private Mapper mapper;
 
 	/** アカウントテストデータ */
-	private List<AccountResource> accountList = new ArrayList<>(Arrays.asList(
+	public List<AccountResource> accountList = new ArrayList<>(Arrays.asList(
 			// テストデータ1
-			new AccountResource(Long.valueOf(1), "my_melody", "マイメロディ", "おはよう♪　あさごはん　ちゃんとたべた〜？　いっしゅうかん　がんばろうね♪", null,
-					null, "Melody_Mariland", null),
+			new AccountResource(Long.valueOf(1), "my_melody", "マイメロディ", "おはよう♪　あさごはん　ちゃんとたべた〜？　いっしゅうかん　がんばろうね♪",
+					"assets/images/my_melody.png", null, null, "Melody_Mariland", null),
 			// テストデータ2
-			new AccountResource(Long.valueOf(2), "ki_ri_mi", "KIRIMIちゃん", "ラブ！サーモン！>°))))◁", null, null,
-					"kirimi_sanrio", null),
+			new AccountResource(Long.valueOf(2), "ki_ri_mi", "KIRIMIちゃん", "ラブ！サーモン！>°))))◁",
+					"assets/images/ki_ri_mi.png", null, null, "kirimi_sanrio", null),
 			// テストデータ3
-			new AccountResource(Long.valueOf(1), "gudetama", "ぐでたま", "だるい", null, null, "gudetama_sanrio", null)));
+			new AccountResource(Long.valueOf(1), "gudetama", "ぐでたま", "だるい", "assets/images/gudetama.png", null, null,
+					"gudetama_sanrio", null)));
 
 	/**
 	 * アカウントを取得する
@@ -57,6 +59,7 @@ public class AccountServiceImpl implements AccountService {
 
 		// プロフィールを更新する
 		mapper.map(form, find(loginId));
+		find(loginId).setImageUrl(ImageUtils.getDataUrl(form.getUpfile()));
 
 		return true;
 	}
