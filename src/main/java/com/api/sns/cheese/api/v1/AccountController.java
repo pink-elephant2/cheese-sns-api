@@ -7,11 +7,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.sns.cheese.form.AccountForm;
+import com.api.sns.cheese.form.FollowForm;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.service.AccountService;
 import com.api.sns.cheese.service.FollowService;
@@ -81,4 +83,31 @@ public class AccountController {
 		return followService.findFollowers(loginId);
 	}
 
+	/**
+	 * フォローする
+	 *
+	 * @param loginId
+	 *            ログインID
+	 */
+	@PostMapping("/follow")
+	@ResponseStatus(HttpStatus.CREATED)
+	public boolean follow(@RequestBody @Validated FollowForm form) {
+		// フォローする
+		System.out.println(form);
+		return followService.follow(form.getLoginId());
+	}
+
+	/**
+	 * フォローを解除する
+	 *
+	 * @param loginId
+	 *            ログインID
+	 */
+	@PostMapping("/unfollow")
+	@ResponseStatus(HttpStatus.CREATED)
+	public boolean unfollow(@RequestBody @Validated FollowForm form) {
+		// フォローを解除する
+		System.out.println(form);
+		return followService.unfollow(form.getLoginId());
+	}
 }
