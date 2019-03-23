@@ -39,4 +39,8 @@ public class AccountResource {
 
 	/** Instagramアカウント */
 	private String instagram;
+
+	/** ログイン状態の場合、フォローしているかどうか */
+	@JsonProperty("isFollow")
+	private boolean isFollow;
 }

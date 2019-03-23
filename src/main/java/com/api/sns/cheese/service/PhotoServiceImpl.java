@@ -32,13 +32,13 @@ public class PhotoServiceImpl implements PhotoService {
 	private List<AccountResource> accountList = new ArrayList<>(Arrays.asList(
 			// テストデータ1
 			new AccountResource(Long.valueOf(1), "my_melody", "マイメロディ", "おはよう♪　あさごはん　ちゃんとたべた〜？　いっしゅうかん　がんばろうね♪",
-					"assets/images/my_melody.png", null, null, "Melody_Mariland", null),
+					"assets/images/my_melody.png", null, null, "Melody_Mariland", null, false),
 			// テストデータ2
 			new AccountResource(Long.valueOf(2), "ki_ri_mi", "KIRIMIちゃん", "ラブ！サーモン！>°))))◁",
-					"assets/images/ki_ri_mi.png", null, null, "kirimi_sanrio", null),
+					"assets/images/ki_ri_mi.png", null, null, "kirimi_sanrio", null, true),
 			// テストデータ3
 			new AccountResource(Long.valueOf(1), "gudetama", "ぐでたま", "だるい", "assets/images/gudetama.png", null, null,
-					"gudetama_sanrio", null)));
+					"gudetama_sanrio", null, false)));
 
 	/** コメントテストデータ */
 	private List<CommentResource> commentList = new ArrayList<>(Arrays.asList(
