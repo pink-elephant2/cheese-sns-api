@@ -1,6 +1,7 @@
 package com.api.sns.cheese.api.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.api.sns.cheese.form.AccountForm;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.service.AccountService;
+import com.api.sns.cheese.service.FollowService;
 
 /**
  * アカウントAPI
@@ -23,6 +25,9 @@ public class AccountController {
 
 	@Autowired
 	private AccountService accountService;
+
+	@Autowired
+	private FollowService followService;
 
 	/**
 	 * アカウント取得
@@ -49,4 +54,31 @@ public class AccountController {
 		// プロフィールを更新する
 		return accountService.saveProfile(form);
 	}
+
+	/**
+	 * フォロー取得
+	 *
+	 * @param loginId
+	 *            ログインID
+	 */
+	@GetMapping("/{loginId}/follow")
+	@ResponseStatus(HttpStatus.OK)
+	public Page<AccountResource> findFollow(@PathVariable("loginId") String loginId) {
+		// フォローを取得する
+		return followService.findFollow(loginId);
+	}
+
+	/**
+	 * フォローワー取得
+	 *
+	 * @param loginId
+	 *            ログインID
+	 */
+	@GetMapping("/{loginId}/follower")
+	@ResponseStatus(HttpStatus.OK)
+	public Page<AccountResource> findFollower(@PathVariable("loginId") String loginId) {
+		// フォローワーを取得する
+		return followService.findFollowers(loginId);
+	}
+
 }

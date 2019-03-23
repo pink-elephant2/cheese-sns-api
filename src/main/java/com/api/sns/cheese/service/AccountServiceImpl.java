@@ -24,7 +24,7 @@ public class AccountServiceImpl implements AccountService {
 	private Mapper mapper;
 
 	/** アカウントテストデータ */
-	public List<AccountResource> accountList = new ArrayList<>(Arrays.asList(
+	private List<AccountResource> accountList = new ArrayList<>(Arrays.asList(
 			// テストデータ1
 			new AccountResource(Long.valueOf(1), "my_melody", "マイメロディ", "おはよう♪　あさごはん　ちゃんとたべた〜？　いっしゅうかん　がんばろうね♪",
 					"assets/images/my_melody.png", null, null, "Melody_Mariland", null),
