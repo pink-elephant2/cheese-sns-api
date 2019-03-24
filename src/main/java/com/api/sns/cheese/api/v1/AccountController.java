@@ -93,7 +93,6 @@ public class AccountController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public boolean follow(@RequestBody @Validated FollowForm form) {
 		// フォローする
-		System.out.println(form);
 		return followService.follow(form.getLoginId());
 	}
 
@@ -107,7 +106,6 @@ public class AccountController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public boolean unfollow(@RequestBody @Validated FollowForm form) {
 		// フォローを解除する
-		System.out.println(form);
 		return followService.unfollow(form.getLoginId());
 	}
 }
