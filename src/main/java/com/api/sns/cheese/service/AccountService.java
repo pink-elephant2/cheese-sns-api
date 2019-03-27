@@ -1,7 +1,5 @@
 package com.api.sns.cheese.service;
 
-import org.springframework.validation.annotation.Validated;
-
 import com.api.sns.cheese.form.AccountForm;
 import com.api.sns.cheese.resources.AccountResource;
 
@@ -25,5 +23,5 @@ public interface AccountService {
 	 * @param form
 	 *            プロフィールフォーム
 	 */
-	public boolean saveProfile(@Validated AccountForm form);
+	public boolean saveProfile(AccountForm form);
 }
