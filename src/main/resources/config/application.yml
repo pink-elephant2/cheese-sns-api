@@ -1,0 +1,6 @@
+spring: 
+  datasource: 
+    driverClassName: com.mysql.jdbc.Driver
+    url: ${DATABASE_URL_SPRINGBOOT:jdbc:mysql://localhost:3306/dbname}
+    username: ${DATABASE_USER:hogehoge}
+    password: ${DATABASE_PASSWORD:fugafuga}
