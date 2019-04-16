@@ -29,6 +29,24 @@
     </javaModelGenerator>
     <sqlMapGenerator targetPackage="com.api.sns.cheese.repository" targetProject="cheese-sns-api/src/main/resources" />
     <javaClientGenerator targetPackage="com.api.sns.cheese.repository" targetProject="cheese-sns-api/src/main/java" type="XMLMAPPER" />
+
+    <!-- 対象テーブル -->
     <table tableName="test"></table>
+    <table tableName="t_account"></table>
+    <table tableName="t_activity">
+        <columnOverride column="activity_type" javaType="com.api.sns.cheese.enums.ActivityTypeEnum" />
+    </table>
+    <table tableName="t_bookmark"></table>
+    <table tableName="t_contact"></table>
+    <table tableName="t_follow"></table>
+    <table tableName="t_follow_tag"></table>
+    <table tableName="t_login_history"></table>
+    <table tableName="t_photo"></table>
+    <table tableName="t_photo_comment"></table>
+    <table tableName="t_photo_comment_like"></table>
+    <table tableName="t_photo_like"></table>
+    <table tableName="t_tag"></table>
+    <table tableName="t_tag_photo"></table>
+
   </context>
 </generatorConfiguration>
