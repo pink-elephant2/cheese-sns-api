@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * アカウントAPIレスポンス
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class AccountResource {
 
@@ -25,8 +27,7 @@ public class AccountResource {
 	private String description;
 
 	/** 画像パス */ // TODO 画像情報クラス
-	@JsonProperty("imgUrl")
-	private String imageUrl;
+	private String imgUrl;
 
 	/** 場所 */
 	private String place;

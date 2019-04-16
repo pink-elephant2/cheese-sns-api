@@ -26,5 +26,5 @@ public class ContactForm {
 	/** 内容 */
 	@NotNull
 	@Size(max = 1000)
-	private String comment;
+	private String content;
 }

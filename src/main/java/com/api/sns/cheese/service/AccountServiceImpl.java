@@ -59,7 +59,7 @@ public class AccountServiceImpl implements AccountService {
 
 		// プロフィールを更新する
 		mapper.map(form, find(loginId));
-		find(loginId).setImageUrl(ImageUtils.getDataUrl(form.getUpfile()));
+		find(loginId).setImgUrl(ImageUtils.getDataUrl(form.getUpfile()));
 
 		return true;
 	}
