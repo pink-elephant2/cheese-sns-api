@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.api.sns.cheese.domain.TAccount;
 import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.form.AccountCreateForm;
-import com.api.sns.cheese.form.AccountForm;
+import com.api.sns.cheese.form.AccountUpdateForm;
 import com.api.sns.cheese.repository.TAccountMapper;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.util.ImageUtils;
@@ -82,7 +82,7 @@ public class AccountServiceImpl implements AccountService {
 	 *            プロフィールフォーム
 	 */
 	@Override
-	public boolean saveProfile(AccountForm form) throws NotFoundException {
+	public boolean saveProfile(AccountUpdateForm form) throws NotFoundException {
 		String loginId = "my_melody"; // TODO セッション情報から取得
 
 		// プロフィールを更新する

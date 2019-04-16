@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.sns.cheese.form.AccountCreateForm;
-import com.api.sns.cheese.form.AccountForm;
+import com.api.sns.cheese.form.AccountUpdateForm;
 import com.api.sns.cheese.form.FollowForm;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.service.AccountService;
@@ -67,7 +67,7 @@ public class AccountController {
 	 */
 	@PostMapping("/profile")
 	@ResponseStatus(HttpStatus.OK)
-	public boolean saveProfile(@Validated AccountForm form) throws NotFoundException {
+	public boolean saveProfile(@Validated AccountUpdateForm form) throws NotFoundException {
 		// プロフィールを更新する
 		return accountService.saveProfile(form);
 	}

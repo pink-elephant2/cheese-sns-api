@@ -3,7 +3,7 @@ package com.api.sns.cheese.service;
 import org.apache.ibatis.javassist.NotFoundException;
 
 import com.api.sns.cheese.form.AccountCreateForm;
-import com.api.sns.cheese.form.AccountForm;
+import com.api.sns.cheese.form.AccountUpdateForm;
 import com.api.sns.cheese.resources.AccountResource;
 
 /**
@@ -34,5 +34,5 @@ public interface AccountService {
 	 * @param form
 	 *            プロフィールフォーム
 	 */
-	public boolean saveProfile(AccountForm form) throws NotFoundException;
+	public boolean saveProfile(AccountUpdateForm form) throws NotFoundException;
 }
