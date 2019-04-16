@@ -7,6 +7,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.ibatis.javassist.NotFoundException;
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,9 @@ public class AccountServiceImpl implements AccountService {
 	@Autowired
 	private Mapper mapper;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	/**
 	 * アカウントを登録する
 	 *
@@ -42,15 +46,17 @@ public class AccountServiceImpl implements AccountService {
 		// アカウントを登録する
 		TAccount account = mapper.map(form, TAccount.class);
 		account.setName(form.getLoginId());
+
+		// パスワード生成
+		account.setPassword(passwordEncoder.encode(form.getPassword()));
 		account.setPasswordChangeDate(new Date());
+
 		// TODO 共通項目は親クラスで設定する
 		account.setDeleted("0");
 		account.setCreatedAt(new Date());
 		account.setCreatedBy(1); // TODO システムユーザ(1)
 		account.setUpdatedAt(new Date());
 		account.setUpdatedBy(1); // TODO システムユーザ(1)
-
-		// TODO パスワード生成
 
 		// TODO エラーメッセージ
 		return BooleanUtils.toBoolean(tAccountMapper.insert(account));
