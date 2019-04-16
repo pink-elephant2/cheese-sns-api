@@ -1,5 +1,6 @@
 package com.api.sns.cheese.api.v1;
 
+import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -39,7 +40,7 @@ public class AccountController {
 	 */
 	@GetMapping("/{loginId}")
 	@ResponseStatus(HttpStatus.OK)
-	public AccountResource find(@PathVariable("loginId") String loginId) {
+	public AccountResource find(@PathVariable("loginId") String loginId) throws NotFoundException {
 		// アカウントを取得する
 		return accountService.find(loginId);
 	}
@@ -52,7 +53,7 @@ public class AccountController {
 	 */
 	@PostMapping("/profile")
 	@ResponseStatus(HttpStatus.OK)
-	public boolean saveProfile(@Validated AccountForm form) {
+	public boolean saveProfile(@Validated AccountForm form) throws NotFoundException {
 		// プロフィールを更新する
 		return accountService.saveProfile(form);
 	}
