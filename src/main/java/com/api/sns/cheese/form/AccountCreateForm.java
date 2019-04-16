@@ -1,30 +1,33 @@
 package com.api.sns.cheese.form;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import lombok.Data;
 
 /**
- * お問合せフォーム
+ * アカウント作成フォーム
  */
 @Data
-public class ContactForm {
+public class AccountCreateForm {
 
-	/** 名前 */
+	/** ログインID */
 	@NotNull
-	@Size(max = 50)
-	private String name;
+	@Size(max = 30)
+	private String loginId;
 
 	/** メールアドレス */
 	@NotNull
 	@Size(max = 256)
-	@Email
 	private String mail;
 
-	/** 内容 */
+	/** パスワード */
 	@NotNull
-	@Size(max = 1000)
-	private String content;
+	@Size(max = 30)
+	private String password;
+
+//	@Override
+//	public String toString() {
+//
+//	}
 }

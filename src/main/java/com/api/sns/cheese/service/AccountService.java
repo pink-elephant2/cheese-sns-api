@@ -1,6 +1,9 @@
 package com.api.sns.cheese.service;
 
-import com.api.sns.cheese.form.AccountForm;
+import org.apache.ibatis.javassist.NotFoundException;
+
+import com.api.sns.cheese.form.AccountCreateForm;
+import com.api.sns.cheese.form.AccountUpdateForm;
 import com.api.sns.cheese.resources.AccountResource;
 
 /**
@@ -9,13 +12,21 @@ import com.api.sns.cheese.resources.AccountResource;
 public interface AccountService {
 
 	/**
+	 * アカウントを登録する
+	 *
+	 * @param form
+	 *            アカウント作成フォーム
+	 */
+	public boolean create(AccountCreateForm form);
+
+	/**
 	 * アカウントを取得する
 	 *
 	 * @param loginId
 	 *            ログインID
 	 * @return アカウント情報
 	 */
-	public AccountResource find(String loginId);
+	public AccountResource find(String loginId) throws NotFoundException;
 
 	/**
 	 * プロフィールを更新する
@@ -23,5 +34,5 @@ public interface AccountService {
 	 * @param form
 	 *            プロフィールフォーム
 	 */
-	public boolean saveProfile(AccountForm form);
+	public boolean saveProfile(AccountUpdateForm form) throws NotFoundException;
 }

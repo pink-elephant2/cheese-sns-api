@@ -36,9 +36,9 @@ public enum ActivityTypeEnum implements BaseEnum {
 	}
 
 	@Override
-    public String toString() {
-        return this.getName();
-    }
+	public String toString() {
+		return this.getName();
+	}
 
 	/** コメントか */
 	public boolean isComment() {

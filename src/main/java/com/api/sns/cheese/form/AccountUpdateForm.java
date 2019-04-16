@@ -8,10 +8,10 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.Data;
 
 /**
- * アカウントフォーム
+ * アカウント更新フォーム
  */
 @Data
-public class AccountForm {
+public class AccountUpdateForm {
 
 	/** 画像ファイル */
 	private MultipartFile upfile;
