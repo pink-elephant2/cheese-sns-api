@@ -15,7 +15,8 @@ import lombok.NoArgsConstructor;
 public class AccountResource {
 
 	/** アカウントID */
-	private Long id;
+	@JsonProperty("id")
+	private Long accountId;
 
 	/** ログインID */
 	private String loginId;
