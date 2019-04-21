@@ -3,8 +3,6 @@ package com.api.sns.cheese.form;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import lombok.Data;
 
 /**
@@ -12,9 +10,6 @@ import lombok.Data;
  */
 @Data
 public class AccountUpdateForm {
-
-	/** 画像ファイル */
-	private MultipartFile upfile;
 
 	/** アカウント名 */
 	@NotNull

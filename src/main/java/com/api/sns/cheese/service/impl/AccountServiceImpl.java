@@ -1,4 +1,4 @@
-package com.api.sns.cheese.service;
+package com.api.sns.cheese.service.impl;
 
 import java.util.Date;
 import java.util.List;
@@ -11,13 +11,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccount;
 import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.form.AccountCreateForm;
+import com.api.sns.cheese.form.AccountImageForm;
 import com.api.sns.cheese.form.AccountUpdateForm;
 import com.api.sns.cheese.repository.TAccountMapper;
 import com.api.sns.cheese.resources.AccountResource;
-import com.api.sns.cheese.util.ImageUtils;
+import com.api.sns.cheese.service.AccountService;
 
 /**
  * アカウントサービス
@@ -52,11 +54,11 @@ public class AccountServiceImpl implements AccountService {
 		account.setPasswordChangeDate(new Date());
 
 		// TODO 共通項目は親クラスで設定する
-		account.setDeleted("0");
+		account.setDeleted(CommonConst.DeletedFlag.OFF);
 		account.setCreatedAt(new Date());
-		account.setCreatedBy(1); // TODO システムユーザ(1)
+		account.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
 		account.setUpdatedAt(new Date());
-		account.setUpdatedBy(1); // TODO システムユーザ(1)
+		account.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
 
 		// TODO エラーメッセージ
 		return BooleanUtils.toBoolean(tAccountMapper.insert(account));
@@ -72,7 +74,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public AccountResource find(String loginId) throws NotFoundException {
 		TAccountExample example = new TAccountExample();
-		example.createCriteria().andLoginIdEqualTo(loginId);
+		example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		List<TAccount> account = tAccountMapper.selectByExample(example);
 		if (account.isEmpty()) {
 			// TODO 404を返す
@@ -93,10 +95,33 @@ public class AccountServiceImpl implements AccountService {
 
 		// プロフィールを更新する
 		TAccount account = mapper.map(form, TAccount.class);
-		account.setImgUrl(ImageUtils.getDataUrl(form.getUpfile()));
 
 		TAccountExample example = new TAccountExample();
-		example.createCriteria().andLoginIdEqualTo(loginId);
+		example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		return BooleanUtils.toBoolean(tAccountMapper.updateByExampleSelective(account, example));
+	}
+
+	/**
+	 * アカウント画像を更新する
+	 *
+	 * @param form
+	 *            画像フォーム
+	 */
+	public boolean saveImage(AccountImageForm form) {
+		String loginId = "my_melody"; // TODO セッション情報から取得
+
+		// プロフィールを更新する
+		TAccount account = mapper.map(form, TAccount.class);
+
+		// TODO S3に保存、URLを設定する
+		// account.setImgUrl(ImageUtils.getDataUrl(upfile));
+		//
+		// TAccountExample example = new TAccountExample();
+		// example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		// return
+		// BooleanUtils.toBoolean(tAccountMapper.updateByExampleSelective(account,
+		// example));
+
+		return true;
 	}
 }

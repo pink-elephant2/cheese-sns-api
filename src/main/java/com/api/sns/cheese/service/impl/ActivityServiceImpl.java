@@ -1,4 +1,4 @@
-package com.api.sns.cheese.service;
+package com.api.sns.cheese.service.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +16,7 @@ import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.resources.ActivityResource;
 import com.api.sns.cheese.resources.CommentResource;
 import com.api.sns.cheese.resources.PhotoResource;
+import com.api.sns.cheese.service.ActivityService;
 
 /**
  * アクティビティサービス
