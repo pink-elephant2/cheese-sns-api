@@ -1,4 +1,4 @@
-package com.api.sns.cheese.service;
+package com.api.sns.cheese.service.impl;
 
 import java.util.Date;
 
@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.api.sns.cheese.domain.TContact;
 import com.api.sns.cheese.form.ContactForm;
 import com.api.sns.cheese.repository.TContactMapper;
+import com.api.sns.cheese.service.ContactService;
 
 /**
  * お問合せサービス

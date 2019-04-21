@@ -1,4 +1,4 @@
-package com.api.sns.cheese.service;
+package com.api.sns.cheese.service.impl;
 
 import static java.util.Comparator.*;
 
@@ -19,6 +19,7 @@ import com.api.sns.cheese.form.PhotoForm;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.resources.CommentResource;
 import com.api.sns.cheese.resources.PhotoResource;
+import com.api.sns.cheese.service.PhotoService;
 import com.api.sns.cheese.util.ImageUtils;
 
 /**

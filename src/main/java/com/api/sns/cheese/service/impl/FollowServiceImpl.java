@@ -1,4 +1,4 @@
-package com.api.sns.cheese.service;
+package com.api.sns.cheese.service.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.api.sns.cheese.resources.AccountResource;
+import com.api.sns.cheese.service.FollowService;
 
 /**
  * フォローサービス

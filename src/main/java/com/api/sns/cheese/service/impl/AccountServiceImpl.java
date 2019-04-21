@@ -1,4 +1,4 @@
-package com.api.sns.cheese.service;
+package com.api.sns.cheese.service.impl;
 
 import java.util.Date;
 import java.util.List;
@@ -17,6 +17,7 @@ import com.api.sns.cheese.form.AccountCreateForm;
 import com.api.sns.cheese.form.AccountUpdateForm;
 import com.api.sns.cheese.repository.TAccountMapper;
 import com.api.sns.cheese.resources.AccountResource;
+import com.api.sns.cheese.service.AccountService;
 import com.api.sns.cheese.util.ImageUtils;
 
 /**
