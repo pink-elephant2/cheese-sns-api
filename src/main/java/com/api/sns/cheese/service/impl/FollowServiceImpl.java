@@ -1,14 +1,12 @@
 package com.api.sns.cheese.service.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.ibatis.javassist.NotFoundException;
+import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -38,40 +36,8 @@ public class FollowServiceImpl implements FollowService {
 	@Autowired
 	private TFollowMapper tFollowMapper;
 
-	/** アカウントテストデータ */
-	private List<AccountResource> accountList = new ArrayList<>(Arrays.asList(
-			// テストデータ1
-			new AccountResource(Long.valueOf(1), "my_melody", "マイメロディ", "おはよう♪　あさごはん　ちゃんとたべた〜？　いっしゅうかん　がんばろうね♪",
-					"assets/images/my_melody.png", null, null, "Melody_Mariland", null, false),
-			// テストデータ2
-			new AccountResource(Long.valueOf(2), "ki_ri_mi", "KIRIMIちゃん", "ラブ！サーモン！>°))))◁",
-					"assets/images/ki_ri_mi.png", null, null, "kirimi_sanrio", null, true),
-			// テストデータ3
-			new AccountResource(Long.valueOf(1), "gudetama", "ぐでたま", "だるい", "assets/images/gudetama.png", null, null,
-					"gudetama_sanrio", null, false)));
-
-	/** フォローテストデータ */
-	private Map<String, List<AccountResource>> followMap = new HashMap<String, List<AccountResource>>() {
-		{
-			put("my_melody", Arrays.asList(accountList.get(1), accountList.get(2)));
-		}
-		{
-			put("ki_ri_mi", Arrays.asList(accountList.get(0)));
-		}
-	};
-
-	/** フォローワーテストデータ */
-	private Map<String, List<AccountResource>> followerMap = new HashMap<String, List<AccountResource>>() {
-		{
-			put("my_melody", Arrays.asList(accountList.get(1)));
-		}
-		{
-			put("ki_ri_mi", Arrays.asList(accountList.get(0)));
-		}
-		{
-			put("gudetama", Arrays.asList(accountList.get(0)));
-		}
-	};
+	@Autowired
+	private Mapper mapper;
 
 	/**
 	 * フォローを取得する
@@ -82,9 +48,24 @@ public class FollowServiceImpl implements FollowService {
 	 */
 	@Override
 	public Page<AccountResource> findFollow(String loginId) {
-		List<AccountResource> followList = followMap.containsKey(loginId) ? followMap.get(loginId) : Arrays.asList();
+		Integer accountId = 4; // TODO ログインユーザー
 
-		return new PageImpl<>(followList);
+		// フォローリストを取得
+		TFollowExample followExample = new TFollowExample();
+		followExample.createCriteria().andAccountIdEqualTo(accountId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		List<TFollow> followList = tFollowMapper.selectByExample(followExample);
+
+		// アカウントを取得
+		TAccountExample accountExample = new TAccountExample();
+		accountExample.createCriteria()
+				.andAccountIdIn(followList.stream().map(TFollow::getAccountId).collect(Collectors.toList()));
+		List<TAccount> accountList = tAccountMapper.selectByExample(accountExample);
+
+		// TODO ページで絞る
+		return new PageImpl<>(accountList.stream().map(account -> {
+			AccountResource resource = mapper.map(accountList, AccountResource.class);
+			return resource;
+		}).collect(Collectors.toList()));
 	}
 
 	/**
@@ -96,10 +77,25 @@ public class FollowServiceImpl implements FollowService {
 	 */
 	@Override
 	public Page<AccountResource> findFollowers(String loginId) {
-		List<AccountResource> followList = followerMap.containsKey(loginId) ? followerMap.get(loginId)
-				: Arrays.asList();
+		Integer accountId = 4; // TODO ログインユーザー
 
-		return new PageImpl<>(followList);
+		// フォローワーリストを取得
+		TFollowExample followExample = new TFollowExample();
+		followExample.createCriteria().andFollowAccountIdEqualTo(accountId)
+				.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		List<TFollow> followList = tFollowMapper.selectByExample(followExample);
+
+		// アカウントを取得
+		TAccountExample accountExample = new TAccountExample();
+		accountExample.createCriteria()
+				.andAccountIdIn(followList.stream().map(TFollow::getAccountId).collect(Collectors.toList()));
+		List<TAccount> accountList = tAccountMapper.selectByExample(accountExample);
+
+		// TODO ページで絞る
+		return new PageImpl<>(accountList.stream().map(account -> {
+			AccountResource resource = mapper.map(accountList, AccountResource.class);
+			return resource;
+		}).collect(Collectors.toList()));
 	}
 
 	/**
