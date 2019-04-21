@@ -15,11 +15,11 @@ import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccount;
 import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.form.AccountCreateForm;
+import com.api.sns.cheese.form.AccountImageForm;
 import com.api.sns.cheese.form.AccountUpdateForm;
 import com.api.sns.cheese.repository.TAccountMapper;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.service.AccountService;
-import com.api.sns.cheese.util.ImageUtils;
 
 /**
  * アカウントサービス
@@ -95,10 +95,33 @@ public class AccountServiceImpl implements AccountService {
 
 		// プロフィールを更新する
 		TAccount account = mapper.map(form, TAccount.class);
-		account.setImgUrl(ImageUtils.getDataUrl(form.getUpfile()));
 
 		TAccountExample example = new TAccountExample();
 		example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		return BooleanUtils.toBoolean(tAccountMapper.updateByExampleSelective(account, example));
+	}
+
+	/**
+	 * アカウント画像を更新する
+	 *
+	 * @param form
+	 *            画像フォーム
+	 */
+	public boolean saveImage(AccountImageForm form) {
+		String loginId = "my_melody"; // TODO セッション情報から取得
+
+		// プロフィールを更新する
+		TAccount account = mapper.map(form, TAccount.class);
+
+		// TODO S3に保存、URLを設定する
+		// account.setImgUrl(ImageUtils.getDataUrl(upfile));
+		//
+		// TAccountExample example = new TAccountExample();
+		// example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		// return
+		// BooleanUtils.toBoolean(tAccountMapper.updateByExampleSelective(account,
+		// example));
+
+		return true;
 	}
 }
