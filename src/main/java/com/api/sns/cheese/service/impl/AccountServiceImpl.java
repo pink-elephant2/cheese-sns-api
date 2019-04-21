@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccount;
 import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.form.AccountCreateForm;
@@ -55,9 +56,9 @@ public class AccountServiceImpl implements AccountService {
 		// TODO 共通項目は親クラスで設定する
 		account.setDeleted("0");
 		account.setCreatedAt(new Date());
-		account.setCreatedBy(1); // TODO システムユーザ(1)
+		account.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
 		account.setUpdatedAt(new Date());
-		account.setUpdatedBy(1); // TODO システムユーザ(1)
+		account.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
 
 		// TODO エラーメッセージ
 		return BooleanUtils.toBoolean(tAccountMapper.insert(account));

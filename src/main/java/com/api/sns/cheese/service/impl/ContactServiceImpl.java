@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TContact;
 import com.api.sns.cheese.form.ContactForm;
 import com.api.sns.cheese.repository.TContactMapper;
@@ -41,9 +42,11 @@ public class ContactServiceImpl implements ContactService {
 		// TODO 共通項目は親クラスで設定する
 		contact.setDeleted("0");
 		contact.setCreatedAt(new Date());
-		contact.setCreatedBy(1); // TODO システムユーザ(1) TODO ログイン済みならそのユーザ
+		// TODO ログイン済みならそのユーザ
+		contact.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
 		contact.setUpdatedAt(new Date());
-		contact.setUpdatedBy(1); // TODO システムユーザ(1) TODO ログイン済みならそのユーザ
+		// TODO ログイン済みならそのユーザ
+		contact.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
 		tContactMapper.insert(contact);
 
 		// TODO 運営にメール送信
