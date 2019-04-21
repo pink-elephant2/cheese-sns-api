@@ -54,7 +54,7 @@ public class AccountServiceImpl implements AccountService {
 		account.setPasswordChangeDate(new Date());
 
 		// TODO 共通項目は親クラスで設定する
-		account.setDeleted("0");
+		account.setDeleted(CommonConst.DeletedFlag.OFF);
 		account.setCreatedAt(new Date());
 		account.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
 		account.setUpdatedAt(new Date());
@@ -74,7 +74,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public AccountResource find(String loginId) throws NotFoundException {
 		TAccountExample example = new TAccountExample();
-		example.createCriteria().andLoginIdEqualTo(loginId);
+		example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		List<TAccount> account = tAccountMapper.selectByExample(example);
 		if (account.isEmpty()) {
 			// TODO 404を返す
@@ -98,7 +98,7 @@ public class AccountServiceImpl implements AccountService {
 		account.setImgUrl(ImageUtils.getDataUrl(form.getUpfile()));
 
 		TAccountExample example = new TAccountExample();
-		example.createCriteria().andLoginIdEqualTo(loginId);
+		example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		return BooleanUtils.toBoolean(tAccountMapper.updateByExampleSelective(account, example));
 	}
 }

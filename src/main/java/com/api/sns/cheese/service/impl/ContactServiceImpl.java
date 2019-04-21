@@ -40,7 +40,7 @@ public class ContactServiceImpl implements ContactService {
 		contact.setReadFlag(false);
 
 		// TODO 共通項目は親クラスで設定する
-		contact.setDeleted("0");
+		contact.setDeleted(CommonConst.DeletedFlag.OFF);
 		contact.setCreatedAt(new Date());
 		// TODO ログイン済みならそのユーザ
 		contact.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);

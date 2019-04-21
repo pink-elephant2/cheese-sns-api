@@ -16,4 +16,15 @@ public class CommonConst {
 		/** バッチアカウントID */
 		public static final Integer BATCH_ID = 3;
 	}
+
+	/**
+	 * 削除フラグ
+	 */
+	public static final class DeletedFlag {
+		/** 未削除 */
+		public static final String OFF = "0";
+		/** 削除済み */
+		public static final String ON = "1";
+	}
+
 }
