@@ -13,6 +13,9 @@
 
     <plugin type="org.mybatis.generator.plugins.SerializablePlugin" />
     <plugin type="org.mybatis.generator.plugins.CaseInsensitiveLikePlugin" />
+    <plugin type="com.api.sns.support.mybatis.generator.plugins.PagingPlugin" />
+    <plugin type="com.api.sns.support.mybatis.generator.plugins.OptimisticLockPlugin" />
+    <plugin type="com.api.sns.support.mybatis.generator.plugins.RepositoryPlugin" />
 
     <!-- 生成される Java ファイルのコメントに日付を付与しない -->
     <commentGenerator>
@@ -24,29 +27,34 @@
     driverClass="com.mysql.jdbc.Driver"
     password="fugafuga"
     userId="hogehoge" />
+
+    <javaTypeResolver type="com.api.sns.support.mybatis.generator.resovler.MySqlJavaTypeResolver">
+    </javaTypeResolver>
+
     <javaModelGenerator targetPackage="com.api.sns.cheese.domain" targetProject="cheese-sns-api/src/main/java">
-    	<property name="trimStrings" value="true" />
+      <property name="rootClass" value="com.api.sns.common.business.domain.AbstractBaseEntity" />
+      <property name="trimStrings" value="true" />
     </javaModelGenerator>
     <sqlMapGenerator targetPackage="com.api.sns.cheese.repository" targetProject="cheese-sns-api/src/main/resources" />
     <javaClientGenerator targetPackage="com.api.sns.cheese.repository" targetProject="cheese-sns-api/src/main/java" type="XMLMAPPER" />
 
     <!-- 対象テーブル -->
-    <table tableName="test"></table>
-    <table tableName="t_account"></table>
-    <table tableName="t_activity">
+    <table tableName="test" modelType="hierarchical"></table>
+    <table tableName="t_account" modelType="hierarchical"></table>
+    <table tableName="t_activity" modelType="hierarchical">
         <columnOverride column="activity_type" javaType="com.api.sns.cheese.enums.ActivityTypeEnum" />
     </table>
-    <table tableName="t_bookmark"></table>
-    <table tableName="t_contact"></table>
-    <table tableName="t_follow"></table>
-    <table tableName="t_follow_tag"></table>
-    <table tableName="t_login_history"></table>
-    <table tableName="t_photo"></table>
-    <table tableName="t_photo_comment"></table>
-    <table tableName="t_photo_comment_like"></table>
-    <table tableName="t_photo_like"></table>
-    <table tableName="t_tag"></table>
-    <table tableName="t_tag_photo"></table>
+    <table tableName="t_bookmark" modelType="hierarchical"></table>
+    <table tableName="t_contact" modelType="hierarchical"></table>
+    <table tableName="t_follow" modelType="hierarchical"></table>
+    <table tableName="t_follow_tag" modelType="hierarchical"></table>
+    <table tableName="t_login_history" modelType="hierarchical"></table>
+    <table tableName="t_photo" modelType="hierarchical"></table>
+    <table tableName="t_photo_comment" modelType="hierarchical"></table>
+    <table tableName="t_photo_comment_like" modelType="hierarchical"></table>
+    <table tableName="t_photo_like" modelType="hierarchical"></table>
+    <table tableName="t_tag" modelType="hierarchical"></table>
+    <table tableName="t_tag_photo" modelType="hierarchical"></table>
 
   </context>
 </generatorConfiguration>
