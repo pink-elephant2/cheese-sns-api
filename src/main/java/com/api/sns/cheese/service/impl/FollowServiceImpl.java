@@ -1,5 +1,6 @@
 package com.api.sns.cheese.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,15 +56,18 @@ public class FollowServiceImpl implements FollowService {
 		followExample.createCriteria().andAccountIdEqualTo(accountId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		List<TFollow> followList = tFollowMapper.selectByExample(followExample);
 
-		// アカウントを取得
-		TAccountExample accountExample = new TAccountExample();
-		accountExample.createCriteria()
-				.andAccountIdIn(followList.stream().map(TFollow::getAccountId).collect(Collectors.toList()));
-		List<TAccount> accountList = tAccountMapper.selectByExample(accountExample);
+		List<TAccount> accountList = new ArrayList<>();
+		if (!followList.isEmpty()) {
+			// アカウントを取得
+			TAccountExample accountExample = new TAccountExample();
+			accountExample.createCriteria()
+					.andAccountIdIn(followList.stream().map(TFollow::getAccountId).collect(Collectors.toList()));
+			accountList = tAccountMapper.selectByExample(accountExample);
+		}
 
 		// TODO ページで絞る
 		return new PageImpl<>(accountList.stream().map(account -> {
-			AccountResource resource = mapper.map(accountList, AccountResource.class);
+			AccountResource resource = mapper.map(account, AccountResource.class);
 			return resource;
 		}).collect(Collectors.toList()));
 	}
@@ -85,15 +89,18 @@ public class FollowServiceImpl implements FollowService {
 				.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		List<TFollow> followList = tFollowMapper.selectByExample(followExample);
 
-		// アカウントを取得
-		TAccountExample accountExample = new TAccountExample();
-		accountExample.createCriteria()
-				.andAccountIdIn(followList.stream().map(TFollow::getAccountId).collect(Collectors.toList()));
-		List<TAccount> accountList = tAccountMapper.selectByExample(accountExample);
+		List<TAccount> accountList = new ArrayList<>();
+		if (!followList.isEmpty()) {
+			// アカウントを取得
+			TAccountExample accountExample = new TAccountExample();
+			accountExample.createCriteria()
+					.andAccountIdIn(followList.stream().map(TFollow::getAccountId).collect(Collectors.toList()));
+			accountList = tAccountMapper.selectByExample(accountExample);
+		}
 
 		// TODO ページで絞る
 		return new PageImpl<>(accountList.stream().map(account -> {
-			AccountResource resource = mapper.map(accountList, AccountResource.class);
+			AccountResource resource = mapper.map(account, AccountResource.class);
 			return resource;
 		}).collect(Collectors.toList()));
 	}

@@ -1,5 +1,5 @@
-﻿-- Project Name : チーズSNS
--- Date/Time    : 2019/04/15 22:07:47
+-- Project Name : チーズSNS
+-- Date/Time    : 2019/04/25 12:23:49
 -- Author       : チーズSNS
 -- RDBMS Type   : MySQL
 -- Application  : A5:SQL Mk-2
@@ -13,9 +13,9 @@ create table t_tag_photo (
   , photo_id BIGINT not null comment '写真ID'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
-  , created_by INT(10) not null comment '作成者'
+  , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
   , updated_at DATETIME default CURRENT_TIMESTAMP not null comment '更新日時'
-  , updated_by INT(10) not null comment '更新者'
+  , updated_by VARCHAR(20) default 'SYSTEM' not null comment '更新者'
   , constraint t_tag_photo_PKC primary key (tag_photo_id)
 ) comment '写真タグ' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -32,9 +32,9 @@ create table t_follow_tag (
   , block_flag TINYINT(1) default 0 comment 'ブロックフラグ'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
-  , created_by INT(10) not null comment '作成者'
+  , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
   , updated_at DATETIME default CURRENT_TIMESTAMP not null comment '更新日時'
-  , updated_by INT(10) not null comment '更新者'
+  , updated_by VARCHAR(20) default 'SYSTEM' not null comment '更新者'
   , constraint t_follow_tag_PKC primary key (follow_tag_id)
 ) comment 'タグフォロー' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -49,9 +49,9 @@ create table t_tag (
   , tag_name VARCHAR(50) not null comment 'タグ名'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
-  , created_by INT(10) not null comment '作成者'
+  , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
   , updated_at DATETIME default CURRENT_TIMESTAMP not null comment '更新日時'
-  , updated_by INT(10) not null comment '更新者'
+  , updated_by VARCHAR(20) default 'SYSTEM' not null comment '更新者'
   , constraint t_tag_PKC primary key (tag_id)
 ) comment 'タグ' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -66,9 +66,9 @@ create table t_login_history (
   , host VARCHAR(32) comment 'ホスト'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
-  , created_by INT(10) not null comment '作成者'
+  , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
   , updated_at DATETIME default CURRENT_TIMESTAMP not null comment '更新日時'
-  , updated_by INT(10) not null comment '更新者'
+  , updated_by VARCHAR(20) default 'SYSTEM' not null comment '更新者'
   , constraint t_login_history_PKC primary key (history_id)
 ) comment 'ログイン履歴' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -84,9 +84,9 @@ create table t_activity (
   , follow_account_id INT(10) comment 'フォローアカウントID'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
-  , created_by INT(10) not null comment '作成者'
+  , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
   , updated_at DATETIME default CURRENT_TIMESTAMP not null comment '更新日時'
-  , updated_by INT(10) not null comment '更新者'
+  , updated_by VARCHAR(20) default 'SYSTEM' not null comment '更新者'
   , constraint t_activity_PKC primary key (activity_id)
 ) comment 'アクティビティ' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -102,9 +102,9 @@ create table t_bookmark (
   , photo_id BIGINT comment '写真ID'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
-  , created_by INT(10) not null comment '作成者'
+  , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
   , updated_at DATETIME default CURRENT_TIMESTAMP not null comment '更新日時'
-  , updated_by INT(10) not null comment '更新者'
+  , updated_by VARCHAR(20) default 'SYSTEM' not null comment '更新者'
   , constraint t_bookmark_PKC primary key (bookmark_id)
 ) comment 'ブックマーク' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -124,9 +124,9 @@ create table t_photo (
   , comment_id BIGINT comment 'コメントID'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
-  , created_by INT(10) not null comment '作成者'
+  , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
   , updated_at DATETIME default CURRENT_TIMESTAMP not null comment '更新日時'
-  , updated_by INT(10) not null comment '更新者'
+  , updated_by VARCHAR(20) default 'SYSTEM' not null comment '更新者'
   , constraint t_photo_PKC primary key (photo_id)
 ) comment '写真' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -143,9 +143,9 @@ create table t_photo_comment (
   , content VARCHAR(120) not null comment '内容'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
-  , created_by INT(10) not null comment '作成者'
+  , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
   , updated_at DATETIME default CURRENT_TIMESTAMP not null comment '更新日時'
-  , updated_by INT(10) not null comment '更新者'
+  , updated_by VARCHAR(20) default 'SYSTEM' not null comment '更新者'
   , constraint t_photo_comment_PKC primary key (comment_id)
 ) comment '写真コメント' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -161,9 +161,9 @@ create table t_photo_comment_like (
   , comment_id BIGINT not null comment 'コメントID'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
-  , created_by INT(10) not null comment '作成者'
+  , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
   , updated_at DATETIME default CURRENT_TIMESTAMP not null comment '更新日時'
-  , updated_by INT(10) not null comment '更新者'
+  , updated_by VARCHAR(20) default 'SYSTEM' not null comment '更新者'
   , constraint t_photo_comment_like_PKC primary key (like_id)
 ) comment '写真コメントいいね' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -179,9 +179,9 @@ create table t_photo_like (
   , photo_id BIGINT comment '写真ID'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
-  , created_by INT(10) not null comment '作成者'
+  , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
   , updated_at DATETIME default CURRENT_TIMESTAMP not null comment '更新日時'
-  , updated_by INT(10) not null comment '更新者'
+  , updated_by VARCHAR(20) default 'SYSTEM' not null comment '更新者'
   , constraint t_photo_like_PKC primary key (like_id)
 ) comment '写真いいね' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -198,9 +198,9 @@ create table t_follow (
   , block_flag TINYINT(1) default 0 comment 'ブロックフラグ'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
-  , created_by INT(10) not null comment '作成者'
+  , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
   , updated_at DATETIME default CURRENT_TIMESTAMP not null comment '更新日時'
-  , updated_by INT(10) not null comment '更新者'
+  , updated_by VARCHAR(20) default 'SYSTEM' not null comment '更新者'
   , constraint t_follow_PKC primary key (follow_id)
 ) comment 'フォロー' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -215,9 +215,9 @@ create table t_contact (
   , content VARCHAR(1000) not null comment '内容'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
-  , created_by INT(10) not null comment '作成者'
+  , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
   , updated_at DATETIME default CURRENT_TIMESTAMP not null comment '更新日時'
-  , updated_by INT(10) not null comment '更新者'
+  , updated_by VARCHAR(20) default 'SYSTEM' not null comment '更新者'
   , constraint t_contact_PKC primary key (contact_id)
 ) comment 'お問合せ' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -240,12 +240,33 @@ create table t_account (
   , instagram VARCHAR(30) comment 'Instagramアカウント'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
-  , created_by INT(10) not null comment '作成者'
+  , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
   , updated_at DATETIME default CURRENT_TIMESTAMP not null comment '更新日時'
-  , updated_by INT(10) not null comment '更新者'
+  , updated_by VARCHAR(20) default 'SYSTEM' not null comment '更新者'
   , constraint t_account_PKC primary key (account_id)
 ) comment 'アカウント' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 create unique index t_account_IX1
   on t_account(login_id);
 
+-- アクティビティビュー
+drop view if exists v_activity;
+
+create view v_activity as
+SELECT
+  tActivity.activity_id
+  , tActivity.follow_account_id
+  , tActivity.comment_id
+  , tActivity.photo_id
+  , tActivity.account_id
+  , tActivity.activity_type
+  , tAccount.login_id
+  , tAccount.name
+  , tAccount.img_url
+FROM
+  t_activity tActivity
+  INNER JOIN t_account tAccount
+    ON tAccount.account_id = tActivity.account_id
+    AND tAccount.deleted = '0'
+
+;
