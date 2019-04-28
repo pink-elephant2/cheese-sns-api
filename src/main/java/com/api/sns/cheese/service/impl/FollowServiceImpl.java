@@ -1,11 +1,9 @@
 package com.api.sns.cheese.service.impl;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.ibatis.javassist.NotFoundException;
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +17,8 @@ import com.api.sns.cheese.domain.TAccount;
 import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.domain.TFollow;
 import com.api.sns.cheese.domain.TFollowExample;
-import com.api.sns.cheese.repository.TAccountMapper;
-import com.api.sns.cheese.repository.TFollowMapper;
+import com.api.sns.cheese.repository.TAccountRepository;
+import com.api.sns.cheese.repository.TFollowRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.service.FollowService;
 
@@ -32,10 +30,10 @@ import com.api.sns.cheese.service.FollowService;
 public class FollowServiceImpl implements FollowService {
 
 	@Autowired
-	private TAccountMapper tAccountMapper;
+	private TAccountRepository tAccountRepository;
 
 	@Autowired
-	private TFollowMapper tFollowMapper;
+	private TFollowRepository tFollowRepository;
 
 	@Autowired
 	private Mapper mapper;
@@ -49,12 +47,12 @@ public class FollowServiceImpl implements FollowService {
 	 */
 	@Override
 	public Page<AccountResource> findFollow(String loginId) {
-		Integer accountId = 4; // TODO ログインユーザー
+		Integer accountId = 1; // TODO ログインユーザー
 
 		// フォローリストを取得
 		TFollowExample followExample = new TFollowExample();
 		followExample.createCriteria().andAccountIdEqualTo(accountId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		List<TFollow> followList = tFollowMapper.selectByExample(followExample);
+		List<TFollow> followList = tFollowRepository.findAllBy(followExample);
 
 		List<TAccount> accountList = new ArrayList<>();
 		if (!followList.isEmpty()) {
@@ -62,7 +60,7 @@ public class FollowServiceImpl implements FollowService {
 			TAccountExample accountExample = new TAccountExample();
 			accountExample.createCriteria()
 					.andAccountIdIn(followList.stream().map(TFollow::getAccountId).collect(Collectors.toList()));
-			accountList = tAccountMapper.selectByExample(accountExample);
+			accountList = tAccountRepository.findAllBy(accountExample);
 		}
 
 		// TODO ページで絞る
@@ -81,13 +79,13 @@ public class FollowServiceImpl implements FollowService {
 	 */
 	@Override
 	public Page<AccountResource> findFollowers(String loginId) {
-		Integer accountId = 4; // TODO ログインユーザー
+		Integer accountId = 1; // TODO ログインユーザー
 
 		// フォローワーリストを取得
 		TFollowExample followExample = new TFollowExample();
 		followExample.createCriteria().andFollowAccountIdEqualTo(accountId)
 				.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		List<TFollow> followList = tFollowMapper.selectByExample(followExample);
+		List<TFollow> followList = tFollowRepository.findAllBy(followExample);
 
 		List<TAccount> accountList = new ArrayList<>();
 		if (!followList.isEmpty()) {
@@ -95,7 +93,7 @@ public class FollowServiceImpl implements FollowService {
 			TAccountExample accountExample = new TAccountExample();
 			accountExample.createCriteria()
 					.andAccountIdIn(followList.stream().map(TFollow::getAccountId).collect(Collectors.toList()));
-			accountList = tAccountMapper.selectByExample(accountExample);
+			accountList = tAccountRepository.findAllBy(accountExample);
 		}
 
 		// TODO ページで絞る
@@ -116,8 +114,8 @@ public class FollowServiceImpl implements FollowService {
 		// 対象ユーザの取得
 		TAccountExample accountExample = new TAccountExample();
 		accountExample.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		List<TAccount> followAccountList = tAccountMapper.selectByExample(accountExample);
-		if (followAccountList.isEmpty()) {
+		TAccount followAccount = tAccountRepository.findOneBy(accountExample);
+		if (followAccount == null) {
 			throw new NotFoundException("アカウントが存在しません");
 		}
 
@@ -126,33 +124,31 @@ public class FollowServiceImpl implements FollowService {
 		// フォロー済みか
 		TFollowExample followExample = new TFollowExample();
 		followExample.createCriteria().andAccountIdEqualTo(accountId)
-				.andFollowAccountIdEqualTo(followAccountList.get(0).getAccountId());
-		List<TFollow> followList = tFollowMapper.selectByExample(followExample);
+				.andFollowAccountIdEqualTo(followAccount.getAccountId());
+		TFollow follower = tFollowRepository.findOneBy(followExample);
 
-		// 登録内容の設定
-		TFollow follow = new TFollow();
-		follow.setAccountId(accountId);
-		follow.setFollowAccountId(followAccountList.get(0).getAccountId());
-		// TODO 共通項目は親クラスで設定する
-		follow.setDeleted(CommonConst.DeletedFlag.OFF);
-		follow.setCreatedAt(new Date());
-		follow.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
-		follow.setUpdatedAt(new Date());
-		follow.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
+		boolean ret;
+		if (follower == null) {
+			// 登録内容の設定
+			TFollow follow = new TFollow();
+			follow.setAccountId(accountId);
+			follow.setFollowAccountId(followAccount.getAccountId());
+			// TODO 共通項目は親クラスで設定する
+			follow.setDeleted(CommonConst.DeletedFlag.OFF);
+			follow.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			follow.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
 
-		int ret;
-		if (followList.isEmpty()) {
 			// レコード登録
-			ret = tFollowMapper.insert(follow);
-		} else if (CommonConst.DeletedFlag.OFF.equals(followList.get(0).getDeleted())) {
+			ret = tFollowRepository.create(follow);
+		} else if (CommonConst.DeletedFlag.OFF.equals(follower.getDeleted())) {
 			// TODO 例外
 			throw new Exception("すでにフォロー済みです");
 		} else {
 			// レコード更新
-			followList.get(0).setDeleted(CommonConst.DeletedFlag.OFF);
-			ret = tFollowMapper.updateByPrimaryKeySelective(followList.get(0));
+			follower.setDeleted(CommonConst.DeletedFlag.OFF);
+			ret = tFollowRepository.update(follower);
 		}
-		return BooleanUtils.toBoolean(ret);
+		return ret;
 	}
 
 	/**
@@ -166,8 +162,8 @@ public class FollowServiceImpl implements FollowService {
 		// 対象ユーザの取得
 		TAccountExample accountExample = new TAccountExample();
 		accountExample.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		List<TAccount> followAccountList = tAccountMapper.selectByExample(accountExample);
-		if (followAccountList.isEmpty()) {
+		TAccount followAccount = tAccountRepository.findOneBy(accountExample);
+		if (followAccount == null) {
 			throw new NotFoundException("アカウントが存在しません");
 		}
 
@@ -176,32 +172,30 @@ public class FollowServiceImpl implements FollowService {
 		// フォロー済みか
 		TFollowExample followExample = new TFollowExample();
 		followExample.createCriteria().andAccountIdEqualTo(accountId)
-				.andFollowAccountIdEqualTo(followAccountList.get(0).getAccountId());
-		List<TFollow> followList = tFollowMapper.selectByExample(followExample);
+				.andFollowAccountIdEqualTo(followAccount.getAccountId());
+		TFollow follower = tFollowRepository.findOneBy(followExample);
 
-		// 登録内容の設定
-		TFollow follow = new TFollow();
-		follow.setAccountId(accountId);
-		follow.setFollowAccountId(followAccountList.get(0).getAccountId());
-		// TODO 共通項目は親クラスで設定する
-		follow.setDeleted(CommonConst.DeletedFlag.OFF);
-		follow.setCreatedAt(new Date());
-		follow.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
-		follow.setUpdatedAt(new Date());
-		follow.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
+		boolean ret;
+		if (follower == null) {
+			// 登録内容の設定
+			TFollow follow = new TFollow();
+			follow.setAccountId(accountId);
+			follow.setFollowAccountId(followAccount.getAccountId());
+			// TODO 共通項目は親クラスで設定する
+			follow.setDeleted(CommonConst.DeletedFlag.OFF);
+			follow.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			follow.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
 
-		int ret;
-		if (followList.isEmpty()) {
 			// レコード登録
-			ret = tFollowMapper.insert(follow);
-		} else if (CommonConst.DeletedFlag.ON.equals(followList.get(0).getDeleted())) {
+			ret = tFollowRepository.create(follow);
+		} else if (CommonConst.DeletedFlag.ON.equals(follower.getDeleted())) {
 			// TODO 例外
 			throw new Exception("すでにフォロー解除済みです");
 		} else {
 			// レコード更新
-			followList.get(0).setDeleted(CommonConst.DeletedFlag.ON);
-			ret = tFollowMapper.updateByPrimaryKeySelective(followList.get(0));
+			follower.setDeleted(CommonConst.DeletedFlag.ON);
+			ret = tFollowRepository.update(follower);
 		}
-		return BooleanUtils.toBoolean(ret);
+		return ret;
 	}
 }
