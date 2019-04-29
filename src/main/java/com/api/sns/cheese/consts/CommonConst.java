@@ -10,11 +10,11 @@ public class CommonConst {
 	 */
 	public static final class SystemAccount {
 		/** 管理者アカウントID */
-		public static final Integer ADMIN_ID = 1;
+		public static final String ADMIN_ID = "admin";
 		/** ゲストアカウントID */
-		public static final Integer GUEST_ID = 2;
+		public static final String GUEST_ID = "guest";
 		/** バッチアカウントID */
-		public static final Integer BATCH_ID = 3;
+		public static final String BATCH_ID = "batch";
 	}
 
 	/**

@@ -1,7 +1,5 @@
 package com.api.sns.cheese.service.impl;
 
-import java.util.Date;
-
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TContact;
 import com.api.sns.cheese.form.ContactForm;
-import com.api.sns.cheese.repository.TContactMapper;
+import com.api.sns.cheese.repository.TContactRepository;
 import com.api.sns.cheese.service.ContactService;
 
 /**
@@ -21,7 +19,7 @@ import com.api.sns.cheese.service.ContactService;
 public class ContactServiceImpl implements ContactService {
 
 	@Autowired
-	private TContactMapper tContactMapper;
+	private TContactRepository tContactRepository;
 
 	@Autowired
 	private Mapper mapper;
@@ -41,13 +39,11 @@ public class ContactServiceImpl implements ContactService {
 
 		// TODO 共通項目は親クラスで設定する
 		contact.setDeleted(CommonConst.DeletedFlag.OFF);
-		contact.setCreatedAt(new Date());
 		// TODO ログイン済みならそのユーザ
 		contact.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
-		contact.setUpdatedAt(new Date());
 		// TODO ログイン済みならそのユーザ
 		contact.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
-		tContactMapper.insert(contact);
+		tContactRepository.create(contact);
 
 		// TODO 運営にメール送信
 

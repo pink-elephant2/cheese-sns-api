@@ -9,8 +9,10 @@ ProjectName=チーズSNS
 Author=チーズSNS
 MaxEntityRowShow=1000
 ReadOnlyRecommend=1
-Page=Main
-PageInfo="Main",2,"A3Landscape",$FFFFFF
+Page=Table
+PageInfo="Table",2,"A3Landscape",$FFFFFF
+Page=View
+PageInfo="View",2,"A3Landscape",$FFFFFF
 LogicalView=1
 DecodeDomain=0
 ViewModePageIndividually=1
@@ -33,9 +35,9 @@ GenerateDropTableStatement=1
 DropTableIfExists=1
 CommonField="削除フラグ","deleted","@VARCHAR(1)","NOT NULL",,"\q0\q","",$FFFFFFFF
 CommonField="作成日時","created_at","@DATETIME","NOT NULL",,"CURRENT_TIMESTAMP","",$FFFFFFFF
-CommonField="作成者","created_by","@INT(10)","NOT NULL",,"","",$FFFFFFFF
+CommonField="作成者","created_by","@VARCHAR(20)","NOT NULL",,"\qSYSTEM\q","",$FFFFFFFF
 CommonField="更新日時","updated_at","@DATETIME","NOT NULL",,"CURRENT_TIMESTAMP","",$FFFFFFFF
-CommonField="更新者","updated_by","@INT(10)","NOT NULL",,"","",$FFFFFFFF
+CommonField="更新者","updated_by","@VARCHAR(20)","NOT NULL",,"\qSYSTEM\q","",$FFFFFFFF
 DefaultPkName=%0:s_PKC
 DefaultPkIndexName=%0:s_PKI
 DefaultIndexName=%0:s_IX%1:d
@@ -43,6 +45,34 @@ DefaultFkName=%0:s_FK%1:d
 SqlSeparator=0
 ShowTag=1
 ShowCommonAttributes=0
+
+[View]
+PName=v_follow
+LName=フォロービュー
+Comment=
+ViewOption=
+Query=SELECT\n  tFollow.follow_id\n  , tFollow.block_flag\n  , tFollow.account_id as follow_account_id\n  , tFollow.follow_account_id as follower_account_id\n  , tFollowAccount.login_id as follow_login_id\n  , tFollowAccount.name as follow_name\n  , tFollowAccount.description as follow_description\n  , tFollowAccount.img_url as follow_img_url\n  , tFollowerAccount.login_id as follower_login_id\n  , tFollowerAccount.name as follower_name\n  , tFollowerAccount.description as follower_description\n  , tFollowerAccount.img_url as follower_img_url\nFROM\n  t_follow as tFollow \n  inner join t_account as tFollowAccount \n    on tFollow.account_id = tFollowAccount.account_id \n    and tFollowAccount.deleted = \q0\q\n  inner join t_account as tFollowerAccount \n    on tFollow.follow_account_id = tFollowerAccount.account_id \n    and tFollowerAccount.deleted = \q0\q\n\n
+LNameByComment=1
+Color=$000000
+BkColor=$FFFFFF
+Position="VIEW",950,150
+Page=VIEW
+Left=950
+Top=150
+
+[View]
+PName=v_activity
+LName=アクティビティビュー
+Comment=
+ViewOption=
+Query=SELECT\n  tActivity.activity_id\n  , tActivity.follow_account_id\n  , tActivity.comment_id\n  , tActivity.photo_id\n  , tActivity.account_id\n  , tActivity.activity_type\n  , tAccount.login_id\n  , tAccount.name\n  , tAccount.img_url \nFROM\n  t_activity tActivity \n  INNER JOIN t_account tAccount \n    ON tAccount.account_id = tActivity.account_id \n    AND tAccount.deleted = \q0\q\n
+LNameByComment=1
+Color=$000000
+BkColor=$FFFFFF
+Position="VIEW",150,150
+Page=VIEW
+Left=150
+Top=150
 
 [Relation]
 Entity1=t_tag
@@ -53,7 +83,7 @@ Fields1=tag_id
 Fields2=tag_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,506,9494,337,R,R
+Position="TABLE",0,506,9494,337,R,R
 Dependence=0
 Caption=
 PName=
@@ -73,7 +103,7 @@ Fields1=photo_id
 Fields2=photo_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,3775,6225,3956,R,R
+Position="TABLE",0,3775,6225,3956,R,R
 Dependence=0
 Caption=
 PName=
@@ -89,7 +119,7 @@ PName=t_tag_photo
 LName=写真タグ
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
-Page=MAIN
+Page=TABLE
 Left=1650
 Top=100
 Field="写真タグID","tag_photo_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
@@ -100,7 +130,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220436
-Position="MAIN",1650,100
+Position="TABLE",1650,100
 
 [Relation]
 Entity1=t_tag
@@ -111,7 +141,7 @@ Fields1=tag_id
 Fields2=tag_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,889,9111,500,R,R
+Position="TABLE",0,889,9111,500,R,R
 Dependence=0
 Caption=
 PName=
@@ -131,7 +161,7 @@ Fields1=account_id
 Fields2=account_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,889,9111,2615,R,R
+Position="TABLE",0,889,9111,2615,R,R
 Dependence=0
 Caption=
 PName=
@@ -147,7 +177,7 @@ PName=t_follow_tag
 LName=タグフォロー
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
-Page=MAIN
+Page=TABLE
 Left=150
 Top=200
 Field="タグフォローID","follow_tag_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
@@ -159,14 +189,14 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220442
-Position="MAIN",150,200
+Position="TABLE",150,200
 
 [Entity]
 PName=t_tag
 LName=タグ
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
-Page=MAIN
+Page=TABLE
 Left=1250
 Top=100
 Field="タグID","tag_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
@@ -175,7 +205,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220428
-Position="MAIN",1250,100
+Position="TABLE",1250,100
 
 [Relation]
 Entity1=t_account
@@ -186,7 +216,7 @@ Fields1=account_id
 Fields2=account_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,4308,5692,3401,R,R
+Position="TABLE",0,4308,5692,3401,R,R
 Dependence=0
 Caption=
 PName=
@@ -202,7 +232,7 @@ PName=t_login_history
 LName=ログイン履歴
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
-Page=MAIN
+Page=TABLE
 Left=850
 Top=1450
 Field="ログイン履歴ID","history_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
@@ -214,7 +244,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220522
-Position="MAIN",850,1450
+Position="TABLE",850,1450
 
 [Relation]
 Entity1=t_account
@@ -225,7 +255,7 @@ Fields1=account_id
 Fields2=account_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,3630,6370,2984,R,R
+Position="TABLE",0,3630,6370,2984,R,R
 Dependence=0
 Caption=
 PName=
@@ -241,7 +271,7 @@ PName=t_activity
 LName=アクティビティ
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
-Page=MAIN
+Page=TABLE
 Left=200
 Top=1150
 Field="アクティビティID","activity_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
@@ -255,7 +285,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220527
-Position="MAIN",200,1150
+Position="TABLE",200,1150
 
 [Relation]
 Entity1=t_photo
@@ -266,7 +296,7 @@ Fields1=photo_id
 Fields2=photo_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,1815,8185,1095,R,R
+Position="TABLE",0,1815,8185,1095,R,R
 Dependence=0
 Caption=
 PName=
@@ -282,7 +312,7 @@ PName=t_bookmark
 LName=ブックマーク
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
-Page=MAIN
+Page=TABLE
 Left=2200
 Top=800
 Field="ブックマークID","bookmark_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
@@ -293,14 +323,14 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220502
-Position="MAIN",2200,800
+Position="TABLE",2200,800
 
 [Entity]
 PName=t_photo
 LName=写真
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
-Page=MAIN
+Page=TABLE
 Left=1650
 Top=500
 Field="写真ID","photo_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
@@ -315,14 +345,14 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220402
-Position="MAIN",1650,500
+Position="TABLE",1650,500
 
 [Entity]
 PName=t_photo_comment
 LName=写真コメント
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
-Page=MAIN
+Page=TABLE
 Left=1650
 Top=1200
 Field="コメントID","comment_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
@@ -335,7 +365,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220739
-Position="MAIN",1650,1200
+Position="TABLE",1650,1200
 
 [Relation]
 Entity1=t_photo_comment
@@ -346,7 +376,7 @@ Fields1=comment_id
 Fields2=comment_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,2241,7759,2801,R,R
+Position="TABLE",0,2241,7759,2801,R,R
 Dependence=0
 Caption=
 PName=
@@ -362,7 +392,7 @@ PName=t_photo_comment_like
 LName=写真コメントいいね
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
-Page=MAIN
+Page=TABLE
 Left=2200
 Top=1200
 Field="いいねID","like_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
@@ -374,7 +404,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220516
-Position="MAIN",2200,1200
+Position="TABLE",2200,1200
 
 [Relation]
 Entity1=t_photo
@@ -385,7 +415,7 @@ Fields1=photo_id
 Fields2=photo_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,2349,7651,3302,R,R
+Position="TABLE",0,2349,7651,3302,R,R
 Dependence=0
 Caption=
 PName=
@@ -401,7 +431,7 @@ PName=t_photo_like
 LName=写真いいね
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
-Page=MAIN
+Page=TABLE
 Left=2200
 Top=500
 Field="いいねID","like_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
@@ -412,7 +442,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220455
-Position="MAIN",2200,500,209,114
+Position="TABLE",2200,500,209,114
 
 [Relation]
 Entity1=t_account
@@ -423,7 +453,7 @@ Fields1=account_id
 Fields2=account_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,1222,8778,1556,R,R
+Position="TABLE",0,1222,8778,1556,R,R
 Dependence=0
 Caption=
 PName=
@@ -439,7 +469,7 @@ PName=t_follow
 LName=フォロー
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
-Page=MAIN
+Page=TABLE
 Left=150
 Top=550
 Field="フォローID","follow_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
@@ -450,14 +480,14 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220449
-Position="MAIN",150,550
+Position="TABLE",150,550
 
 [Entity]
 PName=t_contact
 LName=お問合せ
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
-Page=MAIN
+Page=TABLE
 Left=200
 Top=1650
 Field="お問合せID","contact_id","INT(10)","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
@@ -469,7 +499,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220650
-Position="MAIN",200,1650,286,190
+Position="TABLE",200,1650,286,190
 
 [Relation]
 Entity1=t_account
@@ -480,7 +510,7 @@ Fields1=account_id
 Fields2=account_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,2778,7222,1474,R,R
+Position="TABLE",0,2778,7222,1474,R,R
 Dependence=0
 Caption=
 PName=
@@ -500,7 +530,7 @@ Fields1=photo_id
 Fields2=photo_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,3092,6908,3432,R,R
+Position="TABLE",0,3092,6908,3432,R,R
 Dependence=0
 Caption=
 PName=
@@ -520,7 +550,7 @@ Fields1=account_id
 Fields2=account_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,1014,8986,1542,R,R
+Position="TABLE",0,1014,8986,1542,R,R
 Dependence=0
 Caption=
 PName=
@@ -536,7 +566,7 @@ PName=t_account
 LName=アカウント
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
-Page=MAIN
+Page=TABLE
 Left=850
 Top=550
 Field="アカウントID","account_id","INT(10)","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
@@ -557,4 +587,4 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220420
-Position="MAIN",850,550,365,524
+Position="TABLE",850,550,365,524

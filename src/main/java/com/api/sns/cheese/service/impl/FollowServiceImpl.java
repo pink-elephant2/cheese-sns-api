@@ -1,16 +1,25 @@
 package com.api.sns.cheese.service.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.apache.ibatis.javassist.NotFoundException;
+import org.dozer.Mapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.api.sns.cheese.consts.CommonConst;
+import com.api.sns.cheese.domain.TAccount;
+import com.api.sns.cheese.domain.TAccountExample;
+import com.api.sns.cheese.domain.TFollow;
+import com.api.sns.cheese.domain.TFollowExample;
+import com.api.sns.cheese.domain.VFollow;
+import com.api.sns.cheese.domain.VFollowExample;
+import com.api.sns.cheese.repository.TAccountRepository;
+import com.api.sns.cheese.repository.TFollowRepository;
+import com.api.sns.cheese.repository.VFollowRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.service.FollowService;
 
@@ -21,40 +30,17 @@ import com.api.sns.cheese.service.FollowService;
 @Transactional
 public class FollowServiceImpl implements FollowService {
 
-	/** アカウントテストデータ */
-	private List<AccountResource> accountList = new ArrayList<>(Arrays.asList(
-			// テストデータ1
-			new AccountResource(Long.valueOf(1), "my_melody", "マイメロディ", "おはよう♪　あさごはん　ちゃんとたべた〜？　いっしゅうかん　がんばろうね♪",
-					"assets/images/my_melody.png", null, null, "Melody_Mariland", null, false),
-			// テストデータ2
-			new AccountResource(Long.valueOf(2), "ki_ri_mi", "KIRIMIちゃん", "ラブ！サーモン！>°))))◁",
-					"assets/images/ki_ri_mi.png", null, null, "kirimi_sanrio", null, true),
-			// テストデータ3
-			new AccountResource(Long.valueOf(1), "gudetama", "ぐでたま", "だるい", "assets/images/gudetama.png", null, null,
-					"gudetama_sanrio", null, false)));
+	@Autowired
+	private TAccountRepository tAccountRepository;
 
-	/** フォローテストデータ */
-	private Map<String, List<AccountResource>> followMap = new HashMap<String, List<AccountResource>>() {
-		{
-			put("my_melody", Arrays.asList(accountList.get(1), accountList.get(2)));
-		}
-		{
-			put("ki_ri_mi", Arrays.asList(accountList.get(0)));
-		}
-	};
+	@Autowired
+	private TFollowRepository tFollowRepository;
 
-	/** フォローワーテストデータ */
-	private Map<String, List<AccountResource>> followerMap = new HashMap<String, List<AccountResource>>() {
-		{
-			put("my_melody", Arrays.asList(accountList.get(1)));
-		}
-		{
-			put("ki_ri_mi", Arrays.asList(accountList.get(0)));
-		}
-		{
-			put("gudetama", Arrays.asList(accountList.get(0)));
-		}
-	};
+	@Autowired
+	private VFollowRepository vFollowRepository;
+
+	@Autowired
+	private Mapper mapper;
 
 	/**
 	 * フォローを取得する
@@ -65,9 +51,23 @@ public class FollowServiceImpl implements FollowService {
 	 */
 	@Override
 	public Page<AccountResource> findFollow(String loginId) {
-		List<AccountResource> followList = followMap.containsKey(loginId) ? followMap.get(loginId) : Arrays.asList();
+		// フォローリストを取得
+		Sort sort = new Sort("follow_id");
+		Pageable pageable = new PageRequest(0, 20, sort); // TODO I/Fに追加する
+		VFollowExample example = new VFollowExample();
+		example.createCriteria().andFollowLoginIdEqualTo(loginId);
+		Page<VFollow> page = vFollowRepository.findPageBy(example, pageable);
 
-		return new PageImpl<>(followList);
+		return page.map(vfollow -> {
+			AccountResource resource = mapper.map(vfollow, AccountResource.class);
+			resource.setAccountId((long) vfollow.getFollowerAccountId());
+			resource.setLoginId(vfollow.getFollowerLoginId());
+			resource.setName(vfollow.getFollowerName());
+			resource.setDescription(vfollow.getFollowerDescription());
+			resource.setImgUrl(vfollow.getFollowerImgUrl());
+			resource.setFollow(true);
+			return resource;
+		});
 	}
 
 	/**
@@ -79,10 +79,23 @@ public class FollowServiceImpl implements FollowService {
 	 */
 	@Override
 	public Page<AccountResource> findFollowers(String loginId) {
-		List<AccountResource> followList = followerMap.containsKey(loginId) ? followerMap.get(loginId)
-				: Arrays.asList();
+		// フォローリストを取得
+		Sort sort = new Sort("follow_id");
+		Pageable pageable = new PageRequest(0, 20, sort); // TODO I/Fに追加する
+		VFollowExample example = new VFollowExample();
+		example.createCriteria().andFollowerLoginIdEqualTo(loginId);
+		Page<VFollow> page = vFollowRepository.findPageBy(example, pageable);
 
-		return new PageImpl<>(followList);
+		return page.map(vfollow -> {
+			AccountResource resource = mapper.map(vfollow, AccountResource.class);
+			resource.setAccountId((long) vfollow.getFollowAccountId());
+			resource.setLoginId(vfollow.getFollowLoginId());
+			resource.setName(vfollow.getFollowName());
+			resource.setDescription(vfollow.getFollowDescription());
+			resource.setImgUrl(vfollow.getFollowImgUrl());
+			resource.setFollow(true);
+			return resource;
+		});
 	}
 
 	/**
@@ -92,8 +105,45 @@ public class FollowServiceImpl implements FollowService {
 	 *            ログインID(フォロー対象)
 	 */
 	@Override
-	public boolean follow(String loginId) {
-		return true;
+	public boolean follow(String loginId) throws Exception {
+		// 対象ユーザの取得
+		TAccountExample accountExample = new TAccountExample();
+		accountExample.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		TAccount followAccount = tAccountRepository.findOneBy(accountExample);
+		if (followAccount == null) {
+			throw new NotFoundException("アカウントが存在しません");
+		}
+
+		Integer accountId = 1; // TODO ログインユーザー
+
+		// フォロー済みか
+		TFollowExample followExample = new TFollowExample();
+		followExample.createCriteria().andAccountIdEqualTo(accountId)
+				.andFollowAccountIdEqualTo(followAccount.getAccountId());
+		TFollow follower = tFollowRepository.findOneBy(followExample);
+
+		boolean ret;
+		if (follower == null) {
+			// 登録内容の設定
+			TFollow follow = new TFollow();
+			follow.setAccountId(accountId);
+			follow.setFollowAccountId(followAccount.getAccountId());
+			// TODO 共通項目は親クラスで設定する
+			follow.setDeleted(CommonConst.DeletedFlag.OFF);
+			follow.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			follow.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
+
+			// レコード登録
+			ret = tFollowRepository.create(follow);
+		} else if (CommonConst.DeletedFlag.OFF.equals(follower.getDeleted())) {
+			// TODO 例外
+			throw new Exception("すでにフォロー済みです");
+		} else {
+			// レコード更新
+			follower.setDeleted(CommonConst.DeletedFlag.OFF);
+			ret = tFollowRepository.update(follower);
+		}
+		return ret;
 	}
 
 	/**
@@ -103,7 +153,44 @@ public class FollowServiceImpl implements FollowService {
 	 *            ログインID(フォロー対象)
 	 */
 	@Override
-	public boolean unfollow(String loginId) {
-		return true;
+	public boolean unfollow(String loginId) throws Exception {
+		// 対象ユーザの取得
+		TAccountExample accountExample = new TAccountExample();
+		accountExample.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		TAccount followAccount = tAccountRepository.findOneBy(accountExample);
+		if (followAccount == null) {
+			throw new NotFoundException("アカウントが存在しません");
+		}
+
+		Integer accountId = 1; // TODO ログインユーザー
+
+		// フォロー済みか
+		TFollowExample followExample = new TFollowExample();
+		followExample.createCriteria().andAccountIdEqualTo(accountId)
+				.andFollowAccountIdEqualTo(followAccount.getAccountId());
+		TFollow follower = tFollowRepository.findOneBy(followExample);
+
+		boolean ret;
+		if (follower == null) {
+			// 登録内容の設定
+			TFollow follow = new TFollow();
+			follow.setAccountId(accountId);
+			follow.setFollowAccountId(followAccount.getAccountId());
+			// TODO 共通項目は親クラスで設定する
+			follow.setDeleted(CommonConst.DeletedFlag.OFF);
+			follow.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			follow.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
+
+			// レコード登録
+			ret = tFollowRepository.create(follow);
+		} else if (CommonConst.DeletedFlag.ON.equals(follower.getDeleted())) {
+			// TODO 例外
+			throw new Exception("すでにフォロー解除済みです");
+		} else {
+			// レコード更新
+			follower.setDeleted(CommonConst.DeletedFlag.ON);
+			ret = tFollowRepository.update(follower);
+		}
+		return ret;
 	}
 }

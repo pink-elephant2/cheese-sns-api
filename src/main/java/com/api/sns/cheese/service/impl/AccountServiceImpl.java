@@ -1,7 +1,6 @@
 package com.api.sns.cheese.service.impl;
 
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.ibatis.javassist.NotFoundException;
@@ -17,7 +16,7 @@ import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.form.AccountCreateForm;
 import com.api.sns.cheese.form.AccountImageForm;
 import com.api.sns.cheese.form.AccountUpdateForm;
-import com.api.sns.cheese.repository.TAccountMapper;
+import com.api.sns.cheese.repository.TAccountRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.service.AccountService;
 
@@ -29,7 +28,7 @@ import com.api.sns.cheese.service.AccountService;
 public class AccountServiceImpl implements AccountService {
 
 	@Autowired
-	private TAccountMapper tAccountMapper;
+	private TAccountRepository tAccountRepository;
 
 	@Autowired
 	private Mapper mapper;
@@ -55,13 +54,11 @@ public class AccountServiceImpl implements AccountService {
 
 		// TODO 共通項目は親クラスで設定する
 		account.setDeleted(CommonConst.DeletedFlag.OFF);
-		account.setCreatedAt(new Date());
 		account.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
-		account.setUpdatedAt(new Date());
 		account.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
 
 		// TODO エラーメッセージ
-		return BooleanUtils.toBoolean(tAccountMapper.insert(account));
+		return tAccountRepository.create(account);
 	}
 
 	/**
@@ -75,12 +72,13 @@ public class AccountServiceImpl implements AccountService {
 	public AccountResource find(String loginId) throws NotFoundException {
 		TAccountExample example = new TAccountExample();
 		example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		List<TAccount> account = tAccountMapper.selectByExample(example);
-		if (account.isEmpty()) {
+		TAccount account = tAccountRepository.findOneBy(example);
+
+		if (account == null) {
 			// TODO 404を返す
 			throw new NotFoundException("アカウントが存在しません");
 		}
-		return mapper.map(account.get(0), AccountResource.class);
+		return mapper.map(account, AccountResource.class);
 	}
 
 	/**
@@ -98,7 +96,7 @@ public class AccountServiceImpl implements AccountService {
 
 		TAccountExample example = new TAccountExample();
 		example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		return BooleanUtils.toBoolean(tAccountMapper.updateByExampleSelective(account, example));
+		return BooleanUtils.toBoolean(tAccountRepository.updatePartiallyBy(account, example));
 	}
 
 	/**

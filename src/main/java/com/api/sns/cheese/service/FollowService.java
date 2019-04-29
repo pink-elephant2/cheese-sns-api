@@ -33,7 +33,7 @@ public interface FollowService {
 	 * @param loginId
 	 *            ログインID(フォロー対象)
 	 */
-	public boolean follow(String loginId);
+	public boolean follow(String loginId) throws Exception;
 
 	/**
 	 * フォローを解除する
@@ -41,5 +41,5 @@ public interface FollowService {
 	 * @param loginId
 	 *            ログインID(フォロー対象)
 	 */
-	public boolean unfollow(String loginId);
+	public boolean unfollow(String loginId) throws Exception;
 }

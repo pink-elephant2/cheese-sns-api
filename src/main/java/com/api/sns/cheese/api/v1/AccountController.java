@@ -117,7 +117,7 @@ public class AccountController {
 	 */
 	@PostMapping("/follow")
 	@ResponseStatus(HttpStatus.CREATED)
-	public boolean follow(@RequestBody @Validated FollowForm form) {
+	public boolean follow(@RequestBody @Validated FollowForm form) throws Exception {
 		// フォローする
 		return followService.follow(form.getLoginId());
 	}
@@ -130,7 +130,7 @@ public class AccountController {
 	 */
 	@PostMapping("/unfollow")
 	@ResponseStatus(HttpStatus.CREATED)
-	public boolean unfollow(@RequestBody @Validated FollowForm form) {
+	public boolean unfollow(@RequestBody @Validated FollowForm form) throws Exception {
 		// フォローを解除する
 		return followService.unfollow(form.getLoginId());
 	}
