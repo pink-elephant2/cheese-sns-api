@@ -56,5 +56,8 @@
     <table tableName="t_tag" modelType="hierarchical"></table>
     <table tableName="t_tag_photo" modelType="hierarchical"></table>
 
+    <table tableName="v_activity" modelType="hierarchical"></table>
+    <table tableName="v_follow" modelType="hierarchical"></table>
+
   </context>
 </generatorConfiguration>

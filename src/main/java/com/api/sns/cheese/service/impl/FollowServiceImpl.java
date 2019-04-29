@@ -1,14 +1,12 @@
 package com.api.sns.cheese.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.apache.ibatis.javassist.NotFoundException;
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,8 +15,11 @@ import com.api.sns.cheese.domain.TAccount;
 import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.domain.TFollow;
 import com.api.sns.cheese.domain.TFollowExample;
+import com.api.sns.cheese.domain.VFollow;
+import com.api.sns.cheese.domain.VFollowExample;
 import com.api.sns.cheese.repository.TAccountRepository;
 import com.api.sns.cheese.repository.TFollowRepository;
+import com.api.sns.cheese.repository.VFollowRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.service.FollowService;
 
@@ -36,6 +37,9 @@ public class FollowServiceImpl implements FollowService {
 	private TFollowRepository tFollowRepository;
 
 	@Autowired
+	private VFollowRepository vFollowRepository;
+
+	@Autowired
 	private Mapper mapper;
 
 	/**
@@ -47,27 +51,23 @@ public class FollowServiceImpl implements FollowService {
 	 */
 	@Override
 	public Page<AccountResource> findFollow(String loginId) {
-		Integer accountId = 1; // TODO ログインユーザー
-
 		// フォローリストを取得
-		TFollowExample followExample = new TFollowExample();
-		followExample.createCriteria().andAccountIdEqualTo(accountId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		List<TFollow> followList = tFollowRepository.findAllBy(followExample);
+		Sort sort = new Sort("follow_id");
+		Pageable pageable = new PageRequest(0, 20, sort); // TODO I/Fに追加する
+		VFollowExample example = new VFollowExample();
+		example.createCriteria().andFollowLoginIdEqualTo(loginId);
+		Page<VFollow> page = vFollowRepository.findPageBy(example, pageable);
 
-		List<TAccount> accountList = new ArrayList<>();
-		if (!followList.isEmpty()) {
-			// アカウントを取得
-			TAccountExample accountExample = new TAccountExample();
-			accountExample.createCriteria()
-					.andAccountIdIn(followList.stream().map(TFollow::getAccountId).collect(Collectors.toList()));
-			accountList = tAccountRepository.findAllBy(accountExample);
-		}
-
-		// TODO ページで絞る
-		return new PageImpl<>(accountList.stream().map(account -> {
-			AccountResource resource = mapper.map(account, AccountResource.class);
+		return page.map(vfollow -> {
+			AccountResource resource = mapper.map(vfollow, AccountResource.class);
+			resource.setAccountId((long) vfollow.getFollowerAccountId());
+			resource.setLoginId(vfollow.getFollowerLoginId());
+			resource.setName(vfollow.getFollowerName());
+			resource.setDescription(vfollow.getFollowerDescription());
+			resource.setImgUrl(vfollow.getFollowerImgUrl());
+			resource.setFollow(true);
 			return resource;
-		}).collect(Collectors.toList()));
+		});
 	}
 
 	/**
@@ -79,28 +79,23 @@ public class FollowServiceImpl implements FollowService {
 	 */
 	@Override
 	public Page<AccountResource> findFollowers(String loginId) {
-		Integer accountId = 1; // TODO ログインユーザー
+		// フォローリストを取得
+		Sort sort = new Sort("follow_id");
+		Pageable pageable = new PageRequest(0, 20, sort); // TODO I/Fに追加する
+		VFollowExample example = new VFollowExample();
+		example.createCriteria().andFollowerLoginIdEqualTo(loginId);
+		Page<VFollow> page = vFollowRepository.findPageBy(example, pageable);
 
-		// フォローワーリストを取得
-		TFollowExample followExample = new TFollowExample();
-		followExample.createCriteria().andFollowAccountIdEqualTo(accountId)
-				.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		List<TFollow> followList = tFollowRepository.findAllBy(followExample);
-
-		List<TAccount> accountList = new ArrayList<>();
-		if (!followList.isEmpty()) {
-			// アカウントを取得
-			TAccountExample accountExample = new TAccountExample();
-			accountExample.createCriteria()
-					.andAccountIdIn(followList.stream().map(TFollow::getAccountId).collect(Collectors.toList()));
-			accountList = tAccountRepository.findAllBy(accountExample);
-		}
-
-		// TODO ページで絞る
-		return new PageImpl<>(accountList.stream().map(account -> {
-			AccountResource resource = mapper.map(account, AccountResource.class);
+		return page.map(vfollow -> {
+			AccountResource resource = mapper.map(vfollow, AccountResource.class);
+			resource.setAccountId((long) vfollow.getFollowAccountId());
+			resource.setLoginId(vfollow.getFollowLoginId());
+			resource.setName(vfollow.getFollowName());
+			resource.setDescription(vfollow.getFollowDescription());
+			resource.setImgUrl(vfollow.getFollowImgUrl());
+			resource.setFollow(true);
 			return resource;
-		}).collect(Collectors.toList()));
+		});
 	}
 
 	/**
@@ -119,7 +114,7 @@ public class FollowServiceImpl implements FollowService {
 			throw new NotFoundException("アカウントが存在しません");
 		}
 
-		Integer accountId = 4; // TODO ログインユーザー
+		Integer accountId = 1; // TODO ログインユーザー
 
 		// フォロー済みか
 		TFollowExample followExample = new TFollowExample();
@@ -167,7 +162,7 @@ public class FollowServiceImpl implements FollowService {
 			throw new NotFoundException("アカウントが存在しません");
 		}
 
-		Integer accountId = 4; // TODO ログインユーザー
+		Integer accountId = 1; // TODO ログインユーザー
 
 		// フォロー済みか
 		TFollowExample followExample = new TFollowExample();

@@ -1,5 +1,5 @@
 -- Project Name : チーズSNS
--- Date/Time    : 2019/04/25 12:23:49
+-- Date/Time    : 2019/04/29 16:41:09
 -- Author       : チーズSNS
 -- RDBMS Type   : MySQL
 -- Application  : A5:SQL Mk-2
@@ -248,6 +248,35 @@ create table t_account (
 
 create unique index t_account_IX1
   on t_account(login_id);
+
+-- フォロービュー
+drop view if exists v_follow;
+
+create view v_follow as
+SELECT
+  tFollow.follow_id
+  , tFollow.block_flag
+  , tFollow.account_id as follow_account_id
+  , tFollow.follow_account_id as follower_account_id
+  , tFollowAccount.login_id as follow_login_id
+  , tFollowAccount.name as follow_name
+  , tFollowAccount.description as follow_description
+  , tFollowAccount.img_url as follow_img_url
+  , tFollowerAccount.login_id as follower_login_id
+  , tFollowerAccount.name as follower_name
+  , tFollowerAccount.description as follower_description
+  , tFollowerAccount.img_url as follower_img_url
+FROM
+  t_follow as tFollow
+  inner join t_account as tFollowAccount
+    on tFollow.account_id = tFollowAccount.account_id
+    and tFollowAccount.deleted = '0'
+  inner join t_account as tFollowerAccount
+    on tFollow.follow_account_id = tFollowerAccount.account_id
+    and tFollowerAccount.deleted = '0'
+
+
+;
 
 -- アクティビティビュー
 drop view if exists v_activity;
