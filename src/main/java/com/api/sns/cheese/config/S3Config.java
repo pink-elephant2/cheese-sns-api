@@ -1,5 +1,6 @@
 package com.api.sns.cheese.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,32 +19,28 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 @Configuration
 public class S3Config {
 
-	// TODO application.ymlに移植
-	private final String S3_ACCESS_KEY = "";
-	private final String S3_SECRET_KEY = "";
-	private final int TIMEOUT = 21600;
-	private final String S3_SERVICE_END_POINT = "";
-	private final String S3_REGION = "";
-	private final String S3_BUCKET = "";
+	@Autowired
+	private AppConfig appConfig;
 
 	@Bean
 	public BasicAWSCredentials basicAWSCredentials() {
-		return new BasicAWSCredentials(S3_ACCESS_KEY, S3_SECRET_KEY);
+		return new BasicAWSCredentials(appConfig.getS3AccessKey(), appConfig.getS3SecretKey());
 	}
 
 	@Bean
 	public AmazonS3 amazonS3Client(AWSCredentials awsCredentials) {
 
 		// AWSの認証情報
-		AWSCredentials credentials = new BasicAWSCredentials(S3_ACCESS_KEY, S3_SECRET_KEY);
+		AWSCredentials credentials = new BasicAWSCredentials(appConfig.getS3AccessKey(), appConfig.getS3SecretKey());
 
 		// クライアント設定
 		ClientConfiguration clientConfig = new ClientConfiguration();
 		clientConfig.setProtocol(Protocol.HTTPS); // プロトコル
-		clientConfig.setConnectionTimeout(TIMEOUT); // 接続タイムアウト(ms)
+		clientConfig.setConnectionTimeout(appConfig.getTimeout()); // 接続タイムアウト(ms)
 
 		// エンドポイント設定
-		EndpointConfiguration endpointConfiguration = new EndpointConfiguration(S3_SERVICE_END_POINT, S3_REGION);
+		EndpointConfiguration endpointConfiguration = new EndpointConfiguration(appConfig.getS3ServiceEndPoint(),
+				appConfig.getS3Region());
 
 		// S3アクセスクライアントの生成
 		return AmazonS3ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentials))
