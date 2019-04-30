@@ -4,9 +4,7 @@ import org.apache.ibatis.javassist.NotFoundException;
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,13 +45,13 @@ public class FollowServiceImpl implements FollowService {
 	 *
 	 * @param loginId
 	 *            ログインID
+	 * @param pageable
+	 *            ページ情報
 	 * @return アカウント情報
 	 */
 	@Override
-	public Page<AccountResource> findFollow(String loginId) {
+	public Page<AccountResource> findFollow(String loginId, Pageable pageable) {
 		// フォローリストを取得
-		Sort sort = new Sort("follow_id");
-		Pageable pageable = new PageRequest(0, 20, sort); // TODO I/Fに追加する
 		VFollowExample example = new VFollowExample();
 		example.createCriteria().andFollowLoginIdEqualTo(loginId);
 		Page<VFollow> page = vFollowRepository.findPageBy(example, pageable);
@@ -75,13 +73,13 @@ public class FollowServiceImpl implements FollowService {
 	 *
 	 * @param loginId
 	 *            ログインID
+	 * @param pageable
+	 *            ページ情報
 	 * @return アカウント情報
 	 */
 	@Override
-	public Page<AccountResource> findFollowers(String loginId) {
+	public Page<AccountResource> findFollowers(String loginId, Pageable pageable) {
 		// フォローリストを取得
-		Sort sort = new Sort("follow_id");
-		Pageable pageable = new PageRequest(0, 20, sort); // TODO I/Fに追加する
 		VFollowExample example = new VFollowExample();
 		example.createCriteria().andFollowerLoginIdEqualTo(loginId);
 		Page<VFollow> page = vFollowRepository.findPageBy(example, pageable);

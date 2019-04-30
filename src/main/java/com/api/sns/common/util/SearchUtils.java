@@ -67,7 +67,7 @@ public class SearchUtils {
 	public static Optional<String> createPageOrderSql(Sort sort) {
 		Optional result = Optional.empty();
 
-		if (sort != null) {
+		if (sort != null && sort.isSorted()) {
 			String orderSql = (String) StreamSupport.stream(sort.spliterator(), false).map((order) -> {
 				return order.getProperty() + " " + order.getDirection().toString();
 

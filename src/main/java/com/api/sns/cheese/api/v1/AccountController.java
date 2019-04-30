@@ -3,6 +3,7 @@ package com.api.sns.cheese.api.v1;
 import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -91,9 +92,9 @@ public class AccountController {
 	 */
 	@GetMapping("/{loginId}/follow")
 	@ResponseStatus(HttpStatus.OK)
-	public Page<AccountResource> findFollow(@PathVariable("loginId") String loginId) {
+	public Page<AccountResource> findFollow(@PathVariable("loginId") String loginId, Pageable pageable) {
 		// フォローを取得する
-		return followService.findFollow(loginId);
+		return followService.findFollow(loginId, pageable);
 	}
 
 	/**
@@ -104,9 +105,9 @@ public class AccountController {
 	 */
 	@GetMapping("/{loginId}/follower")
 	@ResponseStatus(HttpStatus.OK)
-	public Page<AccountResource> findFollower(@PathVariable("loginId") String loginId) {
+	public Page<AccountResource> findFollower(@PathVariable("loginId") String loginId, Pageable pageable) {
 		// フォローワーを取得する
-		return followService.findFollowers(loginId);
+		return followService.findFollowers(loginId, pageable);
 	}
 
 	/**
