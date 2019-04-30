@@ -2,12 +2,15 @@ package com.api.sns.cheese.service.impl;
 
 import static java.util.Comparator.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.dozer.Mapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -15,12 +18,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import com.api.sns.cheese.consts.CommonConst;
+import com.api.sns.cheese.domain.TPhoto;
+import com.api.sns.cheese.enums.DocumentTypeEnum;
 import com.api.sns.cheese.form.PhotoForm;
+import com.api.sns.cheese.repository.TPhotoRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.resources.CommentResource;
 import com.api.sns.cheese.resources.PhotoResource;
 import com.api.sns.cheese.service.PhotoService;
-import com.api.sns.cheese.util.ImageUtils;
+import com.api.sns.cheese.service.S3Service;
 
 /**
  * 写真サービス
@@ -28,6 +35,15 @@ import com.api.sns.cheese.util.ImageUtils;
 @Service
 @Transactional
 public class PhotoServiceImpl implements PhotoService {
+
+	@Autowired
+	private TPhotoRepository tPhotoRepository;
+
+	@Autowired
+	private S3Service s3Service;
+
+	@Autowired
+	private Mapper mapper;
 
 	/** アカウントテストデータ */
 	private List<AccountResource> accountList = new ArrayList<>(Arrays.asList(
@@ -124,19 +140,33 @@ public class PhotoServiceImpl implements PhotoService {
 	@Override
 	public PhotoResource create(PhotoForm form) {
 		// 新規写真
-		Long id = Long.valueOf(photoList.size() + 1);
-		String cd = "test" + id;
+		Long id = Long.valueOf(photoList.size() + 1);	// TODO AUTO_INCREMENT
+		String cd = "test" + id; // TODO ランダム文字列生成
 
-		PhotoResource photo = new PhotoResource(id, cd);
-		photo.setCaption(form.getCaption());
-		photo.setImageUrl(ImageUtils.getDataUrl(form.getUpfile()));
-		photo.setCreateAt(new Date());
-		photo.setAccount(accountList.get(0));
+		try {
+			// S3に保存、URLを設定する
+			String filePath = s3Service.upload(DocumentTypeEnum.PHOTO, form.getUpfile());
 
-		// レコード追加
-		photoList.add(photo);
+			// レコード追加
+			TPhoto photo = mapper.map(form, TPhoto.class);
+			photo.setPhotoCd(cd);
+			photo.setImgUrl(filePath);
+			photo.setAccountId(1); // TODO ログインユーザ
+			// TODO 共通項目は親クラスで設定する
+			photo.setDeleted(CommonConst.DeletedFlag.OFF);
+			photo.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			photo.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			tPhotoRepository.create(photo);
 
-		return photo;
+			// 戻り値
+			PhotoResource resource = new PhotoResource(id, cd);
+			mapper.map(photo, resource);
+			return resource;
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	/**
