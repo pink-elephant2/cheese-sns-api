@@ -18,14 +18,14 @@ public class HelloController {
 	private TestMapper testMapper;
 
 	@RequestMapping("/")
-    @ResponseBody
-    public String home() {
-        return "Hello, World!";
-    }
+	@ResponseBody
+	public String home() {
+		return "Hello, World!";
+	}
 
 	@RequestMapping("/sqlsample")
-    @ResponseBody
-	public List<Test> sqlSample(){
+	@ResponseBody
+	public List<Test> sqlSample() {
 
 		TestExample example = new TestExample();
 		example.createCriteria().andIdIsNotNull();
