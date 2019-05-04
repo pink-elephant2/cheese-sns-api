@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.api.sns.cheese.aop.SessionInfoContextHolder;
 import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccount;
 import com.api.sns.cheese.domain.TAccountExample;
@@ -88,11 +89,10 @@ public class AccountServiceImpl implements AccountService {
 		}
 		AccountResource resource = mapper.map(account, AccountResource.class);
 
-		if (true) {
-			// TODO ログイン済みの場合、フォローしているか
+		if (SessionInfoContextHolder.isAuthenticated()) {
+			// ログイン済みの場合、フォローしているか
 			TFollowExample followExample = new TFollowExample();
-			Integer accountId = 1; // TODO ログインユーザ
-			followExample.createCriteria().andAccountIdEqualTo(accountId)
+			followExample.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId())
 					.andFollowAccountIdEqualTo(account.getAccountId()).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 			TFollow follow = tFollowRepository.findOneBy(followExample);
 			resource.setFollow(follow != null);
@@ -109,13 +109,11 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Override
 	public boolean saveProfile(AccountUpdateForm form) throws NotFoundException {
-		String loginId = "my_melody"; // TODO セッション情報から取得
-
 		// プロフィールを更新する
 		TAccount account = mapper.map(form, TAccount.class);
 
 		TAccountExample example = new TAccountExample();
-		example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		example.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId());
 		return BooleanUtils.toBoolean(tAccountRepository.updatePartiallyBy(account, example));
 	}
 
@@ -126,11 +124,10 @@ public class AccountServiceImpl implements AccountService {
 	 *            画像フォーム
 	 */
 	public boolean saveImage(AccountImageForm form) {
-		String loginId = "my_melody"; // TODO セッション情報から取得
-
 		try {
 			// S3に保存、URLを設定する
-			String fileName = loginId + ".png"; // TODO ファイル名
+			String fileName = SessionInfoContextHolder.getSessionInfo().getLoginId() + ".png";
+			// TODO ファイル名
 			String filePath = s3Service.upload(DocumentTypeEnum.ACCOUNT, fileName, form.getUpfile());
 
 			// プロフィールを更新する
@@ -138,7 +135,7 @@ public class AccountServiceImpl implements AccountService {
 			account.setImgUrl(filePath);
 
 			TAccountExample example = new TAccountExample();
-			example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+			example.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId());
 			return BooleanUtils.toBoolean(tAccountRepository.updatePartiallyBy(account, example));
 
 		} catch (IOException e) {

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.api.sns.cheese.aop.SessionInfoContextHolder;
 import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccount;
 import com.api.sns.cheese.domain.TActivity;
@@ -116,7 +117,8 @@ public class FollowServiceImpl implements FollowService {
 			throw new NotFoundException("アカウントが存在しません");
 		}
 
-		Integer accountId = 1; // TODO ログインユーザー
+		// ログインユーザー
+		Integer accountId = SessionInfoContextHolder.getSessionInfo().getAccountId();
 
 		// フォロー済みか
 		TFollowExample followExample = new TFollowExample();
@@ -132,8 +134,6 @@ public class FollowServiceImpl implements FollowService {
 			follow.setFollowAccountId(followAccount.getAccountId());
 			// TODO 共通項目は親クラスで設定する
 			follow.setDeleted(CommonConst.DeletedFlag.OFF);
-			follow.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
-			follow.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
 
 			// レコード登録
 			ret = tFollowRepository.create(follow);
@@ -158,8 +158,8 @@ public class FollowServiceImpl implements FollowService {
 			activity.setFollowAccountId(followAccount.getAccountId());
 			// TODO 共通項目は親クラスで設定する
 			activity.setDeleted(CommonConst.DeletedFlag.OFF);
-			activity.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
-			activity.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
+
+			// レコード登録
 			ret = tActivityRepository.create(activity);
 		}
 
@@ -180,7 +180,8 @@ public class FollowServiceImpl implements FollowService {
 			throw new NotFoundException("アカウントが存在しません");
 		}
 
-		Integer accountId = 1; // TODO ログインユーザー
+		// ログインユーザー
+		Integer accountId = SessionInfoContextHolder.getSessionInfo().getAccountId();
 
 		// フォロー済みか
 		TFollowExample followExample = new TFollowExample();
@@ -196,8 +197,6 @@ public class FollowServiceImpl implements FollowService {
 			follow.setFollowAccountId(followAccount.getAccountId());
 			// TODO 共通項目は親クラスで設定する
 			follow.setDeleted(CommonConst.DeletedFlag.OFF);
-			follow.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
-			follow.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
 
 			// レコード登録
 			ret = tFollowRepository.create(follow);

@@ -38,4 +38,11 @@ public class SessionInfoContextHolder {
 	public static void clear() {
 		contextHolder.remove();
 	}
+
+	/**
+	 * ログインしているか
+	 */
+	public static boolean isAuthenticated() {
+		return getSessionInfo() != null;
+	}
 }

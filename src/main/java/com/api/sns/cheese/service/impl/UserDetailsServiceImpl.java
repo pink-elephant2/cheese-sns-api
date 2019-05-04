@@ -57,6 +57,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 		// セッション情報(HttpSession)
 		SessionInfoResource sessionInfo = new SessionInfoResource();
+		sessionInfo.setAccountId(account.getAccountId());
 		sessionInfo.setLoginId(loginId);
 		sessionInfo.setUserName(account.getName());
 

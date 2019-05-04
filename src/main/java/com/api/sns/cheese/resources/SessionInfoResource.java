@@ -8,6 +8,9 @@ import lombok.Data;
 @Data
 public class SessionInfoResource {
 
+	/** アカウントID */
+	private Integer accountId;
+
 	/** ログインID */
 	private String loginId;
 

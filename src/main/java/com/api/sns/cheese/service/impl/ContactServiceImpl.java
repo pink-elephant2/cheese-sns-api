@@ -39,10 +39,6 @@ public class ContactServiceImpl implements ContactService {
 
 		// TODO 共通項目は親クラスで設定する
 		contact.setDeleted(CommonConst.DeletedFlag.OFF);
-		// TODO ログイン済みならそのユーザ
-		contact.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
-		// TODO ログイン済みならそのユーザ
-		contact.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
 		tContactRepository.create(contact);
 
 		// TODO 運営にメール送信
