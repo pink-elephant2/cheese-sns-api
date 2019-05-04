@@ -14,11 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccount;
 import com.api.sns.cheese.domain.TAccountExample;
+import com.api.sns.cheese.domain.TFollow;
+import com.api.sns.cheese.domain.TFollowExample;
 import com.api.sns.cheese.enums.DocumentTypeEnum;
 import com.api.sns.cheese.form.AccountCreateForm;
 import com.api.sns.cheese.form.AccountImageForm;
 import com.api.sns.cheese.form.AccountUpdateForm;
 import com.api.sns.cheese.repository.TAccountRepository;
+import com.api.sns.cheese.repository.TFollowRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.service.AccountService;
 import com.api.sns.cheese.service.S3Service;
@@ -32,6 +35,9 @@ public class AccountServiceImpl implements AccountService {
 
 	@Autowired
 	private TAccountRepository tAccountRepository;
+
+	@Autowired
+	private TFollowRepository tFollowRepository;
 
 	@Autowired
 	private Mapper mapper;
@@ -84,7 +90,19 @@ public class AccountServiceImpl implements AccountService {
 			// TODO 404を返す
 			throw new NotFoundException("アカウントが存在しません");
 		}
-		return mapper.map(account, AccountResource.class);
+		AccountResource resource = mapper.map(account, AccountResource.class);
+
+		if (true) {
+			// TODO ログイン済みの場合、フォローしているか
+			TFollowExample followExample = new TFollowExample();
+			Integer accountId = 1; // TODO ログインユーザ
+			followExample.createCriteria().andAccountIdEqualTo(accountId)
+					.andFollowAccountIdEqualTo(account.getAccountId()).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+			TFollow follow = tFollowRepository.findOneBy(followExample);
+			resource.setFollow(follow != null);
+		}
+
+		return resource;
 	}
 
 	/**

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -143,8 +144,10 @@ public class PhotoServiceImpl implements PhotoService {
 	@Override
 	public Page<PhotoResource> findList(String loginId, Pageable pageable) {
 		TPhotoExample example = new TPhotoExample();
-		Integer accountId = 1; // TODO View作成
-		example.createCriteria().andAccountIdEqualTo(accountId);
+		if (!StringUtils.isEmpty(loginId)) {
+			Integer accountId = 1; // TODO View作成
+			example.createCriteria().andAccountIdEqualTo(accountId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		}
 		return tPhotoRepository.findPageBy(example, pageable).map(tPhoto -> {
 			PhotoResource resource = new PhotoResource(tPhoto.getPhotoId(), tPhoto.getPhotoCd());
 			mapper.map(tPhoto, resource);

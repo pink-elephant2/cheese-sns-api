@@ -11,11 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccount;
 import com.api.sns.cheese.domain.TAccountExample;
+import com.api.sns.cheese.domain.TActivity;
+import com.api.sns.cheese.domain.TActivityExample;
 import com.api.sns.cheese.domain.TFollow;
 import com.api.sns.cheese.domain.TFollowExample;
 import com.api.sns.cheese.domain.VFollow;
 import com.api.sns.cheese.domain.VFollowExample;
+import com.api.sns.cheese.enums.ActivityTypeEnum;
 import com.api.sns.cheese.repository.TAccountRepository;
+import com.api.sns.cheese.repository.TActivityRepository;
 import com.api.sns.cheese.repository.TFollowRepository;
 import com.api.sns.cheese.repository.VFollowRepository;
 import com.api.sns.cheese.resources.AccountResource;
@@ -36,6 +40,9 @@ public class FollowServiceImpl implements FollowService {
 
 	@Autowired
 	private VFollowRepository vFollowRepository;
+
+	@Autowired
+	private TActivityRepository tActivityRepository;
 
 	@Autowired
 	private Mapper mapper;
@@ -141,6 +148,24 @@ public class FollowServiceImpl implements FollowService {
 			follower.setDeleted(CommonConst.DeletedFlag.OFF);
 			ret = tFollowRepository.update(follower);
 		}
+
+		// アクティビティを登録する
+		TActivityExample example = new TActivityExample();
+		example.createCriteria().andAccountIdEqualTo(accountId).andActivityTypeEqualTo(ActivityTypeEnum.FOLLOW)
+				.andFollowAccountIdEqualTo(followAccount.getAccountId()).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		TActivity tActivity = tActivityRepository.findOneBy(example);
+		if (tActivity == null) {
+			TActivity activity = new TActivity();
+			activity.setAccountId(accountId);
+			activity.setActivityType(ActivityTypeEnum.FOLLOW);
+			activity.setFollowAccountId(followAccount.getAccountId());
+			// TODO 共通項目は親クラスで設定する
+			activity.setDeleted(CommonConst.DeletedFlag.OFF);
+			activity.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			activity.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			ret = tActivityRepository.create(activity);
+		}
+
 		return ret;
 	}
 
