@@ -30,14 +30,15 @@ public class S3ServiceImpl implements S3Service {
 	/**
 	 * アップロード
 	 *
+	 * @param fileName
+	 *            ファイル名
 	 * @param inputFile
 	 *            マルチパートファイル
 	 * @return ファイルパス
 	 * @throws IOException
 	 */
 	@Override
-	public String upload(DocumentTypeEnum documentType, MultipartFile inputFile) throws IOException {
-		String fileName = createFileName();
+	public String upload(DocumentTypeEnum documentType, String fileName, MultipartFile inputFile) throws IOException {
 		String filePath = createFilePath(documentType, fileName);
 		amazonS3.putObject(createRequest(filePath, inputFile.getBytes()));
 
@@ -65,15 +66,6 @@ public class S3ServiceImpl implements S3Service {
 		putRequest.setCannedAcl(CannedAccessControlList.PublicRead);
 
 		return putRequest;
-	}
-
-	/**
-	 * ランダムファイル名を生成する
-	 */
-	private String createFileName() {
-		// TODO ランダム文字列を生成する
-		String fileName = "photo1.png";
-		return fileName;
 	}
 
 	/**

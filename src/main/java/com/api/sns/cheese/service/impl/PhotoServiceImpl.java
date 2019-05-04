@@ -130,12 +130,13 @@ public class PhotoServiceImpl implements PhotoService {
 	 */
 	@Override
 	public PhotoResource create(PhotoForm form) {
-		// 新規写真
-		String cd = RandomStringUtils.randomAlphanumeric(10);
-
 		try {
+			// 新規写真
+			String cd = RandomStringUtils.randomAlphanumeric(10);
+
 			// S3に保存、URLを設定する
-			String filePath = s3Service.upload(DocumentTypeEnum.PHOTO, form.getUpfile());
+			String fileName = cd + ".png"; // TODO ファイル拡張子
+			String filePath = s3Service.upload(DocumentTypeEnum.PHOTO, fileName, form.getUpfile());
 
 			// レコード追加
 			TPhoto photo = mapper.map(form, TPhoto.class);
@@ -147,6 +148,8 @@ public class PhotoServiceImpl implements PhotoService {
 			photo.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
 			photo.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
 			tPhotoRepository.create(photo);
+
+			// TODO コードが重複した場合、ランダム文字列を再生成してリトライする
 
 			Long id = tPhotoRepository.lastInsertId();
 

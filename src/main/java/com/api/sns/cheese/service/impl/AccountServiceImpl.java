@@ -116,7 +116,8 @@ public class AccountServiceImpl implements AccountService {
 
 		try {
 			// S3に保存、URLを設定する
-			String filePath = s3Service.upload(DocumentTypeEnum.ACCOUNT, form.getUpfile());
+			String fileName = loginId + ".png"; // TODO ファイル名
+			String filePath = s3Service.upload(DocumentTypeEnum.ACCOUNT, fileName, form.getUpfile());
 
 			// プロフィールを更新する
 			TAccount account = mapper.map(form, TAccount.class);

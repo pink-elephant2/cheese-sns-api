@@ -14,10 +14,12 @@ public interface S3Service {
 	/**
 	 * アップロード
 	 *
+	 * @param fileName
+	 *            ファイル名
 	 * @param inputFile
 	 *            マルチパートファイル
 	 * @return ファイルパス
 	 * @throws IOException
 	 */
-	public String upload(DocumentTypeEnum documentType, MultipartFile inputFile) throws IOException;
+	public String upload(DocumentTypeEnum documentType, String fileName, MultipartFile inputFile) throws IOException;
 }
