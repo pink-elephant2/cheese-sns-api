@@ -15,9 +15,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.sns.cheese.form.AccountCreateForm;
-import com.api.sns.cheese.form.AccountImageForm;
-import com.api.sns.cheese.form.AccountUpdateForm;
-import com.api.sns.cheese.form.FollowForm;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.service.AccountService;
 import com.api.sns.cheese.service.FollowService;
@@ -62,29 +59,6 @@ public class AccountController {
 	}
 
 	/**
-	 * プロフィール更新
-	 *
-	 * @param form
-	 *            プロフィールフォーム
-	 */
-	@PostMapping("/profile")
-	@ResponseStatus(HttpStatus.CREATED)
-	public boolean saveProfile(@RequestBody @Validated AccountUpdateForm form) throws NotFoundException {
-		// プロフィールを更新する
-		return accountService.saveProfile(form);
-	}
-
-	/**
-	 * アカウント画像更新
-	 */
-	@PostMapping("/image")
-	@ResponseStatus(HttpStatus.CREATED)
-	public boolean saveImage(@Validated AccountImageForm form) {
-		// アカウント画像を更新する
-		return accountService.saveImage(form);
-	}
-
-	/**
 	 * フォロー取得
 	 *
 	 * @param loginId
@@ -108,31 +82,5 @@ public class AccountController {
 	public Page<AccountResource> findFollower(@PathVariable("loginId") String loginId, Pageable pageable) {
 		// フォローワーを取得する
 		return followService.findFollowers(loginId, pageable);
-	}
-
-	/**
-	 * フォローする
-	 *
-	 * @param loginId
-	 *            ログインID
-	 */
-	@PostMapping("/follow")
-	@ResponseStatus(HttpStatus.CREATED)
-	public boolean follow(@RequestBody @Validated FollowForm form) throws Exception {
-		// フォローする
-		return followService.follow(form.getLoginId());
-	}
-
-	/**
-	 * フォローを解除する
-	 *
-	 * @param loginId
-	 *            ログインID
-	 */
-	@PostMapping("/unfollow")
-	@ResponseStatus(HttpStatus.CREATED)
-	public boolean unfollow(@RequestBody @Validated FollowForm form) throws Exception {
-		// フォローを解除する
-		return followService.unfollow(form.getLoginId());
 	}
 }

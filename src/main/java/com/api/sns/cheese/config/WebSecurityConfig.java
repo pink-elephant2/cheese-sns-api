@@ -46,8 +46,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		// 認可の設定
 		http.authorizeRequests()
-				// 認証不要ページ
-				.antMatchers("/", "/api/v1/photo/**").permitAll().anyRequest().authenticated().and()
+				// 認証ページ
+				.antMatchers("/api/v1/user/**").hasRole("USER").and()
 				// ログイン設定
 				.formLogin().loginPage("/").loginProcessingUrl("/api/v1/login").usernameParameter("loginId")
 				.passwordParameter("password").successHandler(new AppAuthenticationSuccessHandler())
