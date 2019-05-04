@@ -1,26 +1,39 @@
 package com.api.sns.cheese.service.impl;
 
-import static java.util.Comparator.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.dozer.Mapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
+import com.api.sns.cheese.consts.CommonConst;
+import com.api.sns.cheese.domain.TAccountKey;
+import com.api.sns.cheese.domain.TPhoto;
+import com.api.sns.cheese.domain.TPhotoComment;
+import com.api.sns.cheese.domain.TPhotoCommentExample;
+import com.api.sns.cheese.domain.TPhotoCommentLike;
+import com.api.sns.cheese.domain.TPhotoCommentLikeExample;
+import com.api.sns.cheese.domain.TPhotoExample;
+import com.api.sns.cheese.domain.TPhotoLike;
+import com.api.sns.cheese.domain.TPhotoLikeExample;
+import com.api.sns.cheese.enums.DocumentTypeEnum;
 import com.api.sns.cheese.form.PhotoForm;
+import com.api.sns.cheese.repository.TAccountRepository;
+import com.api.sns.cheese.repository.TPhotoCommentLikeRepository;
+import com.api.sns.cheese.repository.TPhotoCommentRepository;
+import com.api.sns.cheese.repository.TPhotoLikeRepository;
+import com.api.sns.cheese.repository.TPhotoRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.resources.CommentResource;
 import com.api.sns.cheese.resources.PhotoResource;
 import com.api.sns.cheese.service.PhotoService;
-import com.api.sns.cheese.util.ImageUtils;
+import com.api.sns.cheese.service.S3Service;
 
 /**
  * 写真サービス
@@ -29,48 +42,26 @@ import com.api.sns.cheese.util.ImageUtils;
 @Transactional
 public class PhotoServiceImpl implements PhotoService {
 
-	/** アカウントテストデータ */
-	private List<AccountResource> accountList = new ArrayList<>(Arrays.asList(
-			// テストデータ1
-			new AccountResource(Long.valueOf(1), "my_melody", "マイメロディ", "おはよう♪　あさごはん　ちゃんとたべた〜？　いっしゅうかん　がんばろうね♪",
-					"assets/images/my_melody.png", null, null, "Melody_Mariland", null, false),
-			// テストデータ2
-			new AccountResource(Long.valueOf(2), "ki_ri_mi", "KIRIMIちゃん", "ラブ！サーモン！>°))))◁",
-					"assets/images/ki_ri_mi.png", null, null, "kirimi_sanrio", null, true),
-			// テストデータ3
-			new AccountResource(Long.valueOf(1), "gudetama", "ぐでたま", "だるい", "assets/images/gudetama.png", null, null,
-					"gudetama_sanrio", null, false)));
+	@Autowired
+	private TPhotoRepository tPhotoRepository;
 
-	/** コメントテストデータ */
-	private List<CommentResource> commentList = new ArrayList<>(Arrays.asList(
-			// テストデータ1
-			new CommentResource(Long.valueOf(1), "comment1", "おいしそう😍", new Date(), accountList.get(0), true),
-			// テストデータ2
-			new CommentResource(Long.valueOf(2), "comment2", "作るのだるい", new Date(), accountList.get(2), false)));
+	@Autowired
+	private TPhotoLikeRepository tPhotoLikeRepository;
 
-	/** 写真テストデータ **/
-	private List<PhotoResource> photoList = new ArrayList<>(Arrays.asList(
-			// テストデータ1
-			new PhotoResource(Long.valueOf(1), "test1", "【フォンデュ＆ラクレット】 とろ～り、びよーん♪のおいしいチーズ料理",
-					"assets/images/sample-1.jpg", new Date(), accountList.get(1), 1, true, commentList),
-			// テストデータ2
-			new PhotoResource(Long.valueOf(2), "test2", "おうちで簡単！SNSで話題のもちもちとろ～りチーズレシピ♡", "assets/images/sample-2.jpg",
-					new Date(), accountList.get(0), 1000, true, Arrays.asList()),
-			// テストデータ3
-			new PhotoResource(Long.valueOf(3), "test3", "", "assets/images/sample-3.jpg", new Date(),
-					accountList.get(1), 1000, false, Arrays.asList()),
-			// テストデータ4
-			new PhotoResource(Long.valueOf(4), "test4", "", "assets/images/sample-4.jpg", new Date(),
-					accountList.get(1), 0, false, Arrays.asList()),
-			// テストデータ5
-			new PhotoResource(Long.valueOf(5), "test5", "", "assets/images/sample-5.jpg", new Date(),
-					accountList.get(1), 0, false, Arrays.asList()),
-			// テストデータ6
-			new PhotoResource(Long.valueOf(6), "test6", "", "assets/images/sample-6.jpg", new Date(),
-					accountList.get(1), 0, false, Arrays.asList()),
-			// テストデータ7
-			new PhotoResource(Long.valueOf(7), "test7", "", "assets/images/sample-7.jpg", new Date(),
-					accountList.get(1), 0, false, Arrays.asList())));
+	@Autowired
+	private TPhotoCommentRepository tPhotoCommentRepository;
+
+	@Autowired
+	private TPhotoCommentLikeRepository tPhotoCommentLikeRepository;
+
+	@Autowired
+	private TAccountRepository tAccountRepository;
+
+	@Autowired
+	private S3Service s3Service;
+
+	@Autowired
+	private Mapper mapper;
 
 	/**
 	 * 写真を取得する
@@ -81,7 +72,63 @@ public class PhotoServiceImpl implements PhotoService {
 	 */
 	@Override
 	public PhotoResource find(String cd) {
-		return photoList.stream().filter(photo -> ObjectUtils.nullSafeEquals(cd, photo.getCode())).findFirst().get();
+		TPhotoExample example = new TPhotoExample();
+		example.createCriteria().andPhotoCdEqualTo(cd).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		TPhoto photo = tPhotoRepository.findOneBy(example);
+		if (photo == null) {
+			// TODO 404を返す
+			// throw new NotFoundException("写真が存在しません");
+		}
+
+		PhotoResource resource = new PhotoResource(photo.getPhotoId(), photo.getPhotoCd());
+		mapper.map(photo, resource);
+
+		// TODO 投稿ユーザー View または キャッシュ
+		TAccountKey key = new TAccountKey();
+		key.setAccountId(photo.getAccountId());
+		resource.setAccount(mapper.map(tAccountRepository.findOneBy(key), AccountResource.class));
+
+		// 自分がいいねしているか
+		TPhotoLikeExample likeExample = new TPhotoLikeExample();
+		Integer accountId = 1; // TODO ログインユーザ
+		likeExample.createCriteria().andPhotoIdEqualTo(photo.getPhotoId()).andAccountIdEqualTo(accountId);
+		TPhotoLike photoLike = tPhotoLikeRepository.findOneBy(likeExample);
+		resource.setLike(photoLike != null && CommonConst.DeletedFlag.OFF.equals(photoLike.getDeleted()));
+
+		// いいね件数 TODO 性能改善
+		likeExample.clear();
+		likeExample.createCriteria().andPhotoIdEqualTo(photo.getPhotoId())
+				.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		// TODO テーブル定義 型変更
+		resource.setLikeCount((int) tPhotoLikeRepository.countBy(likeExample));
+
+		// コメント
+		TPhotoCommentExample commentExample = new TPhotoCommentExample();
+		commentExample.createCriteria().andPhotoIdEqualTo(photo.getPhotoId())
+				.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		List<TPhotoComment> commentList = tPhotoCommentRepository.findAllBy(commentExample);
+		if (!commentList.isEmpty()) {
+			resource.setComments(commentList.stream().map(tPhotoComment -> {
+				CommentResource commentResource = mapper.map(tPhotoComment, CommentResource.class);
+
+				// TODO 投稿ユーザー View または キャッシュ
+				TAccountKey accountKey = new TAccountKey();
+				accountKey.setAccountId(tPhotoComment.getAccountId());
+				commentResource.setAccount(mapper.map(tAccountRepository.findOneBy(accountKey), AccountResource.class));
+
+				// 自分がコメントにいいねをしているか
+				TPhotoCommentLikeExample commentLikeExample = new TPhotoCommentLikeExample();
+				commentLikeExample.createCriteria().andAccountIdEqualTo(accountId).andPhotoIdEqualTo(photo.getPhotoId())
+						.andCommentIdEqualTo(tPhotoComment.getCommentId());
+				TPhotoCommentLike photoCommentLike = tPhotoCommentLikeRepository.findOneBy(commentLikeExample);
+				commentResource.setLike(
+						photoCommentLike != null && CommonConst.DeletedFlag.OFF.equals(photoCommentLike.getDeleted()));
+
+				return commentResource;
+			}).collect(Collectors.toList()));
+		}
+
+		return resource;
 	}
 
 	/**
@@ -95,23 +142,20 @@ public class PhotoServiceImpl implements PhotoService {
 	 */
 	@Override
 	public Page<PhotoResource> findList(String loginId, Pageable pageable) {
-		List<PhotoResource> filterdPhotoList = photoList;
+		TPhotoExample example = new TPhotoExample();
+		Integer accountId = 1; // TODO View作成
+		example.createCriteria().andAccountIdEqualTo(accountId);
+		return tPhotoRepository.findPageBy(example, pageable).map(tPhoto -> {
+			PhotoResource resource = new PhotoResource(tPhoto.getPhotoId(), tPhoto.getPhotoCd());
+			mapper.map(tPhoto, resource);
 
-		// ログインIDで絞る
-		if (loginId != null) {
-			filterdPhotoList = photoList.stream().filter(photo -> photo.getAccount().getLoginId().equals(loginId))
-					.collect(Collectors.toList());
-		}
+			// TODO 投稿ユーザー View または キャッシュ
+			TAccountKey key = new TAccountKey();
+			key.setAccountId(tPhoto.getAccountId());
+			resource.setAccount(mapper.map(tAccountRepository.findOneBy(key), AccountResource.class));
 
-		// ID降順ソート
-		filterdPhotoList = filterdPhotoList.stream().sorted(comparing(PhotoResource::getId).reversed())
-				.collect(Collectors.toList());
-
-		// ページで絞る
-		int fromIndex = pageable.getPageNumber() * pageable.getPageSize();
-		int toIndex = Math.min(fromIndex + pageable.getPageSize(), filterdPhotoList.size());
-		List<PhotoResource> subList = filterdPhotoList.subList(fromIndex, toIndex);
-		return new PageImpl<>(subList, pageable, filterdPhotoList.size());
+			return resource;
+		});
 	}
 
 	/**
@@ -123,20 +167,38 @@ public class PhotoServiceImpl implements PhotoService {
 	 */
 	@Override
 	public PhotoResource create(PhotoForm form) {
-		// 新規写真
-		Long id = Long.valueOf(photoList.size() + 1);
-		String cd = "test" + id;
+		try {
+			// 新規写真
+			String cd = RandomStringUtils.randomAlphanumeric(10);
 
-		PhotoResource photo = new PhotoResource(id, cd);
-		photo.setCaption(form.getCaption());
-		photo.setImageUrl(ImageUtils.getDataUrl(form.getUpfile()));
-		photo.setCreateAt(new Date());
-		photo.setAccount(accountList.get(0));
+			// S3に保存、URLを設定する
+			String fileName = cd + ".png"; // TODO ファイル拡張子
+			String filePath = s3Service.upload(DocumentTypeEnum.PHOTO, fileName, form.getUpfile());
 
-		// レコード追加
-		photoList.add(photo);
+			// レコード追加
+			TPhoto photo = mapper.map(form, TPhoto.class);
+			photo.setPhotoCd(cd);
+			photo.setImgUrl(filePath);
+			photo.setAccountId(1); // TODO ログインユーザ
+			// TODO 共通項目は親クラスで設定する
+			photo.setDeleted(CommonConst.DeletedFlag.OFF);
+			photo.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			photo.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			tPhotoRepository.create(photo);
 
-		return photo;
+			// TODO コードが重複した場合、ランダム文字列を再生成してリトライする
+
+			Long id = tPhotoRepository.lastInsertId();
+
+			// 戻り値
+			PhotoResource resource = new PhotoResource(id, cd);
+			mapper.map(photo, resource);
+			return resource;
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	/**
@@ -148,9 +210,30 @@ public class PhotoServiceImpl implements PhotoService {
 	 */
 	@Override
 	public boolean like(String cd, boolean isLike) {
-		find(cd).setLike(isLike);
-		find(cd).setLikeCount(find(cd).getLikeCount() + (isLike ? 1 : -1));
-		return true;
+		// 写真を取得
+		TPhoto photo = tPhotoRepository.findOneByCd(cd);
+
+		// いいねを取得
+		TPhotoLikeExample likeExample = new TPhotoLikeExample();
+		Integer accountId = 1; // TODO ログインユーザ
+		likeExample.createCriteria().andPhotoIdEqualTo(photo.getPhotoId()).andAccountIdEqualTo(accountId);
+		TPhotoLike photoLike = tPhotoLikeRepository.findOneBy(likeExample);
+
+		if (photoLike == null) {
+			// レコード登録
+			TPhotoLike entity = new TPhotoLike();
+			entity.setPhotoId(photo.getPhotoId());
+			entity.setAccountId(accountId);
+			entity.setDeleted(isLike ? CommonConst.DeletedFlag.OFF : CommonConst.DeletedFlag.ON);
+			// TODO 共通項目は親クラスで設定する
+			entity.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			entity.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			return tPhotoLikeRepository.create(entity);
+		} else {
+			// レコード更新
+			photoLike.setDeleted(isLike ? CommonConst.DeletedFlag.OFF : CommonConst.DeletedFlag.ON);
+			return tPhotoLikeRepository.updatePartially(photoLike);
+		}
 	}
 
 	/**
@@ -164,15 +247,30 @@ public class PhotoServiceImpl implements PhotoService {
 	 */
 	@Override
 	public CommentResource comment(String cd, String comment) {
-		// コメント情報生成
-		Long id = Long.valueOf(commentList.size() + 1);
-		String commentCd = "comment" + id;
-		CommentResource commentResource = new CommentResource(id, commentCd, comment, new Date(), accountList.get(0),
-				false);
+		// 写真を取得
+		TPhoto photo = tPhotoRepository.findOneByCd(cd);
 
-		// レコード追加
-		find(cd).getComments().add(commentResource);
-		return commentResource;
+		// レコード登録
+		TPhotoComment entity = new TPhotoComment();
+		entity.setCommentCd(RandomStringUtils.randomAlphanumeric(10));
+		entity.setAccountId(1); // TODO ログインユーザ
+		entity.setPhotoId(photo.getPhotoId());
+		entity.setContent(comment);
+		// TODO 共通項目は親クラスで設定する
+		entity.setDeleted(CommonConst.DeletedFlag.OFF);
+		entity.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
+		entity.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
+		tPhotoCommentRepository.create(entity);
+
+		// 戻り値
+		CommentResource resource = mapper.map(entity, CommentResource.class);
+
+		// TODO 投稿ユーザー View または キャッシュ
+		TAccountKey key = new TAccountKey();
+		key.setAccountId(1); // TODO ログインユーザ
+		resource.setAccount(mapper.map(tAccountRepository.findOneBy(key), AccountResource.class));
+
+		return resource;
 	}
 
 	/**
@@ -185,8 +283,38 @@ public class PhotoServiceImpl implements PhotoService {
 	 */
 	@Override
 	public boolean likeComment(String cd, String commentCd, boolean isLike) {
-		find(cd).getComments().stream().filter(comment -> comment.getCd().equals(commentCd)).findFirst().get()
-				.setLike(isLike);
-		return true;
+		// 写真を取得
+		TPhoto photo = tPhotoRepository.findOneByCd(cd);
+
+		Integer accountId = 1; // TODO ログインユーザ
+
+		// コメントを取得
+		TPhotoCommentExample commentExample = new TPhotoCommentExample();
+		commentExample.createCriteria().andCommentCdEqualTo(commentCd).andAccountIdEqualTo(accountId)
+				.andPhotoIdEqualTo(photo.getPhotoId());
+		TPhotoComment photoComment = tPhotoCommentRepository.findOneBy(commentExample);
+
+		// コメントいいねを取得
+		TPhotoCommentLikeExample commentLikeExample = new TPhotoCommentLikeExample();
+		commentLikeExample.createCriteria().andAccountIdEqualTo(accountId).andPhotoIdEqualTo(photo.getPhotoId())
+				.andCommentIdEqualTo(photoComment.getCommentId());
+		TPhotoCommentLike photoCommentLike = tPhotoCommentLikeRepository.findOneBy(commentLikeExample);
+
+		if (photoCommentLike == null) {
+			// レコード登録
+			TPhotoCommentLike entity = new TPhotoCommentLike();
+			entity.setAccountId(accountId);
+			entity.setPhotoId(photo.getPhotoId());
+			entity.setCommentId(photoComment.getCommentId());
+			entity.setDeleted(isLike ? CommonConst.DeletedFlag.OFF : CommonConst.DeletedFlag.ON);
+			// TODO 共通項目は親クラスで設定する
+			entity.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			entity.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			return tPhotoCommentLikeRepository.create(entity);
+		} else {
+			// レコード更新
+			photoCommentLike.setDeleted(isLike ? CommonConst.DeletedFlag.OFF : CommonConst.DeletedFlag.ON);
+			return tPhotoCommentLikeRepository.updatePartially(photoCommentLike);
+		}
 	}
 }

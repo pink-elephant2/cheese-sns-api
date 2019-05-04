@@ -1,6 +1,7 @@
 package com.api.sns.cheese.service;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.api.sns.cheese.resources.AccountResource;
 
@@ -14,18 +15,22 @@ public interface FollowService {
 	 *
 	 * @param loginId
 	 *            ログインID
+	 * @param pageable
+	 *            ページ情報
 	 * @return アカウント情報
 	 */
-	public Page<AccountResource> findFollow(String loginId);
+	public Page<AccountResource> findFollow(String loginId, Pageable pageable);
 
 	/**
 	 * フォローワーを取得する
 	 *
 	 * @param loginId
 	 *            ログインID
+	 * @param pageable
+	 *            ページ情報
 	 * @return アカウント情報
 	 */
-	public Page<AccountResource> findFollowers(String loginId);
+	public Page<AccountResource> findFollowers(String loginId, Pageable pageable);
 
 	/**
 	 * フォローする

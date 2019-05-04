@@ -7,26 +7,29 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * コメントAPIレスポンス
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class CommentResource {
 
 	/** ID */
 	private Long id;
 
 	/** コード */
-	private String cd;
+	@JsonProperty("cd")
+	private String commentCd;
 
 	/** コメント */
-	private String comment;
+	private String content;
 
 	/** コメント日時 */
 	@JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
-	private Date createAt;
+	private Date createdAt;
 
 	/** コメントユーザー */
 	private AccountResource account;

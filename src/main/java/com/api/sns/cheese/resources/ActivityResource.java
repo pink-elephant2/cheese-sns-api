@@ -21,7 +21,7 @@ public class ActivityResource {
 	private PhotoResource photo;
 
 	/** 日時 */
-	private Date createAt;
+	private Date createdAt;
 
 	/** ユーザー */
 	private AccountResource account;
