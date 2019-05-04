@@ -6,14 +6,21 @@ import org.springframework.stereotype.Repository;
 @Primary
 @Repository
 public class TPhotoRepositoryImpl implements TPhotoRepository {
-    private TPhotoMapper tPhotoMapper;
+	private TPhotoMapper tPhotoMapper;
 
-    public TPhotoRepositoryImpl(TPhotoMapper tPhotoMapper) {
-        this.tPhotoMapper = tPhotoMapper;
-    }
+	public TPhotoRepositoryImpl(TPhotoMapper tPhotoMapper) {
+		this.tPhotoMapper = tPhotoMapper;
+	}
 
-    @Override
-    public TPhotoMapper getMapper() {
-        return this.tPhotoMapper;
-    }
+	@Override
+	public TPhotoMapper getMapper() {
+		return this.tPhotoMapper;
+	}
+
+	/**
+	 * LAST_INSERT_IDを取得する
+	 */
+	public Long lastInsertId() {
+		return null;
+	}
 }

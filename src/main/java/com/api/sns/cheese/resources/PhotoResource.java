@@ -29,12 +29,11 @@ public class PhotoResource {
 	private String caption;
 
 	/** 画像パス */ // TODO 画像情報クラス
-	@JsonProperty("imgUrl")
-	private String imageUrl;
+	private String imgUrl;
 
 	/** 投稿日時 */
 	@JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
-	private Date createAt;
+	private Date createdAt;
 
 	/** 投稿ユーザー */
 	public AccountResource account;

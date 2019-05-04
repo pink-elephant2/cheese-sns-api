@@ -26,7 +26,7 @@ public class CommentResource {
 
 	/** コメント日時 */
 	@JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
-	private Date createAt;
+	private Date createdAt;
 
 	/** コメントユーザー */
 	private AccountResource account;
