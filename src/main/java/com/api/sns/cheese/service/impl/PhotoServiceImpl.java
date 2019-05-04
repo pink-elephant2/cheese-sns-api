@@ -3,8 +3,8 @@ package com.api.sns.cheese.service.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.dozer.Mapper;
@@ -17,12 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccountKey;
 import com.api.sns.cheese.domain.TPhoto;
+import com.api.sns.cheese.domain.TPhotoComment;
+import com.api.sns.cheese.domain.TPhotoCommentExample;
 import com.api.sns.cheese.domain.TPhotoExample;
 import com.api.sns.cheese.domain.TPhotoLike;
 import com.api.sns.cheese.domain.TPhotoLikeExample;
 import com.api.sns.cheese.enums.DocumentTypeEnum;
 import com.api.sns.cheese.form.PhotoForm;
 import com.api.sns.cheese.repository.TAccountRepository;
+import com.api.sns.cheese.repository.TPhotoCommentRepository;
 import com.api.sns.cheese.repository.TPhotoLikeRepository;
 import com.api.sns.cheese.repository.TPhotoRepository;
 import com.api.sns.cheese.resources.AccountResource;
@@ -45,6 +48,9 @@ public class PhotoServiceImpl implements PhotoService {
 	private TPhotoLikeRepository tPhotoLikeRepository;
 
 	@Autowired
+	private TPhotoCommentRepository tPhotoCommentRepository;
+
+	@Autowired
 	private TAccountRepository tAccountRepository;
 
 	@Autowired
@@ -64,13 +70,6 @@ public class PhotoServiceImpl implements PhotoService {
 			// テストデータ3
 			new AccountResource(Long.valueOf(1), "gudetama", "ぐでたま", "だるい", "assets/images/gudetama.png", null, null,
 					"gudetama_sanrio", null, false)));
-
-	/** コメントテストデータ */
-	private List<CommentResource> commentList = new ArrayList<>(Arrays.asList(
-			// テストデータ1
-			new CommentResource(Long.valueOf(1), "comment1", "おいしそう😍", new Date(), accountList.get(0), true),
-			// テストデータ2
-			new CommentResource(Long.valueOf(2), "comment2", "作るのだるい", new Date(), accountList.get(2), false)));
 
 	/**
 	 * 写真を取得する
@@ -102,7 +101,7 @@ public class PhotoServiceImpl implements PhotoService {
 		Integer accountId = 1; // TODO ログインユーザ
 		likeExample.createCriteria().andPhotoIdEqualTo(photo.getPhotoId()).andAccountIdEqualTo(accountId);
 		TPhotoLike photoLike = tPhotoLikeRepository.findOneBy(likeExample);
-		resource.setLike(photoLike == null || CommonConst.DeletedFlag.OFF.equals(photoLike.getDeleted()));
+		resource.setLike(photoLike != null && CommonConst.DeletedFlag.OFF.equals(photoLike.getDeleted()));
 
 		// いいね件数 TODO 性能改善
 		likeExample.clear();
@@ -110,6 +109,23 @@ public class PhotoServiceImpl implements PhotoService {
 				.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		// TODO テーブル定義 型変更
 		resource.setLikeCount((int) tPhotoLikeRepository.countBy(likeExample));
+
+		// コメント
+		TPhotoCommentExample commentExample = new TPhotoCommentExample();
+		commentExample.createCriteria().andPhotoIdEqualTo(photo.getPhotoId())
+				.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		List<TPhotoComment> commentList = tPhotoCommentRepository.findAllBy(commentExample);
+		if (!commentList.isEmpty()) {
+			resource.setComments(commentList.stream().map(tPhotoComment -> {
+				CommentResource commentResource = mapper.map(tPhotoComment, CommentResource.class);
+
+				// TODO 投稿ユーザー View または キャッシュ
+				TAccountKey accountKey = new TAccountKey();
+				accountKey.setAccountId(tPhotoComment.getAccountId());
+				commentResource.setAccount(mapper.map(tAccountRepository.findOneBy(accountKey), AccountResource.class));
+				return commentResource;
+			}).collect(Collectors.toList()));
+		}
 
 		return resource;
 	}
@@ -194,17 +210,11 @@ public class PhotoServiceImpl implements PhotoService {
 	@Override
 	public boolean like(String cd, boolean isLike) {
 		// 写真を取得
-		TPhotoExample photoExample = new TPhotoExample();
-		photoExample.createCriteria().andPhotoCdEqualTo(cd).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		TPhoto photo = tPhotoRepository.findOneBy(photoExample);
-		if (photo == null) {
-			// TODO 404を返す
-			// throw new NotFoundException("写真が存在しません");
-		}
+		TPhoto photo = tPhotoRepository.findOneByCd(cd);
 
-		Integer accountId = 1; // TODO ログインユーザ
-
+		// いいねを取得
 		TPhotoLikeExample likeExample = new TPhotoLikeExample();
+		Integer accountId = 1; // TODO ログインユーザ
 		likeExample.createCriteria().andPhotoIdEqualTo(photo.getPhotoId()).andAccountIdEqualTo(accountId);
 		TPhotoLike photoLike = tPhotoLikeRepository.findOneBy(likeExample);
 
@@ -236,15 +246,30 @@ public class PhotoServiceImpl implements PhotoService {
 	 */
 	@Override
 	public CommentResource comment(String cd, String comment) {
-		// コメント情報生成
-		Long id = Long.valueOf(commentList.size() + 1);
-		String commentCd = "comment" + id;
-		CommentResource commentResource = new CommentResource(id, commentCd, comment, new Date(), accountList.get(0),
-				false);
+		// 写真を取得
+		TPhoto photo = tPhotoRepository.findOneByCd(cd);
 
-		// レコード追加
-		find(cd).getComments().add(commentResource);
-		return commentResource;
+		// レコード登録
+		TPhotoComment entity = new TPhotoComment();
+		entity.setCommentCd(RandomStringUtils.randomAlphanumeric(10));
+		entity.setAccountId(1); // TODO ログインユーザ
+		entity.setPhotoId(photo.getPhotoId());
+		entity.setContent(comment);
+		// TODO 共通項目は親クラスで設定する
+		entity.setDeleted(CommonConst.DeletedFlag.OFF);
+		entity.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
+		entity.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
+		tPhotoCommentRepository.create(entity);
+
+		// 戻り値
+		CommentResource resource = mapper.map(entity, CommentResource.class);
+
+		// TODO 投稿ユーザー View または キャッシュ
+		TAccountKey key = new TAccountKey();
+		key.setAccountId(1); // TODO ログインユーザ
+		resource.setAccount(mapper.map(tAccountRepository.findOneBy(key), AccountResource.class));
+
+		return resource;
 	}
 
 	/**
@@ -257,7 +282,7 @@ public class PhotoServiceImpl implements PhotoService {
 	 */
 	@Override
 	public boolean likeComment(String cd, String commentCd, boolean isLike) {
-		find(cd).getComments().stream().filter(comment -> comment.getCd().equals(commentCd)).findFirst().get()
+		find(cd).getComments().stream().filter(comment -> comment.getCommentCd().equals(commentCd)).findFirst().get()
 				.setLike(isLike);
 		return true;
 	}
