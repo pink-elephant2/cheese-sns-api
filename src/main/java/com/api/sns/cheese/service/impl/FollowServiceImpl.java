@@ -8,14 +8,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.api.sns.cheese.aop.SessionInfoContextHolder;
 import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccount;
-import com.api.sns.cheese.domain.TAccountExample;
+import com.api.sns.cheese.domain.TActivity;
+import com.api.sns.cheese.domain.TActivityExample;
 import com.api.sns.cheese.domain.TFollow;
 import com.api.sns.cheese.domain.TFollowExample;
 import com.api.sns.cheese.domain.VFollow;
 import com.api.sns.cheese.domain.VFollowExample;
+import com.api.sns.cheese.enums.ActivityTypeEnum;
 import com.api.sns.cheese.repository.TAccountRepository;
+import com.api.sns.cheese.repository.TActivityRepository;
 import com.api.sns.cheese.repository.TFollowRepository;
 import com.api.sns.cheese.repository.VFollowRepository;
 import com.api.sns.cheese.resources.AccountResource;
@@ -36,6 +40,9 @@ public class FollowServiceImpl implements FollowService {
 
 	@Autowired
 	private VFollowRepository vFollowRepository;
+
+	@Autowired
+	private TActivityRepository tActivityRepository;
 
 	@Autowired
 	private Mapper mapper;
@@ -105,14 +112,13 @@ public class FollowServiceImpl implements FollowService {
 	@Override
 	public boolean follow(String loginId) throws Exception {
 		// 対象ユーザの取得
-		TAccountExample accountExample = new TAccountExample();
-		accountExample.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		TAccount followAccount = tAccountRepository.findOneBy(accountExample);
+		TAccount followAccount = tAccountRepository.findOneByLoginId(loginId);
 		if (followAccount == null) {
 			throw new NotFoundException("アカウントが存在しません");
 		}
 
-		Integer accountId = 1; // TODO ログインユーザー
+		// ログインユーザー
+		Integer accountId = SessionInfoContextHolder.getSessionInfo().getAccountId();
 
 		// フォロー済みか
 		TFollowExample followExample = new TFollowExample();
@@ -128,8 +134,6 @@ public class FollowServiceImpl implements FollowService {
 			follow.setFollowAccountId(followAccount.getAccountId());
 			// TODO 共通項目は親クラスで設定する
 			follow.setDeleted(CommonConst.DeletedFlag.OFF);
-			follow.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
-			follow.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
 
 			// レコード登録
 			ret = tFollowRepository.create(follow);
@@ -141,6 +145,24 @@ public class FollowServiceImpl implements FollowService {
 			follower.setDeleted(CommonConst.DeletedFlag.OFF);
 			ret = tFollowRepository.update(follower);
 		}
+
+		// アクティビティを登録する
+		TActivityExample example = new TActivityExample();
+		example.createCriteria().andAccountIdEqualTo(accountId).andActivityTypeEqualTo(ActivityTypeEnum.FOLLOW)
+				.andFollowAccountIdEqualTo(followAccount.getAccountId()).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		TActivity tActivity = tActivityRepository.findOneBy(example);
+		if (tActivity == null) {
+			TActivity activity = new TActivity();
+			activity.setAccountId(accountId);
+			activity.setActivityType(ActivityTypeEnum.FOLLOW);
+			activity.setFollowAccountId(followAccount.getAccountId());
+			// TODO 共通項目は親クラスで設定する
+			activity.setDeleted(CommonConst.DeletedFlag.OFF);
+
+			// レコード登録
+			ret = tActivityRepository.create(activity);
+		}
+
 		return ret;
 	}
 
@@ -153,14 +175,13 @@ public class FollowServiceImpl implements FollowService {
 	@Override
 	public boolean unfollow(String loginId) throws Exception {
 		// 対象ユーザの取得
-		TAccountExample accountExample = new TAccountExample();
-		accountExample.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		TAccount followAccount = tAccountRepository.findOneBy(accountExample);
+		TAccount followAccount = tAccountRepository.findOneByLoginId(loginId);
 		if (followAccount == null) {
 			throw new NotFoundException("アカウントが存在しません");
 		}
 
-		Integer accountId = 1; // TODO ログインユーザー
+		// ログインユーザー
+		Integer accountId = SessionInfoContextHolder.getSessionInfo().getAccountId();
 
 		// フォロー済みか
 		TFollowExample followExample = new TFollowExample();
@@ -176,8 +197,6 @@ public class FollowServiceImpl implements FollowService {
 			follow.setFollowAccountId(followAccount.getAccountId());
 			// TODO 共通項目は親クラスで設定する
 			follow.setDeleted(CommonConst.DeletedFlag.OFF);
-			follow.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
-			follow.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
 
 			// レコード登録
 			ret = tFollowRepository.create(follow);

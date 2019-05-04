@@ -3,22 +3,37 @@ package com.api.sns.cheese.config;
 import org.dozer.DozerBeanMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.servlet.handler.MappedInterceptor;
 
+import com.api.sns.cheese.aop.CommonHandlerInterceptor;
+
+/**
+ * 共通設定
+ */
 @Configuration
 public class Config {
 
+	/**
+	 * Dozer設定
+	 */
 	@Bean
 	DozerBeanMapper getDozerBeanMapperFactoryBean() {
 		return new DozerBeanMapper();
 	}
 
 	/**
-	 * パスワードハッシュ化方式 TODO WebSecurityConfigに移行する
+	 * 共通ハンドラ
 	 */
 	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
+	public CommonHandlerInterceptor commonHandlerInterceptor() {
+		return new CommonHandlerInterceptor();
+	}
+
+	/**
+	 * 共通ハンドラインターセプタ
+	 */
+	@Bean
+	public MappedInterceptor interceptor() {
+		return new MappedInterceptor(new String[] { "/**" }, commonHandlerInterceptor());
 	}
 }

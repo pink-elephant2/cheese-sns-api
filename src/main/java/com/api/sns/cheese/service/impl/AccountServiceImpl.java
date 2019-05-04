@@ -11,14 +11,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.api.sns.cheese.aop.SessionInfoContextHolder;
 import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccount;
 import com.api.sns.cheese.domain.TAccountExample;
+import com.api.sns.cheese.domain.TFollow;
+import com.api.sns.cheese.domain.TFollowExample;
 import com.api.sns.cheese.enums.DocumentTypeEnum;
 import com.api.sns.cheese.form.AccountCreateForm;
 import com.api.sns.cheese.form.AccountImageForm;
 import com.api.sns.cheese.form.AccountUpdateForm;
 import com.api.sns.cheese.repository.TAccountRepository;
+import com.api.sns.cheese.repository.TFollowRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.service.AccountService;
 import com.api.sns.cheese.service.S3Service;
@@ -32,6 +36,9 @@ public class AccountServiceImpl implements AccountService {
 
 	@Autowired
 	private TAccountRepository tAccountRepository;
+
+	@Autowired
+	private TFollowRepository tFollowRepository;
 
 	@Autowired
 	private Mapper mapper;
@@ -60,8 +67,6 @@ public class AccountServiceImpl implements AccountService {
 
 		// TODO 共通項目は親クラスで設定する
 		account.setDeleted(CommonConst.DeletedFlag.OFF);
-		account.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
-		account.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
 
 		// TODO エラーメッセージ
 		return tAccountRepository.create(account);
@@ -76,15 +81,24 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Override
 	public AccountResource find(String loginId) throws NotFoundException {
-		TAccountExample example = new TAccountExample();
-		example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		TAccount account = tAccountRepository.findOneBy(example);
+		TAccount account = tAccountRepository.findOneByLoginId(loginId);
 
 		if (account == null) {
 			// TODO 404を返す
 			throw new NotFoundException("アカウントが存在しません");
 		}
-		return mapper.map(account, AccountResource.class);
+		AccountResource resource = mapper.map(account, AccountResource.class);
+
+		if (SessionInfoContextHolder.isAuthenticated()) {
+			// ログイン済みの場合、フォローしているか
+			TFollowExample followExample = new TFollowExample();
+			followExample.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId())
+					.andFollowAccountIdEqualTo(account.getAccountId()).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+			TFollow follow = tFollowRepository.findOneBy(followExample);
+			resource.setFollow(follow != null);
+		}
+
+		return resource;
 	}
 
 	/**
@@ -95,13 +109,11 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Override
 	public boolean saveProfile(AccountUpdateForm form) throws NotFoundException {
-		String loginId = "my_melody"; // TODO セッション情報から取得
-
 		// プロフィールを更新する
 		TAccount account = mapper.map(form, TAccount.class);
 
 		TAccountExample example = new TAccountExample();
-		example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		example.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId());
 		return BooleanUtils.toBoolean(tAccountRepository.updatePartiallyBy(account, example));
 	}
 
@@ -112,11 +124,10 @@ public class AccountServiceImpl implements AccountService {
 	 *            画像フォーム
 	 */
 	public boolean saveImage(AccountImageForm form) {
-		String loginId = "my_melody"; // TODO セッション情報から取得
-
 		try {
 			// S3に保存、URLを設定する
-			String fileName = loginId + ".png"; // TODO ファイル名
+			String fileName = SessionInfoContextHolder.getSessionInfo().getLoginId() + ".png";
+			// TODO ファイル名
 			String filePath = s3Service.upload(DocumentTypeEnum.ACCOUNT, fileName, form.getUpfile());
 
 			// プロフィールを更新する
@@ -124,7 +135,7 @@ public class AccountServiceImpl implements AccountService {
 			account.setImgUrl(filePath);
 
 			TAccountExample example = new TAccountExample();
-			example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+			example.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId());
 			return BooleanUtils.toBoolean(tAccountRepository.updatePartiallyBy(account, example));
 
 		} catch (IOException e) {
