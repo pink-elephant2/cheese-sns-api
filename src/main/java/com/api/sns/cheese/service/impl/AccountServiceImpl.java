@@ -66,8 +66,6 @@ public class AccountServiceImpl implements AccountService {
 
 		// TODO 共通項目は親クラスで設定する
 		account.setDeleted(CommonConst.DeletedFlag.OFF);
-		account.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
-		account.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
 
 		// TODO エラーメッセージ
 		return tAccountRepository.create(account);
@@ -82,9 +80,7 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Override
 	public AccountResource find(String loginId) throws NotFoundException {
-		TAccountExample example = new TAccountExample();
-		example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		TAccount account = tAccountRepository.findOneBy(example);
+		TAccount account = tAccountRepository.findOneByLoginId(loginId);
 
 		if (account == null) {
 			// TODO 404を返す

@@ -6,4 +6,12 @@ import com.api.sns.cheese.domain.TAccountKey;
 import com.api.sns.common.business.repository.BaseRepository;
 
 public interface TAccountRepository extends BaseRepository<TAccountKey, TAccount, TAccountExample> {
+
+	/**
+	 * ログインIDで検索
+	 *
+	 * @param loginId
+	 *            ログインId
+	 */
+	public TAccount findOneByLoginId(String loginId);
 }

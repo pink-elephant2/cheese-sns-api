@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccount;
-import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.domain.TActivity;
 import com.api.sns.cheese.domain.TActivityExample;
 import com.api.sns.cheese.domain.TFollow;
@@ -112,9 +111,7 @@ public class FollowServiceImpl implements FollowService {
 	@Override
 	public boolean follow(String loginId) throws Exception {
 		// 対象ユーザの取得
-		TAccountExample accountExample = new TAccountExample();
-		accountExample.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		TAccount followAccount = tAccountRepository.findOneBy(accountExample);
+		TAccount followAccount = tAccountRepository.findOneByLoginId(loginId);
 		if (followAccount == null) {
 			throw new NotFoundException("アカウントが存在しません");
 		}
@@ -178,9 +175,7 @@ public class FollowServiceImpl implements FollowService {
 	@Override
 	public boolean unfollow(String loginId) throws Exception {
 		// 対象ユーザの取得
-		TAccountExample accountExample = new TAccountExample();
-		accountExample.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		TAccount followAccount = tAccountRepository.findOneBy(accountExample);
+		TAccount followAccount = tAccountRepository.findOneByLoginId(loginId);
 		if (followAccount == null) {
 			throw new NotFoundException("アカウントが存在しません");
 		}

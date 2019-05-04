@@ -9,9 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccount;
-import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.repository.TAccountRepository;
 import com.api.sns.cheese.resources.SessionInfoResource;
 
@@ -30,9 +28,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
 		// DB検索
-		TAccountExample example = new TAccountExample();
-		example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		TAccount account = tAccountRepository.findOneBy(example);
+		TAccount account = tAccountRepository.findOneByLoginId(loginId);
 
 		if (account != null) {
 			return new User(loginId, account.getPassword(), AuthorityUtils.createAuthorityList("ROLE_USER"));
@@ -52,9 +48,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 		// DB検索
 		String loginId = SecurityContextHolder.getContext().getAuthentication().getName();
-		TAccountExample example = new TAccountExample();
-		example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		TAccount account = tAccountRepository.findOneBy(example);
+		TAccount account = tAccountRepository.findOneByLoginId(loginId);
 
 		// ユーザがいない場合はエラー
 		if (account == null) {
