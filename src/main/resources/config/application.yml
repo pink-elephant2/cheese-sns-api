@@ -7,6 +7,10 @@ spring:
   jackson:
     dateFormat: yyyy/MM/dd HH:mm:ss
     time-zone: Asia/Tokyo
+  session:
+    store-type: jdbc
+    jdbc:
+      table-name: t_session
 
 cheese:
   cloud-host-url: https://XXX
