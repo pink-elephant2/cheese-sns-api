@@ -18,9 +18,12 @@ import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccountKey;
 import com.api.sns.cheese.domain.TPhoto;
 import com.api.sns.cheese.domain.TPhotoExample;
+import com.api.sns.cheese.domain.TPhotoLike;
+import com.api.sns.cheese.domain.TPhotoLikeExample;
 import com.api.sns.cheese.enums.DocumentTypeEnum;
 import com.api.sns.cheese.form.PhotoForm;
 import com.api.sns.cheese.repository.TAccountRepository;
+import com.api.sns.cheese.repository.TPhotoLikeRepository;
 import com.api.sns.cheese.repository.TPhotoRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.resources.CommentResource;
@@ -37,6 +40,9 @@ public class PhotoServiceImpl implements PhotoService {
 
 	@Autowired
 	private TPhotoRepository tPhotoRepository;
+
+	@Autowired
+	private TPhotoLikeRepository tPhotoLikeRepository;
 
 	@Autowired
 	private TAccountRepository tAccountRepository;
@@ -90,6 +96,20 @@ public class PhotoServiceImpl implements PhotoService {
 		TAccountKey key = new TAccountKey();
 		key.setAccountId(photo.getAccountId());
 		resource.setAccount(mapper.map(tAccountRepository.findOneBy(key), AccountResource.class));
+
+		// 自分がいいねしているか
+		TPhotoLikeExample likeExample = new TPhotoLikeExample();
+		Integer accountId = 1; // TODO ログインユーザ
+		likeExample.createCriteria().andPhotoIdEqualTo(photo.getPhotoId()).andAccountIdEqualTo(accountId);
+		TPhotoLike photoLike = tPhotoLikeRepository.findOneBy(likeExample);
+		resource.setLike(photoLike == null || CommonConst.DeletedFlag.OFF.equals(photoLike.getDeleted()));
+
+		// いいね件数 TODO 性能改善
+		likeExample.clear();
+		likeExample.createCriteria().andPhotoIdEqualTo(photo.getPhotoId())
+				.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		// TODO テーブル定義 型変更
+		resource.setLikeCount((int) tPhotoLikeRepository.countBy(likeExample));
 
 		return resource;
 	}
@@ -173,9 +193,36 @@ public class PhotoServiceImpl implements PhotoService {
 	 */
 	@Override
 	public boolean like(String cd, boolean isLike) {
-		find(cd).setLike(isLike);
-		find(cd).setLikeCount(find(cd).getLikeCount() + (isLike ? 1 : -1));
-		return true;
+		// 写真を取得
+		TPhotoExample photoExample = new TPhotoExample();
+		photoExample.createCriteria().andPhotoCdEqualTo(cd).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		TPhoto photo = tPhotoRepository.findOneBy(photoExample);
+		if (photo == null) {
+			// TODO 404を返す
+			// throw new NotFoundException("写真が存在しません");
+		}
+
+		Integer accountId = 1; // TODO ログインユーザ
+
+		TPhotoLikeExample likeExample = new TPhotoLikeExample();
+		likeExample.createCriteria().andPhotoIdEqualTo(photo.getPhotoId()).andAccountIdEqualTo(accountId);
+		TPhotoLike photoLike = tPhotoLikeRepository.findOneBy(likeExample);
+
+		if (photoLike == null) {
+			// レコード登録
+			TPhotoLike entity = new TPhotoLike();
+			entity.setPhotoId(photo.getPhotoId());
+			entity.setAccountId(accountId);
+			entity.setDeleted(isLike ? CommonConst.DeletedFlag.OFF : CommonConst.DeletedFlag.ON);
+			// TODO 共通項目は親クラスで設定する
+			entity.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			entity.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
+			return tPhotoLikeRepository.create(entity);
+		} else {
+			// レコード更新
+			photoLike.setDeleted(isLike ? CommonConst.DeletedFlag.OFF : CommonConst.DeletedFlag.ON);
+			return tPhotoLikeRepository.updatePartially(photoLike);
+		}
 	}
 
 	/**
