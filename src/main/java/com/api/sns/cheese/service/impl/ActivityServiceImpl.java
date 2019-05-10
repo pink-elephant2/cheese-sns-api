@@ -11,6 +11,7 @@ import com.api.sns.cheese.aop.SessionInfoContextHolder;
 import com.api.sns.cheese.domain.TActivity;
 import com.api.sns.cheese.domain.TActivityExample;
 import com.api.sns.cheese.domain.TPhoto;
+import com.api.sns.cheese.enums.ActivityTypeEnum;
 import com.api.sns.cheese.repository.TAccountRepository;
 import com.api.sns.cheese.repository.TActivityRepository;
 import com.api.sns.cheese.repository.TPhotoRepository;
@@ -41,16 +42,16 @@ public class ActivityServiceImpl implements ActivityService {
 	/**
 	 * フォロー中のアクティビティを取得する
 	 *
-	 * @param loginId
-	 *            ログインID
 	 * @param pageable
 	 *            ページ情報
 	 * @return アクティビティ情報
 	 */
 	@Override
-	public Page<ActivityResource> findFollowing(String loginId, Pageable pageable) {
+	public Page<ActivityResource> findFollowing(Pageable pageable) {
 		TActivityExample example = new TActivityExample();
-		example.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId());
+		// 新規投稿のみ取得する
+		example.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId())
+				.andActivityTypeEqualTo(ActivityTypeEnum.NEW_POST);
 		return tActivityRepository.findPageBy(example, pageable).map(tActivity -> mapResource(tActivity));
 	}
 
@@ -64,7 +65,9 @@ public class ActivityServiceImpl implements ActivityService {
 	@Override
 	public Page<ActivityResource> findMe(Pageable pageable) {
 		TActivityExample example = new TActivityExample();
-		example.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId());
+		// 新規投稿以外取得する
+		example.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId())
+				.andActivityTypeNotEqualTo(ActivityTypeEnum.NEW_POST);
 		return tActivityRepository.findPageBy(example, pageable).map(tActivity -> mapResource(tActivity));
 	}
 

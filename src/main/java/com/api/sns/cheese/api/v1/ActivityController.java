@@ -31,11 +31,8 @@ public class ActivityController {
 	@ResponseStatus(HttpStatus.OK)
 	public Page<ActivityResource> getFollowing(@SortDefault.SortDefaults({
 			@SortDefault(sort = "activity_id", direction = Direction.DESC) }) Pageable pageable) {
-		// ログインユーザ
-		String loginId = "my_melody";
-
 		// アクティビティを取得する
-		return activityService.findFollowing(loginId, pageable);
+		return activityService.findFollowing(pageable);
 	}
 
 	/**
