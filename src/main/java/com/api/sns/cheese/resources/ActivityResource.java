@@ -4,14 +4,12 @@ import java.util.Date;
 
 import com.api.sns.cheese.enums.ActivityTypeEnum;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
  * アクティビティAPIレスポンス
  */
 @Data
-@AllArgsConstructor
 public class ActivityResource {
 
 	/** 行動種別 */

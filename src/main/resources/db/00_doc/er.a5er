@@ -1,4 +1,4 @@
-﻿# A5:ER FORMAT:11
+﻿# A5:ER FORMAT:13
 # A5:ER ENCODING:UTF8
 # A5:ER Mk-1 Copyright (C)2007 m.matsubara
 # A5:SQL Mk-2 Copyright (C)1997 m.matsubara
@@ -56,6 +56,7 @@ LNameByComment=1
 Color=$000000
 BkColor=$FFFFFF
 Position="VIEW",950,150
+ZOrder=27
 Page=VIEW
 Left=950
 Top=150
@@ -65,11 +66,12 @@ PName=v_activity
 LName=アクティビティビュー
 Comment=
 ViewOption=
-Query=SELECT\n  tActivity.activity_id\n  , tActivity.follow_account_id\n  , tActivity.comment_id\n  , tActivity.photo_id\n  , tActivity.account_id\n  , tActivity.activity_type\n  , tAccount.login_id\n  , tAccount.name\n  , tAccount.img_url \nFROM\n  t_activity tActivity \n  INNER JOIN t_account tAccount \n    ON tAccount.account_id = tActivity.account_id \n    AND tAccount.deleted = \q0\q\n
+Query=SELECT\n  tActivity.activity_id\n  , tActivity.follow_account_id\n  , tActivity.comment_id\n  , tActivity.photo_id\n  , tActivity.account_id\n  , tActivity.activity_type\n  , tActivity.created_at\n  , tAccount.login_id\n  , tAccount.name\n  , tAccount.img_url \nFROM\n  t_activity tActivity \n  INNER JOIN t_account tAccount \n    ON tAccount.account_id = tActivity.account_id \n    AND tAccount.deleted = \q0\q\n
 LNameByComment=1
 Color=$000000
 BkColor=$FFFFFF
 Position="VIEW",150,150
+ZOrder=26
 Page=VIEW
 Left=150
 Top=150
@@ -93,6 +95,7 @@ Bar2=949
 Bar3=34
 TermPos1=R
 TermPos2=R
+ZOrder=25
 
 [Relation]
 Entity1=t_photo
@@ -113,6 +116,7 @@ Bar2=622
 Bar3=396
 TermPos1=R
 TermPos2=R
+ZOrder=24
 
 [Entity]
 PName=t_tag_photo
@@ -131,6 +135,7 @@ Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220436
 Position="TABLE",1650,100
+ZOrder=23
 
 [Relation]
 Entity1=t_tag
@@ -151,6 +156,7 @@ Bar2=911
 Bar3=50
 TermPos1=R
 TermPos2=R
+ZOrder=22
 
 [Relation]
 Entity1=t_account
@@ -171,6 +177,7 @@ Bar2=911
 Bar3=262
 TermPos1=R
 TermPos2=R
+ZOrder=21
 
 [Entity]
 PName=t_follow_tag
@@ -190,6 +197,7 @@ Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220442
 Position="TABLE",150,200
+ZOrder=20
 
 [Entity]
 PName=t_tag
@@ -206,6 +214,7 @@ Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220428
 Position="TABLE",1250,100
+ZOrder=19
 
 [Relation]
 Entity1=t_account
@@ -226,6 +235,7 @@ Bar2=569
 Bar3=340
 TermPos1=R
 TermPos2=R
+ZOrder=18
 
 [Entity]
 PName=t_login_history
@@ -245,6 +255,7 @@ Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220522
 Position="TABLE",850,1450
+ZOrder=17
 
 [Relation]
 Entity1=t_account
@@ -265,6 +276,7 @@ Bar2=637
 Bar3=298
 TermPos1=R
 TermPos2=R
+ZOrder=16
 
 [Entity]
 PName=t_activity
@@ -286,6 +298,7 @@ Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220527
 Position="TABLE",200,1150
+ZOrder=15
 
 [Relation]
 Entity1=t_photo
@@ -306,6 +319,7 @@ Bar2=818
 Bar3=110
 TermPos1=R
 TermPos2=R
+ZOrder=14
 
 [Entity]
 PName=t_bookmark
@@ -324,6 +338,7 @@ Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220502
 Position="TABLE",2200,800
+ZOrder=13
 
 [Entity]
 PName=t_photo
@@ -346,6 +361,7 @@ Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220402
 Position="TABLE",1650,500
+ZOrder=12
 
 [Entity]
 PName=t_photo_comment
@@ -366,6 +382,7 @@ Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220739
 Position="TABLE",1650,1200
+ZOrder=11
 
 [Relation]
 Entity1=t_photo_comment
@@ -386,6 +403,7 @@ Bar2=776
 Bar3=280
 TermPos1=R
 TermPos2=R
+ZOrder=10
 
 [Entity]
 PName=t_photo_comment_like
@@ -405,6 +423,7 @@ Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220516
 Position="TABLE",2200,1200
+ZOrder=9
 
 [Relation]
 Entity1=t_photo
@@ -425,6 +444,7 @@ Bar2=765
 Bar3=330
 TermPos1=R
 TermPos2=R
+ZOrder=8
 
 [Entity]
 PName=t_photo_like
@@ -443,6 +463,7 @@ Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220455
 Position="TABLE",2200,500,209,114
+ZOrder=7
 
 [Relation]
 Entity1=t_account
@@ -463,6 +484,7 @@ Bar2=878
 Bar3=156
 TermPos1=R
 TermPos2=R
+ZOrder=6
 
 [Entity]
 PName=t_follow
@@ -481,6 +503,7 @@ Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220449
 Position="TABLE",150,550
+ZOrder=5
 
 [Entity]
 PName=t_contact
@@ -500,6 +523,7 @@ Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220650
 Position="TABLE",200,1650,286,190
+ZOrder=4
 
 [Relation]
 Entity1=t_account
@@ -520,6 +544,7 @@ Bar2=722
 Bar3=147
 TermPos1=R
 TermPos2=R
+ZOrder=3
 
 [Relation]
 Entity1=t_photo
@@ -540,6 +565,7 @@ Bar2=691
 Bar3=343
 TermPos1=R
 TermPos2=R
+ZOrder=2
 
 [Relation]
 Entity1=t_account
@@ -560,6 +586,7 @@ Bar2=899
 Bar3=154
 TermPos1=R
 TermPos2=R
+ZOrder=1
 
 [Entity]
 PName=t_account
@@ -588,3 +615,4 @@ Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220420
 Position="TABLE",850,550,365,524
+ZOrder=0

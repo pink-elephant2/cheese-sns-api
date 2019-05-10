@@ -289,6 +289,7 @@ SELECT
   , tActivity.photo_id
   , tActivity.account_id
   , tActivity.activity_type
+  , tActivity.created_at
   , tAccount.login_id
   , tAccount.name
   , tAccount.img_url
