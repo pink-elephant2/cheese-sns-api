@@ -288,7 +288,7 @@ public class PhotoServiceImpl implements PhotoService {
 			ret = tPhotoLikeRepository.updatePartially(photoLike);
 		}
 
-		if (ret) {
+		if (ret && !photo.getAccountId().equals(accountId)) {
 			// アクティビティを登録する
 			TActivityExample example = new TActivityExample();
 			example.createCriteria().andAccountIdEqualTo(photo.getAccountId())
@@ -339,7 +339,7 @@ public class PhotoServiceImpl implements PhotoService {
 		entity.setDeleted(CommonConst.DeletedFlag.OFF);
 		boolean ret = tPhotoCommentRepository.create(entity);
 
-		if (ret) {
+		if (ret && !photo.getAccountId().equals(accountId)) {
 			// アクティビティを登録する
 			TActivityExample example = new TActivityExample();
 			example.createCriteria().andAccountIdEqualTo(photo.getAccountId())
@@ -413,7 +413,7 @@ public class PhotoServiceImpl implements PhotoService {
 			ret = tPhotoCommentLikeRepository.updatePartially(photoCommentLike);
 		}
 
-		if (ret && isLike) {
+		if (ret && isLike && !photo.getAccountId().equals(accountId)) {
 			// アクティビティを登録する
 			TActivityExample example = new TActivityExample();
 			example.createCriteria().andAccountIdEqualTo(photo.getAccountId())
