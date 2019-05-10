@@ -78,7 +78,7 @@ drop table if exists t_activity cascade;
 create table t_activity (
   activity_id BIGINT not null AUTO_INCREMENT comment 'アクティビティID'
   , account_id INT(10) not null comment 'アカウントID'
-  , activity_type ENUM('COMMENT', 'LIKE', 'FOLLOW', 'NEW_POST') not null comment 'アクティビティ種別'
+  , activity_type ENUM('COMMENT', 'LIKE', 'FOLLOW', 'NEW_POST', 'COMMENT_LIKE') not null comment 'アクティビティ種別'
   , photo_id BIGINT comment '写真ID'
   , follow_account_id INT(10) comment 'フォローアカウントID'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'

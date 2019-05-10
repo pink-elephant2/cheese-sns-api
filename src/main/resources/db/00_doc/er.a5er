@@ -275,14 +275,14 @@ Left=200
 Top=1150
 Field="アクティビティID","activity_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
 Field="アカウントID","account_id","INT(10)","NOT NULL",,"","",$FFFFFFFF,""
-Field="アクティビティ種別","activity_type","ENUM(\qCOMMENT\q, \qLIKE\q, \qFOLLOW\q, \qNEW_POST\q)","NOT NULL",,"","",$FFFFFFFF,""
+Field="アクティビティ種別","activity_type","ENUM(\qCOMMENT\q, \qLIKE\q, \qFOLLOW\q, \qNEW_POST\q, \qCOMMENT_LIKE\q)","NOT NULL",,"","",$FFFFFFFF,""
 Field="写真ID","photo_id","BIGINT",,,"","",$FFFFFFFF,""
 Field="フォローアカウントID","follow_account_id","INT(10)",,,"","",$FFFFFFFF,""
 Index==0,account_id
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20190511000018
+ModifiedDateTime=20190511003652
 Position="TABLE",200,1150
 ZOrder=15
 
