@@ -7,22 +7,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 /**
  * 写真APIレスポンス
  */
 @Data
-@RequiredArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 public class PhotoResource {
 
 	/** ID */
-	private final Long id;
+	@JsonProperty("id")
+	private Long photoId;
 
 	/** コード */
 	@JsonProperty("cd")
-	private final String code;
+	private String photoCd;
 
 	/** 説明 */
 	private String caption;

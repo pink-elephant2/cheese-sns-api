@@ -15,7 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.api.sns.cheese.aop.SessionInfoContextHolder;
 import com.api.sns.cheese.consts.CommonConst;
+import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.domain.TAccountKey;
+import com.api.sns.cheese.domain.TActivity;
+import com.api.sns.cheese.domain.TFollow;
+import com.api.sns.cheese.domain.TFollowExample;
 import com.api.sns.cheese.domain.TPhoto;
 import com.api.sns.cheese.domain.TPhotoComment;
 import com.api.sns.cheese.domain.TPhotoCommentExample;
@@ -24,9 +28,12 @@ import com.api.sns.cheese.domain.TPhotoCommentLikeExample;
 import com.api.sns.cheese.domain.TPhotoExample;
 import com.api.sns.cheese.domain.TPhotoLike;
 import com.api.sns.cheese.domain.TPhotoLikeExample;
+import com.api.sns.cheese.enums.ActivityTypeEnum;
 import com.api.sns.cheese.enums.DocumentTypeEnum;
 import com.api.sns.cheese.form.PhotoForm;
 import com.api.sns.cheese.repository.TAccountRepository;
+import com.api.sns.cheese.repository.TActivityRepository;
+import com.api.sns.cheese.repository.TFollowRepository;
 import com.api.sns.cheese.repository.TPhotoCommentLikeRepository;
 import com.api.sns.cheese.repository.TPhotoCommentRepository;
 import com.api.sns.cheese.repository.TPhotoLikeRepository;
@@ -60,6 +67,12 @@ public class PhotoServiceImpl implements PhotoService {
 	private TAccountRepository tAccountRepository;
 
 	@Autowired
+	private TFollowRepository tFollowRepository;
+
+	@Autowired
+	private TActivityRepository tActivityRepository;
+
+	@Autowired
 	private S3Service s3Service;
 
 	@Autowired
@@ -82,8 +95,7 @@ public class PhotoServiceImpl implements PhotoService {
 			// throw new NotFoundException("写真が存在しません");
 		}
 
-		PhotoResource resource = new PhotoResource(photo.getPhotoId(), photo.getPhotoCd());
-		mapper.map(photo, resource);
+		PhotoResource resource = mapper.map(photo, PhotoResource.class);
 
 		// TODO 投稿ユーザー View または キャッシュ
 		TAccountKey key = new TAccountKey();
@@ -92,7 +104,8 @@ public class PhotoServiceImpl implements PhotoService {
 
 		// ログインユーザー
 		Integer accountId = SessionInfoContextHolder.isAuthenticated()
-				? SessionInfoContextHolder.getSessionInfo().getAccountId() : null;
+				? SessionInfoContextHolder.getSessionInfo().getAccountId()
+				: null;
 
 		// 自分がいいねしているか
 		TPhotoLikeExample likeExample = new TPhotoLikeExample();
@@ -157,8 +170,7 @@ public class PhotoServiceImpl implements PhotoService {
 			example.createCriteria().andAccountIdEqualTo(accountId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		}
 		return tPhotoRepository.findPageBy(example, pageable).map(tPhoto -> {
-			PhotoResource resource = new PhotoResource(tPhoto.getPhotoId(), tPhoto.getPhotoCd());
-			mapper.map(tPhoto, resource);
+			PhotoResource resource = mapper.map(tPhoto, PhotoResource.class);
 
 			// TODO 投稿ユーザー View または キャッシュ
 			TAccountKey key = new TAccountKey();
@@ -197,16 +209,49 @@ public class PhotoServiceImpl implements PhotoService {
 
 			// TODO コードが重複した場合、ランダム文字列を再生成してリトライする
 
-			Long id = tPhotoRepository.lastInsertId();
+			// 新規写真ID
+			photo.setPhotoId(tPhotoRepository.lastInsertId());
+
+			// フォローワーにアクティビティ登録
+			createActivity(photo.getPhotoId());
 
 			// 戻り値
-			PhotoResource resource = new PhotoResource(id, cd);
-			mapper.map(photo, resource);
+			PhotoResource resource = mapper.map(photo, PhotoResource.class);
 			return resource;
 
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
+		}
+	}
+
+	/**
+	 * フォローワーにアクティビティ登録する
+	 * TODO バッチで行う
+	 *
+	 * @param photoId
+	 */
+	private void createActivity(Long photoId) {
+		TFollowExample followExample = new TFollowExample();
+		followExample.createCriteria()
+				.andFollowAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId())
+				.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		List<TFollow> followList = tFollowRepository.findAllBy(followExample);
+		if (!followList.isEmpty()) {
+			TAccountExample accountExample = new TAccountExample();
+			accountExample.createCriteria()
+					.andAccountIdIn(followList.stream().map(TFollow::getAccountId).collect(Collectors.toList()));
+			tAccountRepository.findAllBy(accountExample).stream().forEach(tAccount -> {
+				TActivity tActivity = new TActivity();
+				tActivity.setAccountId(tAccount.getAccountId());
+				tActivity.setActivityType(ActivityTypeEnum.NEW_POST);
+				tActivity.setPhotoId(photoId);
+				// TODO 共通項目は親クラスで設定する
+				tActivity.setDeleted(CommonConst.DeletedFlag.OFF);
+
+				// レコード登録
+				tActivityRepository.create(tActivity);
+			});
 		}
 	}
 

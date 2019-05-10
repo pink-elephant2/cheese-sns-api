@@ -153,9 +153,9 @@ public class FollowServiceImpl implements FollowService {
 		TActivity tActivity = tActivityRepository.findOneBy(example);
 		if (tActivity == null) {
 			TActivity activity = new TActivity();
-			activity.setAccountId(accountId);
+			activity.setAccountId(followAccount.getAccountId());
 			activity.setActivityType(ActivityTypeEnum.FOLLOW);
-			activity.setFollowAccountId(followAccount.getAccountId());
+			activity.setFollowAccountId(accountId);
 			// TODO 共通項目は親クラスで設定する
 			activity.setDeleted(CommonConst.DeletedFlag.OFF);
 
