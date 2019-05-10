@@ -1,5 +1,5 @@
 -- Project Name : チーズSNS
--- Date/Time    : 2019/04/29 16:41:09
+-- Date/Time    : 2019/05/11 0:02:55
 -- Author       : チーズSNS
 -- RDBMS Type   : MySQL
 -- Application  : A5:SQL Mk-2
@@ -80,7 +80,6 @@ create table t_activity (
   , account_id INT(10) not null comment 'アカウントID'
   , activity_type ENUM('COMMENT', 'LIKE', 'FOLLOW', 'NEW_POST') not null comment 'アクティビティ種別'
   , photo_id BIGINT comment '写真ID'
-  , comment_id BIGINT comment 'コメントID'
   , follow_account_id INT(10) comment 'フォローアカウントID'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
@@ -275,28 +274,5 @@ FROM
     on tFollow.follow_account_id = tFollowerAccount.account_id
     and tFollowerAccount.deleted = '0'
 
-
-;
-
--- アクティビティビュー
-drop view if exists v_activity;
-
-create view v_activity as
-SELECT
-  tActivity.activity_id
-  , tActivity.follow_account_id
-  , tActivity.comment_id
-  , tActivity.photo_id
-  , tActivity.account_id
-  , tActivity.activity_type
-  , tActivity.created_at
-  , tAccount.login_id
-  , tAccount.name
-  , tAccount.img_url
-FROM
-  t_activity tActivity
-  INNER JOIN t_account tAccount
-    ON tAccount.account_id = tActivity.account_id
-    AND tAccount.deleted = '0'
 
 ;

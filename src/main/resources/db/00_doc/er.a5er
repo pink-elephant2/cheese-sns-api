@@ -33,6 +33,8 @@ RDBMSType=5
 RDBMSTypeName=MySQL
 GenerateDropTableStatement=1
 DropTableIfExists=1
+BackupRestoreTempTable=0
+FKParentIndex=1
 CommonField="削除フラグ","deleted","@VARCHAR(1)","NOT NULL",,"\q0\q","",$FFFFFFFF
 CommonField="作成日時","created_at","@DATETIME","NOT NULL",,"CURRENT_TIMESTAMP","",$FFFFFFFF
 CommonField="作成者","created_by","@VARCHAR(20)","NOT NULL",,"\qSYSTEM\q","",$FFFFFFFF
@@ -56,24 +58,9 @@ LNameByComment=1
 Color=$000000
 BkColor=$FFFFFF
 Position="VIEW",950,150
-ZOrder=27
-Page=VIEW
-Left=950
-Top=150
-
-[View]
-PName=v_activity
-LName=アクティビティビュー
-Comment=
-ViewOption=
-Query=SELECT\n  tActivity.activity_id\n  , tActivity.follow_account_id\n  , tActivity.comment_id\n  , tActivity.photo_id\n  , tActivity.account_id\n  , tActivity.activity_type\n  , tActivity.created_at\n  , tAccount.login_id\n  , tAccount.name\n  , tAccount.img_url \nFROM\n  t_activity tActivity \n  INNER JOIN t_account tAccount \n    ON tAccount.account_id = tActivity.account_id \n    AND tAccount.deleted = \q0\q\n
-LNameByComment=1
-Color=$000000
-BkColor=$FFFFFF
-Position="VIEW",150,150
 ZOrder=26
 Page=VIEW
-Left=150
+Left=950
 Top=150
 
 [Relation]
@@ -290,13 +277,12 @@ Field="アクティビティID","activity_id","BIGINT","NOT NULL",0,"","",$FFFFF
 Field="アカウントID","account_id","INT(10)","NOT NULL",,"","",$FFFFFFFF,""
 Field="アクティビティ種別","activity_type","ENUM(\qCOMMENT\q, \qLIKE\q, \qFOLLOW\q, \qNEW_POST\q)","NOT NULL",,"","",$FFFFFFFF,""
 Field="写真ID","photo_id","BIGINT",,,"","",$FFFFFFFF,""
-Field="コメントID","comment_id","BIGINT",,,"","",$FFFFFFFF,""
 Field="フォローアカウントID","follow_account_id","INT(10)",,,"","",$FFFFFFFF,""
 Index==0,account_id
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20190415220527
+ModifiedDateTime=20190511000018
 Position="TABLE",200,1150
 ZOrder=15
 

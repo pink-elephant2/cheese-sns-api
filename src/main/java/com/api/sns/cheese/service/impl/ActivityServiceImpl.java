@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.api.sns.cheese.aop.SessionInfoContextHolder;
+import com.api.sns.cheese.domain.TActivity;
+import com.api.sns.cheese.domain.TActivityExample;
 import com.api.sns.cheese.domain.TPhoto;
-import com.api.sns.cheese.domain.VActivity;
-import com.api.sns.cheese.domain.VActivityExample;
 import com.api.sns.cheese.repository.TAccountRepository;
+import com.api.sns.cheese.repository.TActivityRepository;
 import com.api.sns.cheese.repository.TPhotoRepository;
-import com.api.sns.cheese.repository.VActivityRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.resources.ActivityResource;
 import com.api.sns.cheese.resources.PhotoResource;
@@ -27,7 +27,7 @@ import com.api.sns.cheese.service.ActivityService;
 public class ActivityServiceImpl implements ActivityService {
 
 	@Autowired
-	private VActivityRepository vActivityRepository;
+	private TActivityRepository tActivityRepository;
 
 	@Autowired
 	private TAccountRepository tAccountRepository;
@@ -49,9 +49,9 @@ public class ActivityServiceImpl implements ActivityService {
 	 */
 	@Override
 	public Page<ActivityResource> findFollowing(String loginId, Pageable pageable) {
-		VActivityExample example = new VActivityExample();
+		TActivityExample example = new TActivityExample();
 		example.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId());
-		return vActivityRepository.findPageBy(example, pageable).map(vFollow -> mapResource(vFollow));
+		return tActivityRepository.findPageBy(example, pageable).map(tActivity -> mapResource(tActivity));
 	}
 
 	/**
@@ -65,61 +65,54 @@ public class ActivityServiceImpl implements ActivityService {
 	 */
 	@Override
 	public Page<ActivityResource> findMe(String loginId, Pageable pageable) {
-		VActivityExample example = new VActivityExample();
+		TActivityExample example = new TActivityExample();
 		example.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId());
-		return vActivityRepository.findPageBy(example, pageable).map(vFollow -> mapResource(vFollow));
+		return tActivityRepository.findPageBy(example, pageable).map(tActivity -> mapResource(tActivity));
 	}
 
 	/**
 	 * アクティビティリソースに変換
 	 *
-	 * @param vFollow
+	 * @param tActivity
 	 * @return ActivityResource
 	 */
-	private ActivityResource mapResource(VActivity vFollow) {
-		ActivityResource resource = mapper.map(vFollow, ActivityResource.class);
-
-		switch (resource.getActivityType()) {
+	private ActivityResource mapResource(TActivity tActivity) {
+		switch (tActivity.getActivityType()) {
 
 		// コメントされた
 		case COMMENT:
-			resource = mapResourceComment(vFollow);
-			break;
+			return mapResourceComment(tActivity);
 
 		// フォローされた
 		case FOLLOW:
-			resource = mapResourceFollow(vFollow);
-			break;
+			return mapResourceFollow(tActivity);
 
 		// いいねされた
 		case LIKE:
-			resource = mapResourceLike(vFollow);
-			break;
+			return mapResourceLike(tActivity);
 
 		// 投稿された
 		case NEW_POST:
-			resource = mapResourceNewPost(vFollow);
-			break;
+			return mapResourceNewPost(tActivity);
 
 		default:
-			resource = null;
 			break;
 		}
-		return resource;
+		return null;
 	}
 
 	/**
 	 * アクティビティリソースに変換(COMMENT)
 	 */
-	private ActivityResource mapResourceComment(VActivity vFollow) {
-		ActivityResource resource = mapper.map(vFollow, ActivityResource.class);
+	private ActivityResource mapResourceComment(TActivity tActivity) {
+		ActivityResource resource = mapper.map(tActivity, ActivityResource.class);
 		// 写真を取得
-		TPhoto photo = tPhotoRepository.findOneById(vFollow.getPhotoId());
+		TPhoto photo = tPhotoRepository.findOneById(tActivity.getPhotoId());
 		PhotoResource photoResource = mapper.map(photo, PhotoResource.class);
 		resource.setPhoto(photoResource);
 
 		// アカウントを取得
-		AccountResource postAccount = mapper.map(tAccountRepository.findOneById(vFollow.getFollowAccountId()),
+		AccountResource postAccount = mapper.map(tAccountRepository.findOneById(tActivity.getFollowAccountId()),
 				AccountResource.class);
 		resource.setAccount(postAccount);
 		return resource;
@@ -128,11 +121,11 @@ public class ActivityServiceImpl implements ActivityService {
 	/**
 	 * アクティビティリソースに変換(FOLLOW)
 	 */
-	private ActivityResource mapResourceFollow(VActivity vFollow) {
-		ActivityResource resource = mapper.map(vFollow, ActivityResource.class);
+	private ActivityResource mapResourceFollow(TActivity tActivity) {
+		ActivityResource resource = mapper.map(tActivity, ActivityResource.class);
 		// アカウントを取得
 		AccountResource followAccount = mapper.map(
-				tAccountRepository.findOneById(vFollow.getFollowAccountId()),
+				tAccountRepository.findOneById(tActivity.getFollowAccountId()),
 				AccountResource.class);
 		resource.setAccount(followAccount);
 		return resource;
@@ -141,15 +134,15 @@ public class ActivityServiceImpl implements ActivityService {
 	/**
 	 * アクティビティリソースに変換(LIKE)
 	 */
-	private ActivityResource mapResourceLike(VActivity vFollow) {
-		ActivityResource resource = mapper.map(vFollow, ActivityResource.class);
+	private ActivityResource mapResourceLike(TActivity tActivity) {
+		ActivityResource resource = mapper.map(tActivity, ActivityResource.class);
 		// 写真を取得
-		TPhoto photo = tPhotoRepository.findOneById(vFollow.getPhotoId());
+		TPhoto photo = tPhotoRepository.findOneById(tActivity.getPhotoId());
 		PhotoResource photoResource = mapper.map(photo, PhotoResource.class);
 		resource.setPhoto(photoResource);
 
 		// アカウントを取得
-		AccountResource postAccount = mapper.map(tAccountRepository.findOneById(vFollow.getFollowAccountId()),
+		AccountResource postAccount = mapper.map(tAccountRepository.findOneById(tActivity.getFollowAccountId()),
 				AccountResource.class);
 		resource.setAccount(postAccount);
 		return resource;
@@ -158,10 +151,10 @@ public class ActivityServiceImpl implements ActivityService {
 	/**
 	 * アクティビティリソースに変換(NEW_POST)
 	 */
-	private ActivityResource mapResourceNewPost(VActivity vFollow) {
-		ActivityResource resource = mapper.map(vFollow, ActivityResource.class);
+	private ActivityResource mapResourceNewPost(TActivity tActivity) {
+		ActivityResource resource = mapper.map(tActivity, ActivityResource.class);
 		// 写真を取得
-		TPhoto photo = tPhotoRepository.findOneById(vFollow.getPhotoId());
+		TPhoto photo = tPhotoRepository.findOneById(tActivity.getPhotoId());
 		PhotoResource photoResource = mapper.map(photo, PhotoResource.class);
 		resource.setPhoto(photoResource);
 

@@ -503,66 +503,6 @@ public class TActivityExample implements BaseExample {
             return (Criteria) this;
         }
 
-        public Criteria andCommentIdIsNull() {
-            addCriterion("comment_id is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andCommentIdIsNotNull() {
-            addCriterion("comment_id is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andCommentIdEqualTo(Long value) {
-            addCriterion("comment_id =", value, "commentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andCommentIdNotEqualTo(Long value) {
-            addCriterion("comment_id <>", value, "commentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andCommentIdGreaterThan(Long value) {
-            addCriterion("comment_id >", value, "commentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andCommentIdGreaterThanOrEqualTo(Long value) {
-            addCriterion("comment_id >=", value, "commentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andCommentIdLessThan(Long value) {
-            addCriterion("comment_id <", value, "commentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andCommentIdLessThanOrEqualTo(Long value) {
-            addCriterion("comment_id <=", value, "commentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andCommentIdIn(List<Long> values) {
-            addCriterion("comment_id in", values, "commentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andCommentIdNotIn(List<Long> values) {
-            addCriterion("comment_id not in", values, "commentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andCommentIdBetween(Long value1, Long value2) {
-            addCriterion("comment_id between", value1, value2, "commentId");
-            return (Criteria) this;
-        }
-
-        public Criteria andCommentIdNotBetween(Long value1, Long value2) {
-            addCriterion("comment_id not between", value1, value2, "commentId");
-            return (Criteria) this;
-        }
-
         public Criteria andFollowAccountIdIsNull() {
             addCriterion("follow_account_id is null");
             return (Criteria) this;
