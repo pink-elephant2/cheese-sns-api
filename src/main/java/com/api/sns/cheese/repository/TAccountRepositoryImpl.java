@@ -43,6 +43,7 @@ public class TAccountRepositoryImpl implements TAccountRepository {
 	public TAccount findOneByLoginId(String loginId) {
 		TAccountExample example = new TAccountExample();
 		example.createCriteria().andLoginIdEqualTo(loginId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		// TODO エラー
 		return findOneBy(example);
 	}
 }

@@ -161,8 +161,9 @@ public class PhotoServiceImpl implements PhotoService {
 	@Override
 	public Page<PhotoResource> findList(String loginId, Pageable pageable) {
 		TPhotoExample example = new TPhotoExample();
-		if (!StringUtils.isEmpty(loginId) && SessionInfoContextHolder.isAuthenticated()) {
-			Integer accountId = SessionInfoContextHolder.getSessionInfo().getAccountId();
+		if (!StringUtils.isEmpty(loginId)) {
+			// 指定されたユーザーの写真一覧
+			Integer accountId = tAccountRepository.findOneByLoginId(loginId).getAccountId();
 			example.createCriteria().andAccountIdEqualTo(accountId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		}
 		return tPhotoRepository.findPageBy(example, pageable).map(tPhoto -> {
