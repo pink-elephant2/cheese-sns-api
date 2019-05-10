@@ -17,7 +17,9 @@ public enum ActivityTypeEnum implements BaseEnum {
 	/** フォロー */
 	FOLLOW("Follow", "フォロー", 3),
 	/** 新しい投稿 */
-	NEW_POST("New Post", "新しい投稿", 4);
+	NEW_POST("New Post", "新しい投稿", 4),
+	/** コメントいいね */
+	COMMENT_LIKE("Comment Like", "コメントいいね", 5);
 
 	/** ステータス名称（英語） */
 	private final String nameEn;
@@ -58,5 +60,10 @@ public enum ActivityTypeEnum implements BaseEnum {
 	/** 新しい投稿か */
 	public boolean isNewPost() {
 		return this == NEW_POST;
+	}
+
+	/** コメントいいねか */
+	public boolean isCommentLike() {
+		return this == COMMENT_LIKE;
 	}
 }

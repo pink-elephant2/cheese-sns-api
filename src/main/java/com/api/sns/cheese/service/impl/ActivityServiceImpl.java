@@ -95,6 +95,10 @@ public class ActivityServiceImpl implements ActivityService {
 		case NEW_POST:
 			return mapResourceNewPost(tActivity);
 
+		// コメントにいいねされた
+		case COMMENT_LIKE:
+			return mapResourceCommentLike(tActivity);
+
 		default:
 			break;
 		}
@@ -160,6 +164,23 @@ public class ActivityServiceImpl implements ActivityService {
 
 		// アカウントを取得
 		AccountResource postAccount = mapper.map(tAccountRepository.findOneById(photo.getAccountId()),
+				AccountResource.class);
+		resource.setAccount(postAccount);
+		return resource;
+	}
+
+	/**
+	 * アクティビティリソースに変換(COMMENT_LIKE)
+	 */
+	private ActivityResource mapResourceCommentLike(TActivity tActivity) {
+		ActivityResource resource = mapper.map(tActivity, ActivityResource.class);
+		// 写真を取得
+		TPhoto photo = tPhotoRepository.findOneById(tActivity.getPhotoId());
+		PhotoResource photoResource = mapper.map(photo, PhotoResource.class);
+		resource.setPhoto(photoResource);
+
+		// アカウントを取得
+		AccountResource postAccount = mapper.map(tAccountRepository.findOneById(tActivity.getFollowAccountId()),
 				AccountResource.class);
 		resource.setAccount(postAccount);
 		return resource;

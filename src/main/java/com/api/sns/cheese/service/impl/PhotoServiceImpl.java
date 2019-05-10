@@ -398,6 +398,7 @@ public class PhotoServiceImpl implements PhotoService {
 				.andCommentIdEqualTo(photoComment.getCommentId());
 		TPhotoCommentLike photoCommentLike = tPhotoCommentLikeRepository.findOneBy(commentLikeExample);
 
+		boolean ret;
 		if (photoCommentLike == null) {
 			// レコード登録
 			TPhotoCommentLike entity = new TPhotoCommentLike();
@@ -405,11 +406,34 @@ public class PhotoServiceImpl implements PhotoService {
 			entity.setPhotoId(photo.getPhotoId());
 			entity.setCommentId(photoComment.getCommentId());
 			entity.setDeleted(isLike ? CommonConst.DeletedFlag.OFF : CommonConst.DeletedFlag.ON);
-			return tPhotoCommentLikeRepository.create(entity);
+			ret = tPhotoCommentLikeRepository.create(entity);
 		} else {
 			// レコード更新
 			photoCommentLike.setDeleted(isLike ? CommonConst.DeletedFlag.OFF : CommonConst.DeletedFlag.ON);
-			return tPhotoCommentLikeRepository.updatePartially(photoCommentLike);
+			ret = tPhotoCommentLikeRepository.updatePartially(photoCommentLike);
 		}
+
+		if (ret && isLike) {
+			// アクティビティを登録する
+			TActivityExample example = new TActivityExample();
+			example.createCriteria().andAccountIdEqualTo(photo.getAccountId())
+					.andActivityTypeEqualTo(ActivityTypeEnum.COMMENT_LIKE)
+					.andPhotoIdEqualTo(photo.getPhotoId()).andFollowAccountIdEqualTo(accountId)
+					.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+			TActivity tActivity = tActivityRepository.findOneBy(example);
+			if (tActivity == null) {
+				TActivity activity = new TActivity();
+				activity.setAccountId(photo.getAccountId());
+				activity.setActivityType(ActivityTypeEnum.COMMENT_LIKE);
+				activity.setPhotoId(photo.getPhotoId());
+				activity.setFollowAccountId(accountId);
+				// TODO 共通項目は親クラスで設定する
+				activity.setDeleted(CommonConst.DeletedFlag.OFF);
+
+				// レコード登録
+				ret = tActivityRepository.create(activity);
+			}
+		}
+		return ret;
 	}
 }
