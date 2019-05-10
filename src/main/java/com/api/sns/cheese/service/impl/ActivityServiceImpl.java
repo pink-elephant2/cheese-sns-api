@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.api.sns.cheese.aop.SessionInfoContextHolder;
 import com.api.sns.cheese.domain.TPhoto;
-import com.api.sns.cheese.domain.TPhotoKey;
 import com.api.sns.cheese.domain.VActivity;
 import com.api.sns.cheese.domain.VActivityExample;
 import com.api.sns.cheese.repository.TAccountRepository;
@@ -84,41 +83,92 @@ public class ActivityServiceImpl implements ActivityService {
 
 		// コメントされた
 		case COMMENT:
+			resource = mapResourceComment(vFollow);
 			break;
 
 		// フォローされた
 		case FOLLOW:
-			// アカウントを取得
-			AccountResource followAccount = mapper.map(
-					tAccountRepository.findOneById(vFollow.getFollowAccountId()),
-					AccountResource.class);
-			resource.setAccount(followAccount);
+			resource = mapResourceFollow(vFollow);
 			break;
 
 		// いいねされた
 		case LIKE:
+			resource = mapResourceLike(vFollow);
 			break;
 
 		// 投稿された
 		case NEW_POST:
-			// 写真を取得
-			TPhotoKey photoKey = new TPhotoKey();
-			photoKey.setPhotoId(vFollow.getPhotoId());
-			TPhoto photo = tPhotoRepository.findOneBy(photoKey);
-			PhotoResource photoResource = mapper.map(photo, PhotoResource.class);
-
-			// アカウントを取得
-			AccountResource postAccount = mapper.map(tAccountRepository.findOneById(photo.getAccountId()),
-					AccountResource.class);
-			photoResource.setAccount(postAccount);
-			resource.setAccount(postAccount);
-
-			resource.setPhoto(photoResource);
+			resource = mapResourceNewPost(vFollow);
 			break;
 
 		default:
+			resource = null;
 			break;
 		}
+		return resource;
+	}
+
+	/**
+	 * アクティビティリソースに変換(COMMENT)
+	 */
+	private ActivityResource mapResourceComment(VActivity vFollow) {
+		ActivityResource resource = mapper.map(vFollow, ActivityResource.class);
+		// 写真を取得
+		TPhoto photo = tPhotoRepository.findOneById(vFollow.getPhotoId());
+		PhotoResource photoResource = mapper.map(photo, PhotoResource.class);
+		resource.setPhoto(photoResource);
+
+		// アカウントを取得
+		AccountResource postAccount = mapper.map(tAccountRepository.findOneById(vFollow.getFollowAccountId()),
+				AccountResource.class);
+		resource.setAccount(postAccount);
+		return resource;
+	}
+
+	/**
+	 * アクティビティリソースに変換(FOLLOW)
+	 */
+	private ActivityResource mapResourceFollow(VActivity vFollow) {
+		ActivityResource resource = mapper.map(vFollow, ActivityResource.class);
+		// アカウントを取得
+		AccountResource followAccount = mapper.map(
+				tAccountRepository.findOneById(vFollow.getFollowAccountId()),
+				AccountResource.class);
+		resource.setAccount(followAccount);
+		return resource;
+	}
+
+	/**
+	 * アクティビティリソースに変換(LIKE)
+	 */
+	private ActivityResource mapResourceLike(VActivity vFollow) {
+		ActivityResource resource = mapper.map(vFollow, ActivityResource.class);
+		// 写真を取得
+		TPhoto photo = tPhotoRepository.findOneById(vFollow.getPhotoId());
+		PhotoResource photoResource = mapper.map(photo, PhotoResource.class);
+		resource.setPhoto(photoResource);
+
+		// アカウントを取得
+		AccountResource postAccount = mapper.map(tAccountRepository.findOneById(vFollow.getFollowAccountId()),
+				AccountResource.class);
+		resource.setAccount(postAccount);
+		return resource;
+	}
+
+	/**
+	 * アクティビティリソースに変換(NEW_POST)
+	 */
+	private ActivityResource mapResourceNewPost(VActivity vFollow) {
+		ActivityResource resource = mapper.map(vFollow, ActivityResource.class);
+		// 写真を取得
+		TPhoto photo = tPhotoRepository.findOneById(vFollow.getPhotoId());
+		PhotoResource photoResource = mapper.map(photo, PhotoResource.class);
+		resource.setPhoto(photoResource);
+
+		// アカウントを取得
+		AccountResource postAccount = mapper.map(tAccountRepository.findOneById(photo.getAccountId()),
+				AccountResource.class);
+		resource.setAccount(postAccount);
 		return resource;
 	}
 }

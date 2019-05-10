@@ -17,6 +17,7 @@ import com.api.sns.cheese.aop.SessionInfoContextHolder;
 import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.domain.TActivity;
+import com.api.sns.cheese.domain.TActivityExample;
 import com.api.sns.cheese.domain.TFollow;
 import com.api.sns.cheese.domain.TFollowExample;
 import com.api.sns.cheese.domain.TPhoto;
@@ -270,6 +271,7 @@ public class PhotoServiceImpl implements PhotoService {
 		likeExample.createCriteria().andPhotoIdEqualTo(photo.getPhotoId()).andAccountIdEqualTo(accountId);
 		TPhotoLike photoLike = tPhotoLikeRepository.findOneBy(likeExample);
 
+		boolean ret;
 		if (photoLike == null) {
 			// レコード登録
 			TPhotoLike entity = new TPhotoLike();
@@ -279,12 +281,35 @@ public class PhotoServiceImpl implements PhotoService {
 			// TODO 共通項目は親クラスで設定する
 			entity.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
 			entity.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
-			return tPhotoLikeRepository.create(entity);
+			ret = tPhotoLikeRepository.create(entity);
 		} else {
 			// レコード更新
 			photoLike.setDeleted(isLike ? CommonConst.DeletedFlag.OFF : CommonConst.DeletedFlag.ON);
-			return tPhotoLikeRepository.updatePartially(photoLike);
+			ret = tPhotoLikeRepository.updatePartially(photoLike);
 		}
+
+		if (ret) {
+			// アクティビティを登録する
+			TActivityExample example = new TActivityExample();
+			example.createCriteria().andAccountIdEqualTo(photo.getAccountId())
+					.andActivityTypeEqualTo(ActivityTypeEnum.LIKE)
+					.andPhotoIdEqualTo(photo.getPhotoId()).andFollowAccountIdEqualTo(accountId)
+					.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+			TActivity tActivity = tActivityRepository.findOneBy(example);
+			if (tActivity == null) {
+				TActivity activity = new TActivity();
+				activity.setAccountId(photo.getAccountId());
+				activity.setActivityType(ActivityTypeEnum.LIKE);
+				activity.setPhotoId(photo.getPhotoId());
+				activity.setFollowAccountId(accountId);
+				// TODO 共通項目は親クラスで設定する
+				activity.setDeleted(CommonConst.DeletedFlag.OFF);
+
+				// レコード登録
+				ret = tActivityRepository.create(activity);
+			}
+		}
+		return ret;
 	}
 
 	/**
@@ -312,7 +337,29 @@ public class PhotoServiceImpl implements PhotoService {
 		entity.setContent(comment);
 		// TODO 共通項目は親クラスで設定する
 		entity.setDeleted(CommonConst.DeletedFlag.OFF);
-		tPhotoCommentRepository.create(entity);
+		boolean ret = tPhotoCommentRepository.create(entity);
+
+		if (ret) {
+			// アクティビティを登録する
+			TActivityExample example = new TActivityExample();
+			example.createCriteria().andAccountIdEqualTo(photo.getAccountId())
+					.andActivityTypeEqualTo(ActivityTypeEnum.COMMENT)
+					.andPhotoIdEqualTo(photo.getPhotoId()).andFollowAccountIdEqualTo(accountId)
+					.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+			TActivity tActivity = tActivityRepository.findOneBy(example);
+			if (tActivity == null) {
+				TActivity activity = new TActivity();
+				activity.setAccountId(photo.getAccountId());
+				activity.setActivityType(ActivityTypeEnum.COMMENT);
+				activity.setPhotoId(photo.getPhotoId());
+				activity.setFollowAccountId(accountId);
+				// TODO 共通項目は親クラスで設定する
+				activity.setDeleted(CommonConst.DeletedFlag.OFF);
+
+				// レコード登録
+				ret = tActivityRepository.create(activity);
+			}
+		}
 
 		// 戻り値
 		CommentResource resource = mapper.map(entity, CommentResource.class);

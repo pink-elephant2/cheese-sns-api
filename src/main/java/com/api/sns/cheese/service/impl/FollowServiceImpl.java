@@ -146,23 +146,25 @@ public class FollowServiceImpl implements FollowService {
 			ret = tFollowRepository.update(follower);
 		}
 
-		// アクティビティを登録する
-		TActivityExample example = new TActivityExample();
-		example.createCriteria().andAccountIdEqualTo(accountId).andActivityTypeEqualTo(ActivityTypeEnum.FOLLOW)
-				.andFollowAccountIdEqualTo(followAccount.getAccountId()).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		TActivity tActivity = tActivityRepository.findOneBy(example);
-		if (tActivity == null) {
-			TActivity activity = new TActivity();
-			activity.setAccountId(followAccount.getAccountId());
-			activity.setActivityType(ActivityTypeEnum.FOLLOW);
-			activity.setFollowAccountId(accountId);
-			// TODO 共通項目は親クラスで設定する
-			activity.setDeleted(CommonConst.DeletedFlag.OFF);
+		if (ret) {
+			// アクティビティを登録する
+			TActivityExample example = new TActivityExample();
+			example.createCriteria().andAccountIdEqualTo(accountId).andActivityTypeEqualTo(ActivityTypeEnum.FOLLOW)
+					.andFollowAccountIdEqualTo(followAccount.getAccountId())
+					.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+			TActivity tActivity = tActivityRepository.findOneBy(example);
+			if (tActivity == null) {
+				TActivity activity = new TActivity();
+				activity.setAccountId(followAccount.getAccountId());
+				activity.setActivityType(ActivityTypeEnum.FOLLOW);
+				activity.setFollowAccountId(accountId);
+				// TODO 共通項目は親クラスで設定する
+				activity.setDeleted(CommonConst.DeletedFlag.OFF);
 
-			// レコード登録
-			ret = tActivityRepository.create(activity);
+				// レコード登録
+				ret = tActivityRepository.create(activity);
+			}
 		}
-
 		return ret;
 	}
 
