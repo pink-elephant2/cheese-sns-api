@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.api.sns.cheese.aop.SessionInfoContextHolder;
 import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccountExample;
-import com.api.sns.cheese.domain.TAccountKey;
 import com.api.sns.cheese.domain.TActivity;
 import com.api.sns.cheese.domain.TFollow;
 import com.api.sns.cheese.domain.TFollowExample;
@@ -98,9 +97,7 @@ public class PhotoServiceImpl implements PhotoService {
 		PhotoResource resource = mapper.map(photo, PhotoResource.class);
 
 		// TODO 投稿ユーザー View または キャッシュ
-		TAccountKey key = new TAccountKey();
-		key.setAccountId(photo.getAccountId());
-		resource.setAccount(mapper.map(tAccountRepository.findOneBy(key), AccountResource.class));
+		resource.setAccount(mapper.map(tAccountRepository.findOneById(photo.getAccountId()), AccountResource.class));
 
 		// ログインユーザー
 		Integer accountId = SessionInfoContextHolder.isAuthenticated()
@@ -132,9 +129,8 @@ public class PhotoServiceImpl implements PhotoService {
 				CommentResource commentResource = mapper.map(tPhotoComment, CommentResource.class);
 
 				// TODO 投稿ユーザー View または キャッシュ
-				TAccountKey accountKey = new TAccountKey();
-				accountKey.setAccountId(tPhotoComment.getAccountId());
-				commentResource.setAccount(mapper.map(tAccountRepository.findOneBy(accountKey), AccountResource.class));
+				commentResource.setAccount(mapper.map(tAccountRepository.findOneById(tPhotoComment.getAccountId()),
+						AccountResource.class));
 
 				// 自分がコメントにいいねをしているか TODO 性能改善
 				if (SessionInfoContextHolder.isAuthenticated()) {
@@ -173,9 +169,8 @@ public class PhotoServiceImpl implements PhotoService {
 			PhotoResource resource = mapper.map(tPhoto, PhotoResource.class);
 
 			// TODO 投稿ユーザー View または キャッシュ
-			TAccountKey key = new TAccountKey();
-			key.setAccountId(tPhoto.getAccountId());
-			resource.setAccount(mapper.map(tAccountRepository.findOneBy(key), AccountResource.class));
+			resource.setAccount(
+					mapper.map(tAccountRepository.findOneById(tPhoto.getAccountId()), AccountResource.class));
 
 			return resource;
 		});
@@ -323,9 +318,7 @@ public class PhotoServiceImpl implements PhotoService {
 		CommentResource resource = mapper.map(entity, CommentResource.class);
 
 		// TODO 投稿ユーザー View または キャッシュ
-		TAccountKey key = new TAccountKey();
-		key.setAccountId(accountId);
-		resource.setAccount(mapper.map(tAccountRepository.findOneBy(key), AccountResource.class));
+		resource.setAccount(mapper.map(tAccountRepository.findOneById(accountId), AccountResource.class));
 
 		return resource;
 	}
