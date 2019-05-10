@@ -57,14 +57,12 @@ public class ActivityServiceImpl implements ActivityService {
 	/**
 	 * 自分に対するアクティビティを取得する
 	 *
-	 * @param loginId
-	 *            ログインID
 	 * @param pageable
 	 *            ページ情報
 	 * @return アクティビティ情報
 	 */
 	@Override
-	public Page<ActivityResource> findMe(String loginId, Pageable pageable) {
+	public Page<ActivityResource> findMe(Pageable pageable) {
 		TActivityExample example = new TActivityExample();
 		example.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId());
 		return tActivityRepository.findPageBy(example, pageable).map(tActivity -> mapResource(tActivity));
