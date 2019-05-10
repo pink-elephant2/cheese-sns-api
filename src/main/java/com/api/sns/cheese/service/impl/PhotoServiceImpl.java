@@ -117,8 +117,7 @@ public class PhotoServiceImpl implements PhotoService {
 		likeExample.clear();
 		likeExample.createCriteria().andPhotoIdEqualTo(photo.getPhotoId())
 				.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		// TODO テーブル定義 型変更
-		resource.setLikeCount((int) tPhotoLikeRepository.countBy(likeExample));
+		resource.setLikeCount(tPhotoLikeRepository.countBy(likeExample));
 
 		// コメント
 		TPhotoCommentExample commentExample = new TPhotoCommentExample();

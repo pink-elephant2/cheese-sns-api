@@ -38,7 +38,7 @@ public class PhotoResource {
 	public AccountResource account;
 
 	/** いいね件数 */
-	private Integer likeCount;
+	private long likeCount;
 
 	/** 自分がいいねしたか */
 	@JsonProperty("isLike")
