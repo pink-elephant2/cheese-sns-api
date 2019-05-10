@@ -15,11 +15,11 @@ import com.api.sns.cheese.resources.ActivityResource;
 import com.api.sns.cheese.service.ActivityService;
 
 /**
- * アクティビティAPI
+ * (認証必須)アクティビティAPI TODO インターセプタで自分のログインIDかチェックする
  */
 @RestController
-@RequestMapping("/api/v1/activity")
-public class ActivityController {
+@RequestMapping("/api/v1/user/{loginId}/activity")
+public class UserActivityController {
 
 	@Autowired
 	private ActivityService activityService;
