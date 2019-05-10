@@ -6,6 +6,7 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public abstract class AbstractBaseEntity {
+	private String deleted;
 	private Date createdAt;
 	private Date updatedAt;
 	private String updatedBy;
@@ -16,10 +17,14 @@ public abstract class AbstractBaseEntity {
 	private boolean internalAutoSetUserIdEnabled = true;
 
 	public String toString() {
-		return "AbstractBaseEntity(createdAt=" + this.getCreatedAt() + ", updatedAt=" + this.getUpdatedAt()
-				+ ", updatedBy=" + this.getUpdatedBy() + ", createdBy=" + this.getCreatedBy()
+		return "AbstractBaseEntity(deleted=" + this.getDeleted() + "createdAt=" + this.getCreatedAt() + ", updatedAt="
+				+ this.getUpdatedAt() + ", updatedBy=" + this.getUpdatedBy() + ", createdBy=" + this.getCreatedBy()
 				+ ", optimisticLockEnabled=" + this.isOptimisticLockEnabled() + ", internalAutoSetUserIdEnabled="
 				+ this.isInternalAutoSetUserIdEnabled() + ")";
+	}
+
+	public String getDeleted() {
+		return this.deleted;
 	}
 
 	public Date getCreatedAt() {
@@ -36,6 +41,10 @@ public abstract class AbstractBaseEntity {
 
 	public String getCreatedBy() {
 		return this.createdBy;
+	}
+
+	public void setDeleted(String deleted) {
+		this.deleted = deleted;
 	}
 
 	public void setCreatedAt(Date createdAt) {

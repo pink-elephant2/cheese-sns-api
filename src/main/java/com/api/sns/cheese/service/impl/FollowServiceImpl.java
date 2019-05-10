@@ -132,8 +132,6 @@ public class FollowServiceImpl implements FollowService {
 			TFollow follow = new TFollow();
 			follow.setAccountId(accountId);
 			follow.setFollowAccountId(followAccount.getAccountId());
-			// TODO 共通項目は親クラスで設定する
-			follow.setDeleted(CommonConst.DeletedFlag.OFF);
 
 			// レコード登録
 			ret = tFollowRepository.create(follow);
@@ -158,8 +156,6 @@ public class FollowServiceImpl implements FollowService {
 				activity.setAccountId(followAccount.getAccountId());
 				activity.setActivityType(ActivityTypeEnum.FOLLOW);
 				activity.setFollowAccountId(accountId);
-				// TODO 共通項目は親クラスで設定する
-				activity.setDeleted(CommonConst.DeletedFlag.OFF);
 
 				// レコード登録
 				ret = tActivityRepository.create(activity);
@@ -197,8 +193,6 @@ public class FollowServiceImpl implements FollowService {
 			TFollow follow = new TFollow();
 			follow.setAccountId(accountId);
 			follow.setFollowAccountId(followAccount.getAccountId());
-			// TODO 共通項目は親クラスで設定する
-			follow.setDeleted(CommonConst.DeletedFlag.OFF);
 
 			// レコード登録
 			ret = tFollowRepository.create(follow);

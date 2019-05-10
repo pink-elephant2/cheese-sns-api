@@ -199,8 +199,6 @@ public class PhotoServiceImpl implements PhotoService {
 			photo.setPhotoCd(cd);
 			photo.setImgUrl(filePath);
 			photo.setAccountId(SessionInfoContextHolder.getSessionInfo().getAccountId());
-			// TODO 共通項目は親クラスで設定する
-			photo.setDeleted(CommonConst.DeletedFlag.OFF);
 			tPhotoRepository.create(photo);
 
 			// TODO コードが重複した場合、ランダム文字列を再生成してリトライする
@@ -242,8 +240,6 @@ public class PhotoServiceImpl implements PhotoService {
 				tActivity.setAccountId(tAccount.getAccountId());
 				tActivity.setActivityType(ActivityTypeEnum.NEW_POST);
 				tActivity.setPhotoId(photoId);
-				// TODO 共通項目は親クラスで設定する
-				tActivity.setDeleted(CommonConst.DeletedFlag.OFF);
 
 				// レコード登録
 				tActivityRepository.create(tActivity);
@@ -278,9 +274,6 @@ public class PhotoServiceImpl implements PhotoService {
 			entity.setPhotoId(photo.getPhotoId());
 			entity.setAccountId(accountId);
 			entity.setDeleted(isLike ? CommonConst.DeletedFlag.OFF : CommonConst.DeletedFlag.ON);
-			// TODO 共通項目は親クラスで設定する
-			entity.setCreatedBy(CommonConst.SystemAccount.ADMIN_ID);
-			entity.setUpdatedBy(CommonConst.SystemAccount.ADMIN_ID);
 			ret = tPhotoLikeRepository.create(entity);
 		} else {
 			// レコード更新
@@ -302,8 +295,6 @@ public class PhotoServiceImpl implements PhotoService {
 				activity.setActivityType(ActivityTypeEnum.LIKE);
 				activity.setPhotoId(photo.getPhotoId());
 				activity.setFollowAccountId(accountId);
-				// TODO 共通項目は親クラスで設定する
-				activity.setDeleted(CommonConst.DeletedFlag.OFF);
 
 				// レコード登録
 				ret = tActivityRepository.create(activity);
@@ -335,8 +326,6 @@ public class PhotoServiceImpl implements PhotoService {
 		entity.setAccountId(accountId);
 		entity.setPhotoId(photo.getPhotoId());
 		entity.setContent(comment);
-		// TODO 共通項目は親クラスで設定する
-		entity.setDeleted(CommonConst.DeletedFlag.OFF);
 		boolean ret = tPhotoCommentRepository.create(entity);
 
 		if (ret && !photo.getAccountId().equals(accountId)) {
@@ -353,8 +342,6 @@ public class PhotoServiceImpl implements PhotoService {
 				activity.setActivityType(ActivityTypeEnum.COMMENT);
 				activity.setPhotoId(photo.getPhotoId());
 				activity.setFollowAccountId(accountId);
-				// TODO 共通項目は親クラスで設定する
-				activity.setDeleted(CommonConst.DeletedFlag.OFF);
 
 				// レコード登録
 				ret = tActivityRepository.create(activity);
@@ -427,8 +414,6 @@ public class PhotoServiceImpl implements PhotoService {
 				activity.setActivityType(ActivityTypeEnum.COMMENT_LIKE);
 				activity.setPhotoId(photo.getPhotoId());
 				activity.setFollowAccountId(accountId);
-				// TODO 共通項目は親クラスで設定する
-				activity.setDeleted(CommonConst.DeletedFlag.OFF);
 
 				// レコード登録
 				ret = tActivityRepository.create(activity);

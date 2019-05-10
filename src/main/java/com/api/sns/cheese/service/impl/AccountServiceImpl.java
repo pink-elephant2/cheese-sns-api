@@ -65,9 +65,6 @@ public class AccountServiceImpl implements AccountService {
 		account.setPassword(passwordEncoder.encode(form.getPassword()));
 		account.setPasswordChangeDate(new Date());
 
-		// TODO 共通項目は親クラスで設定する
-		account.setDeleted(CommonConst.DeletedFlag.OFF);
-
 		// TODO エラーメッセージ
 		return tAccountRepository.create(account);
 	}
