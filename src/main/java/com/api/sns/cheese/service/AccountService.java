@@ -2,6 +2,7 @@ package com.api.sns.cheese.service;
 
 import org.apache.ibatis.javassist.NotFoundException;
 
+import com.api.sns.cheese.enums.ReportReasonEnum;
 import com.api.sns.cheese.form.AccountCreateForm;
 import com.api.sns.cheese.form.AccountImageForm;
 import com.api.sns.cheese.form.AccountUpdateForm;
@@ -28,6 +29,24 @@ public interface AccountService {
 	 * @return アカウント情報
 	 */
 	public AccountResource find(String loginId) throws NotFoundException;
+
+	/**
+	 * アカウントを通報する
+	 *
+	 * @param loginId
+	 *            ログインID
+	 * @param reason
+	 *            理由
+	 */
+	public boolean report(String loginId, ReportReasonEnum reason);
+
+	/**
+	 * アカウントをブロックする
+	 *
+	 * @param loginId
+	 *            ログインID
+	 */
+	public boolean block(String loginId);
 
 	/**
 	 * プロフィールを更新する
