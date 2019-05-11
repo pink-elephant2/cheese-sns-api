@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dozer.Mapper;
@@ -420,5 +421,39 @@ public class PhotoServiceImpl implements PhotoService {
 			}
 		}
 		return ret;
+	}
+
+	/**
+	 * 写真を通報する
+	 *
+	 * @param cd
+	 *            コード
+	 */
+	@Override
+	public boolean report(String cd) {
+		// TODO 実装
+		return true;
+	}
+
+	/**
+	 * 写真を削除する
+	 *
+	 * @param cd
+	 *            コード
+	 */
+	@Override
+	public boolean remove(String cd) {
+		// 写真を取得
+		TPhoto photo = tPhotoRepository.findOneByCd(cd);
+
+		// 論理削除
+		TPhoto entity = new TPhoto();
+		entity.setDeleted(CommonConst.DeletedFlag.ON);
+
+		TPhotoExample example = new TPhotoExample();
+		example.createCriteria().andPhotoIdEqualTo(photo.getPhotoId())
+				.andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId())
+				.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		return BooleanUtils.toBoolean(tPhotoRepository.updatePartiallyBy(entity, example));
 	}
 }

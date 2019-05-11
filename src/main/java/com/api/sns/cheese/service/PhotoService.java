@@ -70,4 +70,20 @@ public interface PhotoService {
 	 *            コメントコード
 	 */
 	public boolean likeComment(String cd, String commentCd, boolean isLike);
+
+	/**
+	 * 写真を通報する
+	 *
+	 * @param cd
+	 *            コード
+	 */
+	public boolean report(String cd);
+
+	/**
+	 * 写真を削除する
+	 *
+	 * @param cd
+	 *            コード
+	 */
+	public boolean remove(String cd);
 }
