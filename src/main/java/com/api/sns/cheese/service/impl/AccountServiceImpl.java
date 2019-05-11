@@ -18,6 +18,7 @@ import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.domain.TFollow;
 import com.api.sns.cheese.domain.TFollowExample;
 import com.api.sns.cheese.enums.DocumentTypeEnum;
+import com.api.sns.cheese.enums.ReportReasonEnum;
 import com.api.sns.cheese.form.AccountCreateForm;
 import com.api.sns.cheese.form.AccountImageForm;
 import com.api.sns.cheese.form.AccountUpdateForm;
@@ -96,6 +97,32 @@ public class AccountServiceImpl implements AccountService {
 		}
 
 		return resource;
+	}
+
+	/**
+	 * アカウントを通報する
+	 *
+	 * @param loginId
+	 *            ログインID
+	 * @param reason
+	 *            理由
+	 */
+	@Override
+	public boolean report(String loginId, ReportReasonEnum reason) {
+		// TODO 実装
+		return true;
+	}
+
+	/**
+	 * アカウントをブロックする
+	 *
+	 * @param loginId
+	 *            ログインID
+	 */
+	@Override
+	public boolean block(String loginId) {
+		// TODO 実装
+		return true;
 	}
 
 	/**

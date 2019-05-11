@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.sns.cheese.form.AccountCreateForm;
+import com.api.sns.cheese.form.PhotoReportForm;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.service.AccountService;
 import com.api.sns.cheese.service.FollowService;
@@ -56,6 +57,32 @@ public class AccountController {
 	public AccountResource find(@PathVariable("loginId") String loginId) throws NotFoundException {
 		// アカウントを取得する
 		return accountService.find(loginId);
+	}
+
+	/**
+	 * アカウント通報
+	 *
+	 * @param loginId
+	 *            ログインID
+	 */
+	@PostMapping("/{loginId}/report")
+	@ResponseStatus(HttpStatus.OK)
+	public boolean report(@PathVariable("loginId") String loginId, @RequestBody @Validated PhotoReportForm form) {
+		// アカウントを通報する
+		return accountService.report(loginId, form.getReason());
+	}
+
+	/**
+	 * アカウントブロック
+	 *
+	 * @param loginId
+	 *            ログインID
+	 */
+	@PostMapping("/{loginId}/block")
+	@ResponseStatus(HttpStatus.OK)
+	public boolean block(@PathVariable("loginId") String loginId) {
+		// アカウントをブロックする
+		return accountService.block(loginId);
 	}
 
 	/**
