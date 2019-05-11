@@ -19,6 +19,7 @@ import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.domain.TActivity;
 import com.api.sns.cheese.domain.TActivityExample;
+import com.api.sns.cheese.domain.TBanReport;
 import com.api.sns.cheese.domain.TFollow;
 import com.api.sns.cheese.domain.TFollowExample;
 import com.api.sns.cheese.domain.TPhoto;
@@ -31,9 +32,12 @@ import com.api.sns.cheese.domain.TPhotoLike;
 import com.api.sns.cheese.domain.TPhotoLikeExample;
 import com.api.sns.cheese.enums.ActivityTypeEnum;
 import com.api.sns.cheese.enums.DocumentTypeEnum;
+import com.api.sns.cheese.enums.ReportReasonEnum;
+import com.api.sns.cheese.enums.ReportTargetEnum;
 import com.api.sns.cheese.form.PhotoForm;
 import com.api.sns.cheese.repository.TAccountRepository;
 import com.api.sns.cheese.repository.TActivityRepository;
+import com.api.sns.cheese.repository.TBanReportRepository;
 import com.api.sns.cheese.repository.TFollowRepository;
 import com.api.sns.cheese.repository.TPhotoCommentLikeRepository;
 import com.api.sns.cheese.repository.TPhotoCommentRepository;
@@ -72,6 +76,9 @@ public class PhotoServiceImpl implements PhotoService {
 
 	@Autowired
 	private TActivityRepository tActivityRepository;
+
+	@Autowired
+	private TBanReportRepository tBanReportRepository;
 
 	@Autowired
 	private S3Service s3Service;
@@ -428,11 +435,22 @@ public class PhotoServiceImpl implements PhotoService {
 	 *
 	 * @param cd
 	 *            コード
+	 * @param reason
+	 *            理由
 	 */
 	@Override
-	public boolean report(String cd) {
-		// TODO 実装
-		return true;
+	public boolean report(String cd, ReportReasonEnum reason) {
+		// 写真を取得
+		TPhoto photo = tPhotoRepository.findOneByCd(cd);
+
+		// レコード登録
+		TBanReport entity = new TBanReport();
+		entity.setReportTarget(ReportTargetEnum.PHOTO);
+		entity.setReason(reason);
+		entity.setPhotoId(photo.getPhotoId());
+		entity.setReadFlag(false);
+		entity.setDoneFlag(false);
+		return tBanReportRepository.create(entity);
 	}
 
 	/**

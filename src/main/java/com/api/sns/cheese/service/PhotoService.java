@@ -3,6 +3,7 @@ package com.api.sns.cheese.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.api.sns.cheese.enums.ReportReasonEnum;
 import com.api.sns.cheese.form.PhotoForm;
 import com.api.sns.cheese.resources.CommentResource;
 import com.api.sns.cheese.resources.PhotoResource;
@@ -76,8 +77,10 @@ public interface PhotoService {
 	 *
 	 * @param cd
 	 *            コード
+	 * @param reason
+	 *            理由
 	 */
-	public boolean report(String cd);
+	public boolean report(String cd, ReportReasonEnum reason);
 
 	/**
 	 * 写真を削除する

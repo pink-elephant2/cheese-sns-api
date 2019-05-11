@@ -68,6 +68,6 @@ public class PhotoController {
 	@ResponseStatus(HttpStatus.OK)
 	public boolean report(@PathVariable("cd") String cd, @RequestBody @Validated PhotoReportForm form) {
 		// 写真を通報する
-		return photoService.report(cd);
+		return photoService.report(cd, form.getReason());
 	}
 }
