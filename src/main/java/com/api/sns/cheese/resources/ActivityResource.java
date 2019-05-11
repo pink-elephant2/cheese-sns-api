@@ -3,15 +3,15 @@ package com.api.sns.cheese.resources;
 import java.util.Date;
 
 import com.api.sns.cheese.enums.ActivityTypeEnum;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
  * アクティビティAPIレスポンス
  */
 @Data
-@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ActivityResource {
 
 	/** 行動種別 */

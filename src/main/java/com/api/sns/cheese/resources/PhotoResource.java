@@ -3,26 +3,29 @@ package com.api.sns.cheese.resources;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 /**
  * 写真APIレスポンス
  */
 @Data
-@RequiredArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PhotoResource {
 
 	/** ID */
-	private final Long id;
+	@JsonProperty("id")
+	private Long photoId;
 
 	/** コード */
 	@JsonProperty("cd")
-	private final String code;
+	private String photoCd;
 
 	/** 説明 */
 	private String caption;
@@ -37,7 +40,7 @@ public class PhotoResource {
 	public AccountResource account;
 
 	/** いいね件数 */
-	private Integer likeCount;
+	private long likeCount;
 
 	/** 自分がいいねしたか */
 	@JsonProperty("isLike")

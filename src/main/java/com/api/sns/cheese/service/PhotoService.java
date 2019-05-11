@@ -3,6 +3,7 @@ package com.api.sns.cheese.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.api.sns.cheese.enums.ReportReasonEnum;
 import com.api.sns.cheese.form.PhotoForm;
 import com.api.sns.cheese.resources.CommentResource;
 import com.api.sns.cheese.resources.PhotoResource;
@@ -70,4 +71,22 @@ public interface PhotoService {
 	 *            コメントコード
 	 */
 	public boolean likeComment(String cd, String commentCd, boolean isLike);
+
+	/**
+	 * 写真を通報する
+	 *
+	 * @param cd
+	 *            コード
+	 * @param reason
+	 *            理由
+	 */
+	public boolean report(String cd, ReportReasonEnum reason);
+
+	/**
+	 * 写真を削除する
+	 *
+	 * @param cd
+	 *            コード
+	 */
+	public boolean remove(String cd);
 }

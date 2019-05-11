@@ -1,20 +1,22 @@
 package com.api.sns.cheese.service.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
+import org.dozer.Mapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.api.sns.cheese.aop.SessionInfoContextHolder;
+import com.api.sns.cheese.domain.TActivity;
+import com.api.sns.cheese.domain.TActivityExample;
+import com.api.sns.cheese.domain.TPhoto;
 import com.api.sns.cheese.enums.ActivityTypeEnum;
+import com.api.sns.cheese.repository.TAccountRepository;
+import com.api.sns.cheese.repository.TActivityRepository;
+import com.api.sns.cheese.repository.TPhotoRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.resources.ActivityResource;
-import com.api.sns.cheese.resources.CommentResource;
 import com.api.sns.cheese.resources.PhotoResource;
 import com.api.sns.cheese.service.ActivityService;
 
@@ -25,93 +27,163 @@ import com.api.sns.cheese.service.ActivityService;
 @Transactional
 public class ActivityServiceImpl implements ActivityService {
 
-	/** アカウントテストデータ */
-	private List<AccountResource> accountList = new ArrayList<>(Arrays.asList(
-			// テストデータ1
-			new AccountResource(Long.valueOf(1), "my_melody", "マイメロディ", "おはよう♪　あさごはん　ちゃんとたべた〜？　いっしゅうかん　がんばろうね♪",
-					"assets/images/my_melody.png", null, null, "Melody_Mariland", null, false),
-			// テストデータ2
-			new AccountResource(Long.valueOf(2), "ki_ri_mi", "KIRIMIちゃん", "ラブ！サーモン！>°))))◁",
-					"assets/images/ki_ri_mi.png", null, null, "kirimi_sanrio", null, true),
-			// テストデータ3
-			new AccountResource(Long.valueOf(1), "gudetama", "ぐでたま", "だるい", "assets/images/gudetama.png", null, null,
-					"gudetama_sanrio", null, false)));
+	@Autowired
+	private TActivityRepository tActivityRepository;
 
-	/** コメントテストデータ */
-	private List<CommentResource> commentList = new ArrayList<>(Arrays.asList(
-			// テストデータ1
-			new CommentResource(Long.valueOf(1), "comment1", "おいしそう😍", new Date(), accountList.get(0), true),
-			// テストデータ2
-			new CommentResource(Long.valueOf(2), "comment2", "作るのだるい", new Date(), accountList.get(2), false)));
+	@Autowired
+	private TAccountRepository tAccountRepository;
 
-	/** 写真テストデータ **/
-	private List<PhotoResource> photoList = new ArrayList<>(Arrays.asList(
-			// テストデータ1
-			new PhotoResource(Long.valueOf(1), "test1", "【フォンデュ＆ラクレット】 とろ～り、びよーん♪のおいしいチーズ料理",
-					"assets/images/sample-1.jpg", new Date(), accountList.get(1), 1, true, commentList),
-			// テストデータ2
-			new PhotoResource(Long.valueOf(2), "test2", "おうちで簡単！SNSで話題のもちもちとろ～りチーズレシピ♡", "assets/images/sample-2.jpg",
-					new Date(), accountList.get(0), 1000, true, Arrays.asList()),
-			// テストデータ3
-			new PhotoResource(Long.valueOf(3), "test3", "", "assets/images/sample-3.jpg", new Date(),
-					accountList.get(1), 1000, false, Arrays.asList()),
-			// テストデータ4
-			new PhotoResource(Long.valueOf(4), "test4", "", "assets/images/sample-4.jpg", new Date(),
-					accountList.get(1), 0, false, Arrays.asList()),
-			// テストデータ5
-			new PhotoResource(Long.valueOf(5), "test5", "", "assets/images/sample-5.jpg", new Date(),
-					accountList.get(1), 0, false, Arrays.asList()),
-			// テストデータ6
-			new PhotoResource(Long.valueOf(6), "test6", "", "assets/images/sample-6.jpg", new Date(),
-					accountList.get(1), 0, false, Arrays.asList()),
-			// テストデータ7
-			new PhotoResource(Long.valueOf(7), "test7", "", "assets/images/sample-7.jpg", new Date(),
-					accountList.get(1), 0, false, Arrays.asList())));
+	@Autowired
+	private TPhotoRepository tPhotoRepository;
 
-	/** アクティビティテストデータ */
-	private List<ActivityResource> activityList = new ArrayList<>(Arrays.asList(
-			// テストデータ1
-			new ActivityResource(ActivityTypeEnum.COMMENT, photoList.get(0), new Date(), photoList.get(0).account),
-			// テストデータ2
-			new ActivityResource(ActivityTypeEnum.FOLLOW, null, new Date(), accountList.get(1)),
-			// テストデータ3
-			new ActivityResource(ActivityTypeEnum.LIKE, photoList.get(1), new Date(), photoList.get(2).account),
-			// テストデータ4
-			new ActivityResource(ActivityTypeEnum.NEW_POST, photoList.get(2), new Date(), photoList.get(2).account)));
+	@Autowired
+	private Mapper mapper;
 
 	/**
 	 * フォロー中のアクティビティを取得する
 	 *
-	 * @param loginId
-	 *            ログインID
 	 * @param pageable
 	 *            ページ情報
 	 * @return アクティビティ情報
 	 */
 	@Override
-	public Page<ActivityResource> findFollowing(String loginId, Pageable pageable) {
-		// ページで絞る
-		int fromIndex = pageable.getPageNumber() * pageable.getPageSize();
-		int toIndex = Math.min(fromIndex + pageable.getPageSize(), activityList.size());
-		List<ActivityResource> subList = activityList.subList(fromIndex, toIndex);
-		return new PageImpl<>(subList, pageable, activityList.size());
+	public Page<ActivityResource> findFollowing(Pageable pageable) {
+		TActivityExample example = new TActivityExample();
+		// 新規投稿のみ取得する
+		example.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId())
+				.andActivityTypeEqualTo(ActivityTypeEnum.NEW_POST);
+		return tActivityRepository.findPageBy(example, pageable).map(tActivity -> mapResource(tActivity));
 	}
 
 	/**
 	 * 自分に対するアクティビティを取得する
 	 *
-	 * @param loginId
-	 *            ログインID
 	 * @param pageable
 	 *            ページ情報
 	 * @return アクティビティ情報
 	 */
 	@Override
-	public Page<ActivityResource> findMe(String loginId, Pageable pageable) {
-		// ページで絞る
-		int fromIndex = pageable.getPageNumber() * pageable.getPageSize();
-		int toIndex = Math.min(fromIndex + pageable.getPageSize(), activityList.size());
-		List<ActivityResource> subList = activityList.subList(fromIndex, toIndex);
-		return new PageImpl<>(subList, pageable, activityList.size());
+	public Page<ActivityResource> findMe(Pageable pageable) {
+		TActivityExample example = new TActivityExample();
+		// 新規投稿以外取得する
+		example.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId())
+				.andActivityTypeNotEqualTo(ActivityTypeEnum.NEW_POST);
+		return tActivityRepository.findPageBy(example, pageable).map(tActivity -> mapResource(tActivity));
+	}
+
+	/**
+	 * アクティビティリソースに変換
+	 *
+	 * @param tActivity
+	 * @return ActivityResource
+	 */
+	private ActivityResource mapResource(TActivity tActivity) {
+		switch (tActivity.getActivityType()) {
+
+		// コメントされた
+		case COMMENT:
+			return mapResourceComment(tActivity);
+
+		// フォローされた
+		case FOLLOW:
+			return mapResourceFollow(tActivity);
+
+		// いいねされた
+		case LIKE:
+			return mapResourceLike(tActivity);
+
+		// 投稿された
+		case NEW_POST:
+			return mapResourceNewPost(tActivity);
+
+		// コメントにいいねされた
+		case COMMENT_LIKE:
+			return mapResourceCommentLike(tActivity);
+
+		default:
+			break;
+		}
+		return null;
+	}
+
+	/**
+	 * アクティビティリソースに変換(COMMENT)
+	 */
+	private ActivityResource mapResourceComment(TActivity tActivity) {
+		ActivityResource resource = mapper.map(tActivity, ActivityResource.class);
+		// 写真を取得
+		TPhoto photo = tPhotoRepository.findOneById(tActivity.getPhotoId());
+		PhotoResource photoResource = mapper.map(photo, PhotoResource.class);
+		resource.setPhoto(photoResource);
+
+		// アカウントを取得
+		AccountResource postAccount = mapper.map(tAccountRepository.findOneById(tActivity.getFollowAccountId()),
+				AccountResource.class);
+		resource.setAccount(postAccount);
+		return resource;
+	}
+
+	/**
+	 * アクティビティリソースに変換(FOLLOW)
+	 */
+	private ActivityResource mapResourceFollow(TActivity tActivity) {
+		ActivityResource resource = mapper.map(tActivity, ActivityResource.class);
+		// アカウントを取得
+		AccountResource followAccount = mapper.map(
+				tAccountRepository.findOneById(tActivity.getFollowAccountId()),
+				AccountResource.class);
+		resource.setAccount(followAccount);
+		return resource;
+	}
+
+	/**
+	 * アクティビティリソースに変換(LIKE)
+	 */
+	private ActivityResource mapResourceLike(TActivity tActivity) {
+		ActivityResource resource = mapper.map(tActivity, ActivityResource.class);
+		// 写真を取得
+		TPhoto photo = tPhotoRepository.findOneById(tActivity.getPhotoId());
+		PhotoResource photoResource = mapper.map(photo, PhotoResource.class);
+		resource.setPhoto(photoResource);
+
+		// アカウントを取得
+		AccountResource postAccount = mapper.map(tAccountRepository.findOneById(tActivity.getFollowAccountId()),
+				AccountResource.class);
+		resource.setAccount(postAccount);
+		return resource;
+	}
+
+	/**
+	 * アクティビティリソースに変換(NEW_POST)
+	 */
+	private ActivityResource mapResourceNewPost(TActivity tActivity) {
+		ActivityResource resource = mapper.map(tActivity, ActivityResource.class);
+		// 写真を取得
+		TPhoto photo = tPhotoRepository.findOneById(tActivity.getPhotoId());
+		PhotoResource photoResource = mapper.map(photo, PhotoResource.class);
+		resource.setPhoto(photoResource);
+
+		// アカウントを取得
+		AccountResource postAccount = mapper.map(tAccountRepository.findOneById(photo.getAccountId()),
+				AccountResource.class);
+		resource.setAccount(postAccount);
+		return resource;
+	}
+
+	/**
+	 * アクティビティリソースに変換(COMMENT_LIKE)
+	 */
+	private ActivityResource mapResourceCommentLike(TActivity tActivity) {
+		ActivityResource resource = mapper.map(tActivity, ActivityResource.class);
+		// 写真を取得
+		TPhoto photo = tPhotoRepository.findOneById(tActivity.getPhotoId());
+		PhotoResource photoResource = mapper.map(photo, PhotoResource.class);
+		resource.setPhoto(photoResource);
+
+		// アカウントを取得
+		AccountResource postAccount = mapper.map(tAccountRepository.findOneById(tActivity.getFollowAccountId()),
+				AccountResource.class);
+		resource.setAccount(postAccount);
+		return resource;
 	}
 }

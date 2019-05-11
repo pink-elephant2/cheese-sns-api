@@ -13,22 +13,18 @@ public interface ActivityService {
 	/**
 	 * フォロー中のアクティビティを取得する
 	 *
-	 * @param loginId
-	 *            ログインID
 	 * @param pageable
 	 *            ページ情報
 	 * @return アクティビティ情報
 	 */
-	public Page<ActivityResource> findFollowing(String loginId, Pageable pageable);
+	public Page<ActivityResource> findFollowing(Pageable pageable);
 
 	/**
 	 * 自分に対するアクティビティを取得する
 	 *
-	 * @param loginId
-	 *            ログインID
 	 * @param pageable
 	 *            ページ情報
 	 * @return アクティビティ情報
 	 */
-	public Page<ActivityResource> findMe(String loginId, Pageable pageable);
+	public Page<ActivityResource> findMe(Pageable pageable);
 }

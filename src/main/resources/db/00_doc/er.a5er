@@ -1,4 +1,4 @@
-﻿# A5:ER FORMAT:11
+﻿# A5:ER FORMAT:13
 # A5:ER ENCODING:UTF8
 # A5:ER Mk-1 Copyright (C)2007 m.matsubara
 # A5:SQL Mk-2 Copyright (C)1997 m.matsubara
@@ -33,6 +33,8 @@ RDBMSType=5
 RDBMSTypeName=MySQL
 GenerateDropTableStatement=1
 DropTableIfExists=1
+BackupRestoreTempTable=0
+FKParentIndex=1
 CommonField="削除フラグ","deleted","@VARCHAR(1)","NOT NULL",,"\q0\q","",$FFFFFFFF
 CommonField="作成日時","created_at","@DATETIME","NOT NULL",,"CURRENT_TIMESTAMP","",$FFFFFFFF
 CommonField="作成者","created_by","@VARCHAR(20)","NOT NULL",,"\qSYSTEM\q","",$FFFFFFFF
@@ -56,22 +58,9 @@ LNameByComment=1
 Color=$000000
 BkColor=$FFFFFF
 Position="VIEW",950,150
+ZOrder=26
 Page=VIEW
 Left=950
-Top=150
-
-[View]
-PName=v_activity
-LName=アクティビティビュー
-Comment=
-ViewOption=
-Query=SELECT\n  tActivity.activity_id\n  , tActivity.follow_account_id\n  , tActivity.comment_id\n  , tActivity.photo_id\n  , tActivity.account_id\n  , tActivity.activity_type\n  , tAccount.login_id\n  , tAccount.name\n  , tAccount.img_url \nFROM\n  t_activity tActivity \n  INNER JOIN t_account tAccount \n    ON tAccount.account_id = tActivity.account_id \n    AND tAccount.deleted = \q0\q\n
-LNameByComment=1
-Color=$000000
-BkColor=$FFFFFF
-Position="VIEW",150,150
-Page=VIEW
-Left=150
 Top=150
 
 [Relation]
@@ -93,6 +82,7 @@ Bar2=949
 Bar3=34
 TermPos1=R
 TermPos2=R
+ZOrder=25
 
 [Relation]
 Entity1=t_photo
@@ -103,16 +93,17 @@ Fields1=photo_id
 Fields2=photo_id
 Cardinarity1=
 Cardinarity2=
-Position="TABLE",0,3775,6225,3956,R,R
+Position="TABLE",0,3775,6225,3908,R,R
 Dependence=0
 Caption=
 PName=
 LineMode=0
 Bar1=378
 Bar2=622
-Bar3=396
+Bar3=391
 TermPos1=R
 TermPos2=R
+ZOrder=24
 
 [Entity]
 PName=t_tag_photo
@@ -120,7 +111,7 @@ LName=写真タグ
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
 Page=TABLE
-Left=1650
+Left=1800
 Top=100
 Field="写真タグID","tag_photo_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
 Field="タグID","tag_id","BIGINT","NOT NULL",,"","",$FFFFFFFF,""
@@ -130,7 +121,8 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220436
-Position="TABLE",1650,100
+Position="TABLE",1800,100
+ZOrder=23
 
 [Relation]
 Entity1=t_tag
@@ -151,6 +143,7 @@ Bar2=911
 Bar3=50
 TermPos1=R
 TermPos2=R
+ZOrder=22
 
 [Relation]
 Entity1=t_account
@@ -171,6 +164,7 @@ Bar2=911
 Bar3=262
 TermPos1=R
 TermPos2=R
+ZOrder=21
 
 [Entity]
 PName=t_follow_tag
@@ -190,6 +184,7 @@ Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220442
 Position="TABLE",150,200
+ZOrder=20
 
 [Entity]
 PName=t_tag
@@ -206,6 +201,7 @@ Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220428
 Position="TABLE",1250,100
+ZOrder=19
 
 [Relation]
 Entity1=t_account
@@ -226,6 +222,7 @@ Bar2=569
 Bar3=340
 TermPos1=R
 TermPos2=R
+ZOrder=18
 
 [Entity]
 PName=t_login_history
@@ -234,7 +231,7 @@ Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
 Page=TABLE
 Left=850
-Top=1450
+Top=1650
 Field="ログイン履歴ID","history_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
 Field="アカウントID","account_id","INT(10)","NOT NULL",,"","",$FFFFFFFF,""
 Field="IPアドレス","ip_address","VARCHAR(16)",,,"","",$FFFFFFFF,""
@@ -244,7 +241,8 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220522
-Position="TABLE",850,1450
+Position="TABLE",850,1650
+ZOrder=17
 
 [Relation]
 Entity1=t_account
@@ -265,6 +263,7 @@ Bar2=637
 Bar3=298
 TermPos1=R
 TermPos2=R
+ZOrder=16
 
 [Entity]
 PName=t_activity
@@ -273,19 +272,19 @@ Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
 Page=TABLE
 Left=200
-Top=1150
+Top=1350
 Field="アクティビティID","activity_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
 Field="アカウントID","account_id","INT(10)","NOT NULL",,"","",$FFFFFFFF,""
-Field="アクティビティ種別","activity_type","ENUM(\qCOMMENT\q, \qLIKE\q, \qFOLLOW\q, \qNEW_POST\q)","NOT NULL",,"","",$FFFFFFFF,""
+Field="アクティビティ種別","activity_type","ENUM(\qCOMMENT\q, \qLIKE\q, \qFOLLOW\q, \qNEW_POST\q, \qCOMMENT_LIKE\q)","NOT NULL",,"","",$FFFFFFFF,""
 Field="写真ID","photo_id","BIGINT",,,"","",$FFFFFFFF,""
-Field="コメントID","comment_id","BIGINT",,,"","",$FFFFFFFF,""
 Field="フォローアカウントID","follow_account_id","INT(10)",,,"","",$FFFFFFFF,""
 Index==0,account_id
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20190415220527
-Position="TABLE",200,1150
+ModifiedDateTime=20190511003652
+Position="TABLE",200,1350
+ZOrder=15
 
 [Relation]
 Entity1=t_photo
@@ -306,6 +305,7 @@ Bar2=818
 Bar3=110
 TermPos1=R
 TermPos2=R
+ZOrder=14
 
 [Entity]
 PName=t_bookmark
@@ -313,8 +313,8 @@ LName=ブックマーク
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
 Page=TABLE
-Left=2200
-Top=800
+Left=2350
+Top=1000
 Field="ブックマークID","bookmark_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
 Field="アカウントID","account_id","INT(10)","NOT NULL",,"","",$FFFFFFFF,""
 Field="写真ID","photo_id","BIGINT",,,"","",$FFFFFFFF,""
@@ -323,7 +323,8 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220502
-Position="TABLE",2200,800
+Position="TABLE",2350,1000
+ZOrder=13
 
 [Entity]
 PName=t_photo
@@ -331,8 +332,8 @@ LName=写真
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
 Page=TABLE
-Left=1650
-Top=500
+Left=1800
+Top=700
 Field="写真ID","photo_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
 Field="写真コード","photo_cd","VARCHAR(128)","NOT NULL",,"","",$FFFFFFFF,""
 Field="説明","caption","VARCHAR(1000)",,,"","",$FFFFFFFF,""
@@ -345,7 +346,8 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220402
-Position="TABLE",1650,500
+Position="TABLE",1800,700
+ZOrder=12
 
 [Entity]
 PName=t_photo_comment
@@ -353,8 +355,8 @@ LName=写真コメント
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
 Page=TABLE
-Left=1650
-Top=1200
+Left=1800
+Top=1400
 Field="コメントID","comment_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
 Field="コメントコード","comment_cd","VARCHAR(128)","NOT NULL",,"","",$FFFFFFFF,""
 Field="アカウントID","account_id","INT(10)","NOT NULL",,"","",$FFFFFFFF,""
@@ -365,7 +367,8 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220739
-Position="TABLE",1650,1200
+Position="TABLE",1800,1400
+ZOrder=11
 
 [Relation]
 Entity1=t_photo_comment
@@ -386,6 +389,7 @@ Bar2=776
 Bar3=280
 TermPos1=R
 TermPos2=R
+ZOrder=10
 
 [Entity]
 PName=t_photo_comment_like
@@ -393,8 +397,8 @@ LName=写真コメントいいね
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
 Page=TABLE
-Left=2200
-Top=1200
+Left=2350
+Top=1400
 Field="いいねID","like_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
 Field="アカウントID","account_id","INT(10)","NOT NULL",,"","",$FFFFFFFF,""
 Field="写真ID","photo_id","BIGINT","NOT NULL",,"","",$FFFFFFFF,""
@@ -404,7 +408,8 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220516
-Position="TABLE",2200,1200
+Position="TABLE",2350,1400
+ZOrder=9
 
 [Relation]
 Entity1=t_photo
@@ -425,6 +430,7 @@ Bar2=765
 Bar3=330
 TermPos1=R
 TermPos2=R
+ZOrder=8
 
 [Entity]
 PName=t_photo_like
@@ -432,8 +438,8 @@ LName=写真いいね
 Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
 Page=TABLE
-Left=2200
-Top=500
+Left=2350
+Top=700
 Field="いいねID","like_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
 Field="アカウントID","account_id","INT(10)",,,"","",$FFFFFFFF,""
 Field="写真ID","photo_id","BIGINT",,,"","",$FFFFFFFF,""
@@ -442,7 +448,8 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220455
-Position="TABLE",2200,500,209,114
+Position="TABLE",2350,700,209,114
+ZOrder=7
 
 [Relation]
 Entity1=t_account
@@ -463,6 +470,7 @@ Bar2=878
 Bar3=156
 TermPos1=R
 TermPos2=R
+ZOrder=6
 
 [Entity]
 PName=t_follow
@@ -471,7 +479,7 @@ Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
 Page=TABLE
 Left=150
-Top=550
+Top=750
 Field="フォローID","follow_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
 Field="アカウントID","account_id","INT(10)","NOT NULL",,"","",$FFFFFFFF,""
 Field="フォローアカウントID","follow_account_id","INT(10)","NOT NULL",,"","",$FFFFFFFF,""
@@ -480,7 +488,8 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220449
-Position="TABLE",150,550
+Position="TABLE",150,750
+ZOrder=5
 
 [Entity]
 PName=t_contact
@@ -489,7 +498,7 @@ Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
 Page=TABLE
 Left=200
-Top=1650
+Top=1800
 Field="お問合せID","contact_id","INT(10)","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
 Field="既読フラグ","read_flag","TINYINT(1)","NOT NULL",,"0","",$FFFFFFFF,""
 Field="名前","name","VARCHAR(50)","NOT NULL",,"","",$FFFFFFFF,""
@@ -499,7 +508,8 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220650
-Position="TABLE",200,1650,286,190
+Position="TABLE",200,1800,286,190
+ZOrder=4
 
 [Relation]
 Entity1=t_account
@@ -520,6 +530,7 @@ Bar2=722
 Bar3=147
 TermPos1=R
 TermPos2=R
+ZOrder=3
 
 [Relation]
 Entity1=t_photo
@@ -540,6 +551,7 @@ Bar2=691
 Bar3=343
 TermPos1=R
 TermPos2=R
+ZOrder=2
 
 [Relation]
 Entity1=t_account
@@ -560,6 +572,7 @@ Bar2=899
 Bar3=154
 TermPos1=R
 TermPos2=R
+ZOrder=1
 
 [Entity]
 PName=t_account
@@ -568,7 +581,7 @@ Comment=
 TableOption=ENGINE=InnoDB DEFAULT CHARSET=utf8
 Page=TABLE
 Left=850
-Top=550
+Top=750
 Field="アカウントID","account_id","INT(10)","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
 Field="ログインID","login_id","VARCHAR(30)","NOT NULL",,"","",$FFFFFFFF,""
 Field="アカウント名","name","VARCHAR(30)","NOT NULL",,"","",$FFFFFFFF,""
@@ -587,4 +600,70 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20190415220420
-Position="TABLE",850,550,365,524
+Position="TABLE",850,750,365,524
+ZOrder=0
+
+[Entity]
+PName=t_ban_report
+LName=通報
+Comment=
+TableOption=
+Page=TABLE
+Left=1350
+Top=250
+Field="通報ID","report_id","INT(10)","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMENT"
+Field="通報対象","report_target","ENUM(\qACCOUNT\q, \qPHOTO\q, \qCOMMENT\q)","NOT NULL",,"","",$FFFFFFFF,""
+Field="理由","reason","ENUM(\qDISLIKE\q, \qSPAM\q, \qADULT\q, \qDISCRIMINATION\q, \qOTHER\q)","NOT NULL",,"","",$FFFFFFFF,""
+Field="アカウントID","account_id","INT(10)",,,"","",$FFFFFFFF,""
+Field="写真ID","photo_id","BIGINT",,,"","",$FFFFFFFF,""
+Field="既読フラグ","read_flag","TINYINT(1)","NOT NULL",,"","",$FFFFFFFF,""
+Field="処理済みフラグ","done_flag","TINYINT(1)","NOT NULL",,"","",$FFFFFFFF,""
+Field="メモ","memo","VARCHAR(256)",,,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20190511103434
+Position="TABLE",1350,250
+ZOrder=27
+
+[Relation]
+Entity1=t_account
+Entity2=t_ban_report
+RelationType1=1
+RelationType2=3
+Fields1=account_id
+Fields2=account_id
+Cardinarity1=
+Cardinarity2=
+Position="TABLE",0,0,9441,0,R,R
+Dependence=0
+Caption=
+PName=
+LineMode=0
+Bar1=0
+Bar2=944
+Bar3=0
+TermPos1=R
+TermPos2=R
+ZOrder=28
+
+[Relation]
+Entity1=t_photo
+Entity2=t_ban_report
+RelationType1=1
+RelationType2=3
+Fields1=photo_id
+Fields2=photo_id
+Cardinarity1=
+Cardinarity2=
+Position="TABLE",0,0,4290,9941,R,R
+Dependence=0
+Caption=
+PName=
+LineMode=0
+Bar1=0
+Bar2=429
+Bar3=994
+TermPos1=R
+TermPos2=R
+ZOrder=29

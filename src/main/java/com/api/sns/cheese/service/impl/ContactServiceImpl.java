@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TContact;
 import com.api.sns.cheese.form.ContactForm;
 import com.api.sns.cheese.repository.TContactRepository;
@@ -36,9 +35,6 @@ public class ContactServiceImpl implements ContactService {
 		// DB登録
 		TContact contact = mapper.map(form, TContact.class);
 		contact.setReadFlag(false);
-
-		// TODO 共通項目は親クラスで設定する
-		contact.setDeleted(CommonConst.DeletedFlag.OFF);
 		tContactRepository.create(contact);
 
 		// TODO 運営にメール送信

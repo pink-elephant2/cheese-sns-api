@@ -5,6 +5,7 @@ import java.util.Date;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.util.StringUtils;
 
+import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.common.business.domain.AbstractBaseEntity;
 import com.api.sns.common.business.domain.BaseExample;
 import com.api.sns.common.util.DateUtils;
@@ -61,6 +62,9 @@ public interface BaseNoKeyRepository<E extends AbstractBaseEntity, C extends Bas
 
 	default void beforeInsert(E entity) {
 		Date now = DateUtils.now();
+		if (entity.getDeleted() == null) {
+			entity.setDeleted(CommonConst.DeletedFlag.OFF);
+		}
 		entity.setCreatedAt(now);
 		entity.setUpdatedAt(now);
 

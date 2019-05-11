@@ -111,4 +111,17 @@ public class UserPhotoController {
 		// いいねを解除する
 		return photoService.likeComment(cd, commentCd, false);
 	}
+
+	/**
+	 * 写真を削除する
+	 *
+	 * @param cd
+	 *            コード
+	 */
+	@PostMapping("/{cd}/remove")
+	@ResponseStatus(HttpStatus.CREATED)
+	public boolean remove(@PathVariable("cd") String cd) {
+		// 写真を削除する
+		return photoService.remove(cd);
+	}
 }

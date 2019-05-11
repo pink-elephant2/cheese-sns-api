@@ -25,8 +25,7 @@
 
     <jdbcConnection connectionURL="jdbc:mysql://localhost:3306/dbname"
     driverClass="com.mysql.jdbc.Driver"
-    password="fugafuga"
-    userId="hogehoge" />
+    password="fugafuga" userId="hogehoge" />
 
     <javaTypeResolver type="com.api.sns.support.mybatis.generator.resovler.MySqlJavaTypeResolver">
     </javaTypeResolver>
@@ -44,6 +43,10 @@
     <table tableName="t_activity" modelType="hierarchical">
         <columnOverride column="activity_type" javaType="com.api.sns.cheese.enums.ActivityTypeEnum" />
     </table>
+    <table tableName="t_ban_report" modelType="hierarchical">
+        <columnOverride column="report_target" javaType="com.api.sns.cheese.enums.ReportTargetEnum" />
+        <columnOverride column="reason" javaType="com.api.sns.cheese.enums.ReportReasonEnum" />
+    </table>
     <table tableName="t_bookmark" modelType="hierarchical"></table>
     <table tableName="t_contact" modelType="hierarchical"></table>
     <table tableName="t_follow" modelType="hierarchical"></table>
@@ -56,7 +59,7 @@
     <table tableName="t_tag" modelType="hierarchical"></table>
     <table tableName="t_tag_photo" modelType="hierarchical"></table>
 
-    <table tableName="v_activity" modelType="hierarchical"></table>
+    <!-- 対象ビュー -->
     <table tableName="v_follow" modelType="hierarchical"></table>
 
   </context>
