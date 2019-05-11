@@ -1,8 +1,28 @@
 -- Project Name : チーズSNS
--- Date/Time    : 2019/05/11 0:02:55
+-- Date/Time    : 2019/05/11 10:34:43
 -- Author       : チーズSNS
 -- RDBMS Type   : MySQL
 -- Application  : A5:SQL Mk-2
+
+-- 通報
+drop table if exists t_ban_report cascade;
+
+create table t_ban_report (
+  report_id INT(10) not null AUTO_INCREMENT comment '通報ID'
+  , report_target ENUM('ACCOUNT', 'PHOTO', 'COMMENT') not null comment '通報対象'
+  , reason ENUM('DISLIKE', 'SPAM', 'ADULT', 'DISCRIMINATION', 'OTHER') not null comment '理由'
+  , account_id INT(10) comment 'アカウントID'
+  , photo_id BIGINT comment '写真ID'
+  , read_flag TINYINT(1) not null comment '既読フラグ'
+  , done_flag TINYINT(1) not null comment '処理済みフラグ'
+  , memo VARCHAR(256) comment 'メモ'
+  , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
+  , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
+  , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
+  , updated_at DATETIME default CURRENT_TIMESTAMP not null comment '更新日時'
+  , updated_by VARCHAR(20) default 'SYSTEM' not null comment '更新者'
+  , constraint t_ban_report_PKC primary key (report_id)
+) comment '通報' ;
 
 -- 写真タグ
 drop table if exists t_tag_photo cascade;

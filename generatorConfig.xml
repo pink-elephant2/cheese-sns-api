@@ -43,6 +43,10 @@
     <table tableName="t_activity" modelType="hierarchical">
         <columnOverride column="activity_type" javaType="com.api.sns.cheese.enums.ActivityTypeEnum" />
     </table>
+    <table tableName="t_ban_report" modelType="hierarchical">
+        <columnOverride column="report_target" javaType="com.api.sns.cheese.enums.ReportTargetEnum" />
+        <columnOverride column="reason" javaType="com.api.sns.cheese.enums.ReportReasonEnum" />
+    </table>
     <table tableName="t_bookmark" modelType="hierarchical"></table>
     <table tableName="t_contact" modelType="hierarchical"></table>
     <table tableName="t_follow" modelType="hierarchical"></table>
