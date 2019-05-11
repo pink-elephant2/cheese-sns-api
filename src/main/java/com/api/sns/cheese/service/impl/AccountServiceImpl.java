@@ -15,14 +15,17 @@ import com.api.sns.cheese.aop.SessionInfoContextHolder;
 import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccount;
 import com.api.sns.cheese.domain.TAccountExample;
+import com.api.sns.cheese.domain.TBanReport;
 import com.api.sns.cheese.domain.TFollow;
 import com.api.sns.cheese.domain.TFollowExample;
 import com.api.sns.cheese.enums.DocumentTypeEnum;
 import com.api.sns.cheese.enums.ReportReasonEnum;
+import com.api.sns.cheese.enums.ReportTargetEnum;
 import com.api.sns.cheese.form.AccountCreateForm;
 import com.api.sns.cheese.form.AccountImageForm;
 import com.api.sns.cheese.form.AccountUpdateForm;
 import com.api.sns.cheese.repository.TAccountRepository;
+import com.api.sns.cheese.repository.TBanReportRepository;
 import com.api.sns.cheese.repository.TFollowRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.service.AccountService;
@@ -40,6 +43,9 @@ public class AccountServiceImpl implements AccountService {
 
 	@Autowired
 	private TFollowRepository tFollowRepository;
+
+	@Autowired
+	private TBanReportRepository tBanReportRepository;
 
 	@Autowired
 	private Mapper mapper;
@@ -109,8 +115,16 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Override
 	public boolean report(String loginId, ReportReasonEnum reason) {
-		// TODO 実装
-		return true;
+		TAccount account = tAccountRepository.findOneByLoginId(loginId);
+
+		// レコード登録
+		TBanReport entity = new TBanReport();
+		entity.setReportTarget(ReportTargetEnum.ACCOUNT);
+		entity.setReason(reason);
+		entity.setAccountId(account.getAccountId());
+		entity.setReadFlag(false);
+		entity.setDoneFlag(false);
+		return tBanReportRepository.create(entity);
 	}
 
 	/**
@@ -121,8 +135,39 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Override
 	public boolean block(String loginId) {
-		// TODO 実装
-		return true;
+		if (!SessionInfoContextHolder.isAuthenticated()) {
+			return false;
+		}
+
+		TAccount account = tAccountRepository.findOneByLoginId(loginId);
+		Integer accountId = SessionInfoContextHolder.getSessionInfo().getAccountId();
+
+		// ログイン済みの場合、フォローしているか
+		TFollowExample followExample = new TFollowExample();
+		followExample.createCriteria().andAccountIdEqualTo(accountId)
+				.andFollowAccountIdEqualTo(account.getAccountId());
+		TFollow follower = tFollowRepository.findOneBy(followExample);
+
+		boolean ret;
+		if (follower == null) {
+			// 登録内容の設定
+			TFollow follow = new TFollow();
+			follow.setAccountId(accountId);
+			follow.setFollowAccountId(account.getAccountId());
+			follow.setBlockFlag(true);
+			follow.setDeleted(CommonConst.DeletedFlag.ON);
+
+			// レコード登録
+			ret = tFollowRepository.create(follow);
+		} else {
+			// 更新内容の設定
+			follower.setBlockFlag(true);
+			follower.setDeleted(CommonConst.DeletedFlag.ON);
+
+			// レコード更新
+			ret = tFollowRepository.update(follower);
+		}
+		return ret;
 	}
 
 	/**
