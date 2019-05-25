@@ -92,13 +92,27 @@ public class AccountServiceImpl implements AccountService {
 		}
 		AccountResource resource = mapper.map(account, AccountResource.class);
 
-		if (SessionInfoContextHolder.isAuthenticated()) {
-			// ログイン済みの場合、フォローしているか
+		// ログイン済みの場合
+		if (SessionInfoContextHolder.isAuthenticated()
+				&& !SessionInfoContextHolder.getSessionInfo().getAccountId().equals(account.getAccountId())) {
+			// フォローしているか
 			TFollowExample followExample = new TFollowExample();
 			followExample.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId())
 					.andFollowAccountIdEqualTo(account.getAccountId()).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 			TFollow follow = tFollowRepository.findOneBy(followExample);
+
 			resource.setFollow(follow != null);
+
+			// フォローされているか
+			TFollowExample followerExample = new TFollowExample();
+			followerExample.createCriteria().andAccountIdEqualTo(account.getAccountId())
+					.andFollowAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId());
+			TFollow follower = tFollowRepository.findOneBy(followerExample);
+
+			if (follower != null) {
+				resource.setFollower(CommonConst.DeletedFlag.OFF.equals(follower.getDeleted()));
+				resource.setBlocked(follower.getBlockFlag());
+			}
 		}
 
 		return resource;

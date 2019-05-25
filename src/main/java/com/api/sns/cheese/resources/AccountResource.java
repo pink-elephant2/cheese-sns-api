@@ -47,4 +47,12 @@ public class AccountResource {
 	/** ログイン状態の場合、フォローしているかどうか */
 	@JsonProperty("isFollow")
 	private boolean isFollow;
+
+	/** ログイン状態の場合、フォローされているかどうか */
+	@JsonProperty("isFollower")
+	private boolean isFollower;
+
+	/** ログイン状態の場合、ブロックされているかどうか */
+	@JsonProperty("isBlocked")
+	private boolean isBlocked;
 }
