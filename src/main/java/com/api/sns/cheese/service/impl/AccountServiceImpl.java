@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.ibatis.javassist.NotFoundException;
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +20,7 @@ import com.api.sns.cheese.domain.TFollowExample;
 import com.api.sns.cheese.enums.DocumentTypeEnum;
 import com.api.sns.cheese.enums.ReportReasonEnum;
 import com.api.sns.cheese.enums.ReportTargetEnum;
+import com.api.sns.cheese.exception.NotFoundException;
 import com.api.sns.cheese.form.AccountCreateForm;
 import com.api.sns.cheese.form.AccountImageForm;
 import com.api.sns.cheese.form.AccountUpdateForm;
@@ -84,11 +84,10 @@ public class AccountServiceImpl implements AccountService {
 	 * @return アカウント情報
 	 */
 	@Override
-	public AccountResource find(String loginId) throws NotFoundException {
+	public AccountResource find(String loginId) {
 		TAccount account = tAccountRepository.findOneByLoginId(loginId);
 
 		if (account == null) {
-			// TODO 404を返す
 			throw new NotFoundException("アカウントが存在しません");
 		}
 		AccountResource resource = mapper.map(account, AccountResource.class);
@@ -177,7 +176,7 @@ public class AccountServiceImpl implements AccountService {
 	 *            プロフィールフォーム
 	 */
 	@Override
-	public boolean saveProfile(AccountUpdateForm form) throws NotFoundException {
+	public boolean saveProfile(AccountUpdateForm form) {
 		// プロフィールを更新する
 		TAccount account = mapper.map(form, TAccount.class);
 

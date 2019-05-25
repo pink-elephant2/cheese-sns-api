@@ -1,6 +1,5 @@
 package com.api.sns.cheese.service.impl;
 
-import org.apache.ibatis.javassist.NotFoundException;
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +17,7 @@ import com.api.sns.cheese.domain.TFollowExample;
 import com.api.sns.cheese.domain.VFollow;
 import com.api.sns.cheese.domain.VFollowExample;
 import com.api.sns.cheese.enums.ActivityTypeEnum;
+import com.api.sns.cheese.exception.NotFoundException;
 import com.api.sns.cheese.repository.TAccountRepository;
 import com.api.sns.cheese.repository.TActivityRepository;
 import com.api.sns.cheese.repository.TFollowRepository;

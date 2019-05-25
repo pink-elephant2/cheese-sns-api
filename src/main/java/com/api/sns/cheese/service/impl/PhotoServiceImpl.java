@@ -34,6 +34,7 @@ import com.api.sns.cheese.enums.ActivityTypeEnum;
 import com.api.sns.cheese.enums.DocumentTypeEnum;
 import com.api.sns.cheese.enums.ReportReasonEnum;
 import com.api.sns.cheese.enums.ReportTargetEnum;
+import com.api.sns.cheese.exception.NotFoundException;
 import com.api.sns.cheese.form.PhotoForm;
 import com.api.sns.cheese.repository.TAccountRepository;
 import com.api.sns.cheese.repository.TActivityRepository;
@@ -99,8 +100,7 @@ public class PhotoServiceImpl implements PhotoService {
 		example.createCriteria().andPhotoCdEqualTo(cd).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		TPhoto photo = tPhotoRepository.findOneBy(example);
 		if (photo == null) {
-			// TODO 404を返す
-			// throw new NotFoundException("写真が存在しません");
+			 throw new NotFoundException("写真が存在しません");
 		}
 
 		PhotoResource resource = mapper.map(photo, PhotoResource.class);
