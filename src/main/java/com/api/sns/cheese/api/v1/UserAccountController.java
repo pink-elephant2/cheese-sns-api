@@ -1,6 +1,5 @@
 package com.api.sns.cheese.api.v1;
 
-import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -37,7 +36,7 @@ public class UserAccountController {
 	 */
 	@PostMapping("/profile")
 	@ResponseStatus(HttpStatus.CREATED)
-	public boolean saveProfile(@RequestBody @Validated AccountUpdateForm form) throws NotFoundException {
+	public boolean saveProfile(@RequestBody @Validated AccountUpdateForm form) {
 		// プロフィールを更新する
 		return accountService.saveProfile(form);
 	}

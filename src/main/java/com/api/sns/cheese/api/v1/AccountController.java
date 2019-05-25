@@ -1,6 +1,5 @@
 package com.api.sns.cheese.api.v1;
 
-import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,7 +53,7 @@ public class AccountController {
 	 */
 	@GetMapping("/{loginId}")
 	@ResponseStatus(HttpStatus.OK)
-	public AccountResource find(@PathVariable("loginId") String loginId) throws NotFoundException {
+	public AccountResource find(@PathVariable("loginId") String loginId) {
 		// アカウントを取得する
 		return accountService.find(loginId);
 	}

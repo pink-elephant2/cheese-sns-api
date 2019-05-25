@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TPhoto;
 import com.api.sns.cheese.domain.TPhotoExample;
+import com.api.sns.cheese.exception.NotFoundException;
 
 @Primary
 @Repository
@@ -32,8 +33,7 @@ public class TPhotoRepositoryImpl implements TPhotoRepository {
 		photoExample.createCriteria().andPhotoIdEqualTo(photoId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		TPhoto photo = findOneBy(photoExample);
 		if (photo == null) {
-			// TODO 404を返す
-			// throw new NotFoundException("写真が存在しません");
+			throw new NotFoundException("写真が存在しません");
 		}
 		return photo;
 	}
@@ -49,8 +49,7 @@ public class TPhotoRepositoryImpl implements TPhotoRepository {
 		photoExample.createCriteria().andPhotoCdEqualTo(photoCd).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		TPhoto photo = findOneBy(photoExample);
 		if (photo == null) {
-			// TODO 404を返す
-			// throw new NotFoundException("写真が存在しません");
+			 throw new NotFoundException("写真が存在しません");
 		}
 		return photo;
 	}
