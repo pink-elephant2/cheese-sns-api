@@ -3,6 +3,7 @@ package com.api.sns.cheese.api.v1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,7 @@ import com.api.sns.cheese.service.PhotoService;
 /**
  * (認証必須)写真API TODO インターセプタで自分のログインIDかチェックする
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/user/{loginId}/photo")
 public class UserPhotoController {
