@@ -18,9 +18,9 @@ create index principal_name
   on t_session(principal_name);
 
 -- セッションアトリビュート
-drop table if exists t_session_attributes cascade;
+drop table if exists t_session_ATTRIBUTES cascade;
 
-create table t_session_attributes (
+create table t_session_ATTRIBUTES (
   session_primary_id CHAR(36) not null comment 'セッションID'
   , attribute_name VARCHAR(200) not null
   , attribute_bytes BLOB
