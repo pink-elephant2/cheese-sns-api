@@ -111,7 +111,7 @@ public class AccountServiceImpl implements AccountService {
 
 			if (follower != null) {
 				resource.setFollower(CommonConst.DeletedFlag.OFF.equals(follower.getDeleted()));
-				resource.setBlocked(follower.getBlockFlag());
+				resource.setBlocked(BooleanUtils.toBoolean(follower.getBlockFlag()));
 			}
 		}
 

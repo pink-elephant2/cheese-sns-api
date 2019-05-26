@@ -173,6 +173,8 @@ public class PhotoServiceImpl implements PhotoService {
 			// 指定されたユーザーの写真一覧
 			Integer accountId = tAccountRepository.findOneByLoginId(loginId).getAccountId();
 			example.createCriteria().andAccountIdEqualTo(accountId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		} else {
+			example.createCriteria().andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		}
 		return tPhotoRepository.findPageBy(example, pageable).map(tPhoto -> {
 			PhotoResource resource = mapper.map(tPhoto, PhotoResource.class);

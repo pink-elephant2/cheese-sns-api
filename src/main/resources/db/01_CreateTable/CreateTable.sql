@@ -1,5 +1,5 @@
 -- Project Name : チーズSNS
--- Date/Time    : 2019/05/11 10:34:43
+-- Date/Time    : 2019/05/26 14:52:53
 -- Author       : チーズSNS
 -- RDBMS Type   : MySQL
 -- Application  : A5:SQL Mk-2
@@ -293,6 +293,8 @@ FROM
   inner join t_account as tFollowerAccount
     on tFollow.follow_account_id = tFollowerAccount.account_id
     and tFollowerAccount.deleted = '0'
+WHERE
+  tFollow.deleted = '0'
 
 
 ;
