@@ -42,7 +42,7 @@ public class S3ServiceImpl implements S3Service {
 		String filePath = createFilePath(documentType, fileName);
 		amazonS3.putObject(createRequest(filePath, inputFile.getBytes()));
 
-		return appConfig.getS3ServiceEndPoint() + "/" + appConfig.getS3Bucket() + "/" + filePath;
+		return appConfig.getCloudHostUrl() + "/" + filePath;
 	}
 
 	/**
