@@ -39,7 +39,7 @@ logging:
     config: classpath:config/logbak.xml
 
 cheese:
-  app-name: éBÇÎÇ¡Ç∆É`Å[ÉY
+  app-name: ÊíÆ„Çç„Å£„Å®„ÉÅ„Éº„Ç∫
   url: https://www.torochee.com/
   cloud-host-url: ${CHEESE_CLOUD_HOST_URL:https://cdn.torochee.com}
   s3-access-key: ${CHEESE_S3_ACCESS_KEY:}
