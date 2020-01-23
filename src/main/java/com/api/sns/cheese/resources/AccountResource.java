@@ -38,6 +38,9 @@ public class AccountResource {
 	/** ウェブサイト */
 	private String url;
 
+	/** Facebookアカウント */
+	private String facebook;
+
 	/** Twitterアカウント */
 	private String twitter;
 

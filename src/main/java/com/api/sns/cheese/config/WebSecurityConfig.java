@@ -1,6 +1,7 @@
 package com.api.sns.cheese.config;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -10,8 +11,10 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,14 +23,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.openid.OpenIDAuthenticationProvider;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.api.sns.cheese.service.impl.UserDetailsServiceImpl;
+
 
 /**
  * SpringSecurity設定
@@ -59,7 +67,46 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.logout().logoutUrl("/api/v1/logout").invalidateHttpSession(true).deleteCookies("JSESSIONID")
 				.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()).and()
 				// CSRF
-				.csrf().disable(); // TODO CSRF有効にする
+				.csrf().disable() // TODO CSRF有効にする
+				// CORS
+				.cors().configurationSource(corsConfigurationSource());
+	}
+
+	/**
+	 * CORS設定
+	 *
+	 * @return CORS設定
+	 */
+	private CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration corsConfiguration = new CorsConfiguration();
+		corsConfiguration.setAllowedMethods(Arrays.asList(HttpMethod.GET.name(), HttpMethod.POST.name(),
+				HttpMethod.PUT.name(), HttpMethod.DELETE.name()));
+		corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
+		corsConfiguration.addAllowedOrigin("*");
+		corsConfiguration.setAllowCredentials(true);
+
+		UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
+		corsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+
+		return corsConfigurationSource;
+	}
+
+	/**
+	 * Facebookプロバイダ
+	 */
+	@Bean(name = "openIDAuthenticationProvider")
+	public AuthenticationProvider openIDAuthenticationProvider() {
+		OpenIDAuthenticationProvider openIDAuthenticationProvider = new OpenIDAuthenticationProvider();
+		openIDAuthenticationProvider.setUserDetailsService(userDetailsService);
+		return openIDAuthenticationProvider;
+	}
+
+	/**
+	 * 独自ログイン
+	 */
+	@Bean
+	public AutoAuthenticationManager autoAuthenticationManager() {
+		return new AutoAuthenticationManager();
 	}
 
 	/**

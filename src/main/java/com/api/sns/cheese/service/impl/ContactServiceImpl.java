@@ -9,6 +9,8 @@ import com.api.sns.cheese.domain.TContact;
 import com.api.sns.cheese.form.ContactForm;
 import com.api.sns.cheese.repository.TContactRepository;
 import com.api.sns.cheese.service.ContactService;
+import com.api.sns.cheese.service.MailService;
+import com.api.sns.cheese.service.SlackService;
 
 /**
  * お問合せサービス
@@ -22,6 +24,12 @@ public class ContactServiceImpl implements ContactService {
 
 	@Autowired
 	private Mapper mapper;
+
+	@Autowired
+	private MailService mailService;
+
+	@Autowired
+	private SlackService slackService;
 
 	/**
 	 * お問合せ登録する
@@ -37,9 +45,11 @@ public class ContactServiceImpl implements ContactService {
 		contact.setReadFlag(false);
 		tContactRepository.create(contact);
 
-		// TODO 運営にメール送信
+		// 運営にSlack送信
+		slackService.sendContactComplete(form);
 
-		// TODO サンキューメール送信
+		// サンキューメール送信
+		mailService.sendContactComplete(form);
 
 		return true;
 	}

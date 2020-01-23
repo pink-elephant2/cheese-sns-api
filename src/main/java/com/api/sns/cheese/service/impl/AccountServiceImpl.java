@@ -226,4 +226,14 @@ public class AccountServiceImpl implements AccountService {
 			return false;
 		}
 	}
+
+	/**
+	 * FacebookIDからアカウントを取得する
+	 */
+	@Override
+	public TAccount findByFacebookId(String facebookId) {
+		TAccountExample example = new TAccountExample();
+		example.createCriteria().andFacebookEqualTo(facebookId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		return tAccountRepository.findOneBy(example);
+	}
 }

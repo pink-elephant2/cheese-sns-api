@@ -1,5 +1,6 @@
 package com.api.sns.cheese.service;
 
+import com.api.sns.cheese.domain.TAccount;
 import com.api.sns.cheese.enums.ReportReasonEnum;
 import com.api.sns.cheese.form.AccountCreateForm;
 import com.api.sns.cheese.form.AccountImageForm;
@@ -61,4 +62,9 @@ public interface AccountService {
 	 *            画像フォーム
 	 */
 	public boolean saveImage(AccountImageForm form);
+
+	/**
+	 * FacebookIDからアカウントを取得する
+	 */
+	public TAccount findByFacebookId(String facebookId);
 }

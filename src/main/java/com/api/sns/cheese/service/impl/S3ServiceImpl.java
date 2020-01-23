@@ -40,7 +40,7 @@ public class S3ServiceImpl implements S3Service {
 	@Override
 	public String upload(DocumentTypeEnum documentType, String fileName, MultipartFile inputFile) throws IOException {
 		String filePath = createFilePath(documentType, fileName);
-		amazonS3.putObject(createRequest(filePath, inputFile.getBytes()));
+		amazonS3.putObject(createRequest("assets/" + filePath, inputFile.getBytes()));
 
 		return appConfig.getCloudHostUrl() + "/" + filePath;
 	}
@@ -57,6 +57,7 @@ public class S3ServiceImpl implements S3Service {
 		// バイト長設定
 		ObjectMetadata metaData = new ObjectMetadata();
 		metaData.setContentLength(file.length);
+		metaData.setCacheControl("max-age=2592000");
 
 		// アップロード対象のオブジェクトを作成
 		PutObjectRequest putRequest = new PutObjectRequest(appConfig.getS3Bucket(), filePath,

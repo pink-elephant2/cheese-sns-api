@@ -10,6 +10,12 @@ import lombok.Data;
 @Data
 public class AppConfig {
 
+	/** アプリ名 */
+	private String appName;
+
+	/** サイトURL */
+	private String url;
+
 	/** S3アクセスキー */
 	private String s3AccessKey;
 
@@ -31,4 +37,9 @@ public class AppConfig {
 	/** AWSアクセス時のタイムアウト時間(ms) */
 	private Integer timeout;
 
+	/** SlackAPIトークン (お問い合わせBot) */
+	private String slackAppToken;
+
+	/** Slackお問い合わせチャンネル */
+	private String slackContactChannel;
 }
