@@ -1,4 +1,6 @@
-package com.api.note.quiz.service;
+package com.api.sns.cheese.service;
+
+import javax.validation.constraints.NotNull;
 
 import com.restfb.types.User;
 
@@ -15,5 +17,5 @@ public interface FacebookService {
 	/**
 	 * Facebookユーザーを取得する
 	 */
-	public User getFacebookUser(String code);
+	public User getFacebookUser(@NotNull String code);
 }

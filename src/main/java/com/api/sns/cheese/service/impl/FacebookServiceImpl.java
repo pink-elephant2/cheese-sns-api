@@ -1,10 +1,12 @@
-package com.api.note.quiz.service.impl;
+package com.api.sns.cheese.service.impl;
+
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.api.note.quiz.service.FacebookService;
+import com.api.sns.cheese.service.FacebookService;
 import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
 import com.restfb.Parameter;
@@ -46,7 +48,7 @@ public class FacebookServiceImpl implements FacebookService {
 	 * Facebookユーザーを取得する
 	 */
 	@Override
-	public User getFacebookUser(String code) {
+	public User getFacebookUser(@NotNull String code) {
 		try {
 			// get accessToken
 			FacebookClient client = getFacebookClient(null, facebookSecret);
@@ -95,7 +97,7 @@ public class FacebookServiceImpl implements FacebookService {
 	 * @return the client of facebook
 	 */
 	private FacebookClient getFacebookClient(String accessToken, String appSecret) {
-		Version apiVersion = Version.VERSION_3_2;
+		Version apiVersion = Version.VERSION_5_0;
 
 		if (StringUtils.isAnyBlank(accessToken, appSecret)) {
 			return new DefaultFacebookClient(apiVersion);
