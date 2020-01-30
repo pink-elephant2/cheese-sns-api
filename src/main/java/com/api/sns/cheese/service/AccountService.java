@@ -1,5 +1,7 @@
 package com.api.sns.cheese.service;
 
+import javax.validation.constraints.NotNull;
+
 import com.api.sns.cheese.domain.TAccount;
 import com.api.sns.cheese.enums.ReportReasonEnum;
 import com.api.sns.cheese.form.AccountCreateForm;
@@ -66,5 +68,5 @@ public interface AccountService {
 	/**
 	 * FacebookIDからアカウントを取得する
 	 */
-	public TAccount findByFacebookId(String facebookId);
+	public TAccount findByFacebookId(@NotNull String facebookId);
 }

@@ -24,6 +24,7 @@ import com.restfb.types.User;
 /**
  * ログインAPI
  */
+//@Slf4j
 @Controller
 @RequestMapping("/api/v1/login")
 public class LoginController {
@@ -61,17 +62,17 @@ public class LoginController {
 		User facebookUser = facebookService.getFacebookUser(code);
 
 		// DBに登録されているユーザーを取得
-		TAccount account = accountService.findByFacebookId(facebookUser.getThirdPartyId());
+		TAccount account = accountService.findByFacebookId(facebookUser.getId());
 		// TODO BANされている場合
 		if (account == null) {
 			// ユーザー登録
 			AccountCreateForm form = new AccountCreateForm();
-			form.setLoginId(facebookUser.getThirdPartyId()); // TODO ログインID検討
+			form.setLoginId(facebookUser.getId()); // TODO ログインID検討
 			form.setName(facebookUser.getName());
 			form.setMail(facebookUser.getEmail());
-			form.setPassword("FACEBOOK," + facebookUser.getThirdPartyId() + ",USER"); // TODO 仮パスワード長すぎ
+			form.setPassword("FACEBOOK," + facebookUser.getId() + ",USER"); // TODO 仮パスワード長すぎ
 			form.setImgUrl(facebookUser.getPicture() == null ? null : facebookUser.getPicture().getUrl());
-			form.setFacebook(facebookUser.getThirdPartyId());
+			form.setFacebook(facebookUser.getId());
 			accountService.create(form);
 		}
 		// ログイン
@@ -84,9 +85,9 @@ public class LoginController {
 	 */
 	private void autoLogin(HttpServletRequest request, User facebookUser) {
 		// ログイン
-		String pass = "FACEBOOK," + facebookUser.getThirdPartyId() + ",USER";
+		String pass = "FACEBOOK," + facebookUser.getId() + ",USER";
 		UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken(
-				facebookUser.getThirdPartyId(), pass, AuthorityUtils.createAuthorityList("ROLE_USER"));
+				facebookUser.getId(), pass, AuthorityUtils.createAuthorityList("ROLE_USER"));
 		authReq.setDetails(new WebAuthenticationDetails(request));
 		Authentication auth = autoAuthenticationManager.authenticate(authReq);
 

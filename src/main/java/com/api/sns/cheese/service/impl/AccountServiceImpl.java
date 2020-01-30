@@ -3,12 +3,15 @@ package com.api.sns.cheese.service.impl;
 import java.io.IOException;
 import java.util.Date;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.util.StringUtils;
 
 import com.api.sns.cheese.aop.SessionInfoContextHolder;
 import com.api.sns.cheese.consts.CommonConst;
@@ -29,6 +32,7 @@ import com.api.sns.cheese.repository.TBanReportRepository;
 import com.api.sns.cheese.repository.TFollowRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.service.AccountService;
+import com.api.sns.cheese.service.MailService;
 import com.api.sns.cheese.service.S3Service;
 
 /**
@@ -54,6 +58,9 @@ public class AccountServiceImpl implements AccountService {
 	private PasswordEncoder passwordEncoder;
 
 	@Autowired
+	private MailService mailService;
+
+	@Autowired
 	private S3Service s3Service;
 
 	/**
@@ -73,7 +80,13 @@ public class AccountServiceImpl implements AccountService {
 		account.setPasswordChangeDate(new Date());
 
 		// TODO エラーメッセージ
-		return tAccountRepository.create(account);
+		boolean ret = tAccountRepository.create(account);
+		if (ret && !StringUtils.isEmpty(form.getMail())) {
+			// ソーシャルからメールが取得できない場合がある
+			// 登録完了メール送信
+			ret = mailService.sendAccountRegistComplete(form);
+		}
+		return ret;
 	}
 
 	/**
@@ -231,7 +244,7 @@ public class AccountServiceImpl implements AccountService {
 	 * FacebookIDからアカウントを取得する
 	 */
 	@Override
-	public TAccount findByFacebookId(String facebookId) {
+	public TAccount findByFacebookId(@NotNull String facebookId) {
 		TAccountExample example = new TAccountExample();
 		example.createCriteria().andFacebookEqualTo(facebookId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		return tAccountRepository.findOneBy(example);
