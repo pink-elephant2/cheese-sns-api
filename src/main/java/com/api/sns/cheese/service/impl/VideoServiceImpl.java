@@ -35,7 +35,7 @@ import com.api.sns.cheese.enums.DocumentTypeEnum;
 import com.api.sns.cheese.enums.ReportReasonEnum;
 import com.api.sns.cheese.enums.ReportTargetEnum;
 import com.api.sns.cheese.exception.NotFoundException;
-import com.api.sns.cheese.form.PhotoForm;
+import com.api.sns.cheese.form.VideoForm;
 import com.api.sns.cheese.repository.TAccountRepository;
 import com.api.sns.cheese.repository.TActivityRepository;
 import com.api.sns.cheese.repository.TBanReportRepository;
@@ -46,28 +46,29 @@ import com.api.sns.cheese.repository.TPhotoLikeRepository;
 import com.api.sns.cheese.repository.TPhotoRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.resources.CommentResource;
-import com.api.sns.cheese.resources.PhotoResource;
-import com.api.sns.cheese.service.PhotoService;
+import com.api.sns.cheese.resources.VideoResource;
 import com.api.sns.cheese.service.S3Service;
+import com.api.sns.cheese.service.VideoService;
 
 /**
- * 写真サービス
+ * 動画サービス
  */
+//@Slf4j
 @Service
 @Transactional
-public class PhotoServiceImpl implements PhotoService {
+public class VideoServiceImpl implements VideoService {
 
 	@Autowired
-	private TPhotoRepository tPhotoRepository;
+	private TPhotoRepository tPhotoRepository;	// TODO videoに変換
 
 	@Autowired
-	private TPhotoLikeRepository tPhotoLikeRepository;
+	private TPhotoLikeRepository tPhotoLikeRepository;	// TODO videoに変換
 
 	@Autowired
-	private TPhotoCommentRepository tPhotoCommentRepository;
+	private TPhotoCommentRepository tPhotoCommentRepository;	// TODO videoに変換
 
 	@Autowired
-	private TPhotoCommentLikeRepository tPhotoCommentLikeRepository;
+	private TPhotoCommentLikeRepository tPhotoCommentLikeRepository;	// TODO videoに変換
 
 	@Autowired
 	private TAccountRepository tAccountRepository;
@@ -88,22 +89,22 @@ public class PhotoServiceImpl implements PhotoService {
 	private Mapper mapper;
 
 	/**
-	 * 写真を取得する
+	 * 動画を取得する
 	 *
 	 * @param cd
 	 *            コード
-	 * @return 写真情報
+	 * @return 動画情報
 	 */
 	@Override
-	public PhotoResource find(String cd) {
+	public VideoResource find(String cd) {
 		TPhotoExample example = new TPhotoExample();
 		example.createCriteria().andPhotoCdEqualTo(cd).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		TPhoto photo = tPhotoRepository.findOneBy(example);
 		if (photo == null) {
-			 throw new NotFoundException("写真が存在しません");
+			throw new NotFoundException("動画が存在しません");
 		}
 
-		PhotoResource resource = mapper.map(photo, PhotoResource.class);
+		VideoResource resource = mapper.map(photo, VideoResource.class);
 
 		// TODO 投稿ユーザー View または キャッシュ
 		resource.setAccount(mapper.map(tAccountRepository.findOneById(photo.getAccountId()), AccountResource.class));
@@ -158,26 +159,26 @@ public class PhotoServiceImpl implements PhotoService {
 	}
 
 	/**
-	 * 写真一覧を取得する
+	 * 動画一覧を取得する
 	 *
 	 * @param loginId
 	 *            ログインID
 	 * @param pageable
 	 *            ページ情報
-	 * @param 写真一覧
+	 * @param 動画一覧
 	 */
 	@Override
-	public Page<PhotoResource> findList(String loginId, Pageable pageable) {
+	public Page<VideoResource> findList(String loginId, Pageable pageable) {
 		TPhotoExample example = new TPhotoExample();
 		if (!StringUtils.isEmpty(loginId)) {
-			// 指定されたユーザーの写真一覧
+			// 指定されたユーザーの動画一覧
 			Integer accountId = tAccountRepository.findOneByLoginId(loginId).getAccountId();
 			example.createCriteria().andAccountIdEqualTo(accountId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		} else {
 			example.createCriteria().andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		}
 		return tPhotoRepository.findPageBy(example, pageable).map(tPhoto -> {
-			PhotoResource resource = mapper.map(tPhoto, PhotoResource.class);
+			VideoResource resource = mapper.map(tPhoto, VideoResource.class);
 
 			// TODO 投稿ユーザー View または キャッシュ
 			resource.setAccount(
@@ -188,22 +189,22 @@ public class PhotoServiceImpl implements PhotoService {
 	}
 
 	/**
-	 * 写真を登録する
+	 * 動画を登録する
 	 *
 	 * @param form
-	 *            写真フォーム
-	 * @return 写真情報
+	 *            動画フォーム
+	 * @return 動画情報
 	 */
 	@Override
-	public PhotoResource create(PhotoForm form) {
+	public VideoResource create(VideoForm form) {
 		try {
-			// 新規写真
+			// 新規動画
 			String cd = RandomStringUtils.randomAlphanumeric(10);
 
 			// S3に保存、URLを設定する
 			String fileName = cd + form.getUpfile().getOriginalFilename()
 					.substring(form.getUpfile().getOriginalFilename().lastIndexOf("."));
-			String filePath = s3Service.upload(DocumentTypeEnum.PHOTO, fileName, form.getUpfile());
+			String filePath = s3Service.upload(DocumentTypeEnum.VIDEO, fileName, form.getUpfile());
 
 			// レコード追加
 			TPhoto photo = mapper.map(form, TPhoto.class);
@@ -214,14 +215,14 @@ public class PhotoServiceImpl implements PhotoService {
 
 			// TODO コードが重複した場合、ランダム文字列を再生成してリトライする
 
-			// 新規写真ID
+			// 新規動画ID
 			photo.setPhotoId(tPhotoRepository.lastInsertId());
 
 			// フォローワーにアクティビティ登録
 			createActivity(photo.getPhotoId());
 
 			// 戻り値
-			PhotoResource resource = mapper.map(photo, PhotoResource.class);
+			VideoResource resource = mapper.map(photo, VideoResource.class);
 			return resource;
 
 		} catch (IOException e) {
@@ -259,7 +260,7 @@ public class PhotoServiceImpl implements PhotoService {
 	}
 
 	/**
-	 * 写真にいいねをする/解除する
+	 * 動画にいいねをする/解除する
 	 *
 	 * @param cd
 	 *            コード
@@ -267,7 +268,7 @@ public class PhotoServiceImpl implements PhotoService {
 	 */
 	@Override
 	public boolean like(String cd, boolean isLike) {
-		// 写真を取得
+		// 動画を取得
 		TPhoto photo = tPhotoRepository.findOneByCd(cd);
 
 		// ログインユーザ
@@ -325,7 +326,7 @@ public class PhotoServiceImpl implements PhotoService {
 	 */
 	@Override
 	public CommentResource comment(String cd, String comment) {
-		// 写真を取得
+		// 動画を取得
 		TPhoto photo = tPhotoRepository.findOneByCd(cd);
 
 		// ログインユーザ
@@ -378,7 +379,7 @@ public class PhotoServiceImpl implements PhotoService {
 	 */
 	@Override
 	public boolean likeComment(String cd, String commentCd, boolean isLike) {
-		// 写真を取得
+		// 動画を取得
 		TPhoto photo = tPhotoRepository.findOneByCd(cd);
 
 		// ログインユーザ
@@ -434,7 +435,7 @@ public class PhotoServiceImpl implements PhotoService {
 	}
 
 	/**
-	 * 写真を通報する
+	 * 動画を通報する
 	 *
 	 * @param cd
 	 *            コード
@@ -443,7 +444,7 @@ public class PhotoServiceImpl implements PhotoService {
 	 */
 	@Override
 	public boolean report(String cd, ReportReasonEnum reason) {
-		// 写真を取得
+		// 動画を取得
 		TPhoto photo = tPhotoRepository.findOneByCd(cd);
 
 		// レコード登録
@@ -457,14 +458,14 @@ public class PhotoServiceImpl implements PhotoService {
 	}
 
 	/**
-	 * 写真を削除する
+	 * 動画を削除する
 	 *
 	 * @param cd
 	 *            コード
 	 */
 	@Override
 	public boolean remove(String cd) {
-		// 写真を取得
+		// 動画を取得
 		TPhoto photo = tPhotoRepository.findOneByCd(cd);
 
 		// 論理削除

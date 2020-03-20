@@ -1,9 +1,9 @@
 spring:
   datasource:
     driverClassName: com.mysql.jdbc.Driver
-    url: ${DATABASE_URL_SPRINGBOOT:jdbc:mysql://localhost:3306/dbname}
-    username: ${DATABASE_USER:hogehoge}
-    password: ${DATABASE_PASSWORD:fugafuga}
+    url: ${DATABASE_URL_SPRINGBOOT:jdbc:mysql://localhost:3306/cheese_dev}
+    username: ${DATABASE_USER:root}
+    password: ${DATABASE_PASSWORD:}
   jackson:
     dateFormat: yyyy/MM/dd HH:mm:ss
     time-zone: Asia/Tokyo
@@ -14,8 +14,8 @@ spring:
   servlet:
     multipart:
       enabled: true
-      max-file-size: 1MB
-      max-request-size: 1MB
+      max-file-size: 5MB
+      max-request-size: 5MB
   social:
     facebook:
       appId: ${CHEESE_FACEBOOK_APP_ID:}
@@ -46,7 +46,7 @@ cheese:
   s3-secret-key: ${CHEESE_S3_SECRET_KEY:}
   s3-service-end-point: https://s3-ap-northeast-1.amazonaws.com
   s3-region: ap-northeast-1
-  s3-bucket: ${CHEESE_S3_BUCKET:}
+  s3-bucket: ${CHEESE_S3_BUCKET:sns-cheese-dev}
   timeout: 21600
   slack-app-token: ${CHEESE_SLACK_APP_TOKEN:}
   slack-contact-channel: contact

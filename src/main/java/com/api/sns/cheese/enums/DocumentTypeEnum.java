@@ -14,7 +14,9 @@ public enum DocumentTypeEnum {
 	/** アカウント画像 */
 	ACCOUNT("account"),
 	/** 写真 */
-	PHOTO("photo");
+	PHOTO("photo"),
+	/** 動画 */
+	VIDEO("video");
 
 	DocumentTypeEnum(String uploadPath) {
 		this.uploadPath = uploadPath;
