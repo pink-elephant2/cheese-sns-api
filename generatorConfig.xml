@@ -23,9 +23,9 @@
       <property name="addRemarkComments" value="true"/>
     </commentGenerator>
 
-    <jdbcConnection connectionURL="jdbc:mysql://localhost:3306/dbname"
+    <jdbcConnection connectionURL="jdbc:mysql://localhost:3306/cheese_dev"
     driverClass="com.mysql.jdbc.Driver"
-    password="fugafuga" userId="hogehoge" />
+    password="" userId="root" />
 
     <javaTypeResolver type="com.api.sns.support.mybatis.generator.resovler.MySqlJavaTypeResolver">
     </javaTypeResolver>
