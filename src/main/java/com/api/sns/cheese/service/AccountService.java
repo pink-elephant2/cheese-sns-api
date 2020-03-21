@@ -7,6 +7,7 @@ import com.api.sns.cheese.enums.ReportReasonEnum;
 import com.api.sns.cheese.form.AccountCreateForm;
 import com.api.sns.cheese.form.AccountImageForm;
 import com.api.sns.cheese.form.AccountUpdateForm;
+import com.api.sns.cheese.form.PasswordResetForm;
 import com.api.sns.cheese.resources.AccountResource;
 
 /**
@@ -58,6 +59,11 @@ public interface AccountService {
 	public boolean saveProfile(AccountUpdateForm form);
 
 	/**
+	 * パスワードを更新する
+	 */
+	public boolean savePassword(@NotNull String loginId, PasswordResetForm form);
+
+	/**
 	 * アカウント画像を更新する
 	 *
 	 * @param form
@@ -69,4 +75,11 @@ public interface AccountService {
 	 * FacebookIDからアカウントを取得する
 	 */
 	public TAccount findByFacebookId(@NotNull String facebookId);
+
+	/**
+	 * メールアドレスからアカウントを取得する
+	 *
+	 * @param mail メールアドレス
+	 */
+	public TAccount findByMail(@NotNull String mail);
 }

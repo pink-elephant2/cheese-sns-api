@@ -1,5 +1,7 @@
 package com.api.sns.cheese.service;
 
+import javax.validation.constraints.NotNull;
+
 import com.api.sns.cheese.form.AccountCreateForm;
 import com.api.sns.cheese.form.ContactForm;
 
@@ -23,4 +25,12 @@ public interface MailService {
 	 *            お問合せフォーム
 	 */
 	public boolean sendContactComplete(ContactForm form);
+
+	/**
+	 * パスワードリマインダーメールを送信する
+	 *
+	 * @param mail メールアドレス
+	 * @param token ワンタイムトークン
+	 */
+	public boolean sendPasswordReminder(@NotNull String mail, @NotNull String token);
 }

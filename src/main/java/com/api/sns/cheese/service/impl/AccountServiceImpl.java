@@ -29,6 +29,7 @@ import com.api.sns.cheese.exception.NotFoundException;
 import com.api.sns.cheese.form.AccountCreateForm;
 import com.api.sns.cheese.form.AccountImageForm;
 import com.api.sns.cheese.form.AccountUpdateForm;
+import com.api.sns.cheese.form.PasswordResetForm;
 import com.api.sns.cheese.repository.TAccountRepository;
 import com.api.sns.cheese.repository.TBanReportRepository;
 import com.api.sns.cheese.repository.TFollowRepository;
@@ -215,6 +216,25 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	/**
+	 * パスワードを更新する
+	 */
+	@Override
+	public boolean savePassword(@NotNull String loginId, PasswordResetForm form) {
+		// アカウントを取得
+		TAccount account = tAccountRepository.findOneByLoginId(loginId);
+
+		if (!form.getMail().equals(account.getMail())) {
+			// フォームのメールとDBのメールが異なる場合エラー
+			throw new NotFoundException("アカウントが存在しません");
+		}
+
+		account.setPassword(passwordEncoder.encode(form.getPassword()));
+		account.setPasswordChangeDate(new Date());
+
+		return tAccountRepository.updatePartially(account);
+	}
+
+	/**
 	 * アカウント画像を更新する
 	 *
 	 * @param form
@@ -252,5 +272,22 @@ public class AccountServiceImpl implements AccountService {
 		TAccountExample example = new TAccountExample();
 		example.createCriteria().andFacebookEqualTo(facebookId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		return tAccountRepository.findOneBy(example);
+	}
+
+	/**
+	 * メールアドレスからアカウントを取得する
+	 *
+	 * @param mail メールアドレス
+	 */
+	@Override
+	public TAccount findByMail(@NotNull String mail) {
+		TAccountExample example = new TAccountExample();
+		example.createCriteria().andMailEqualTo(mail).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		TAccount account = tAccountRepository.findOneBy(example); // TODO 2件以上HITした場合
+
+		if (account == null) {
+			throw new NotFoundException("アカウントが存在しません");
+		}
+		return account;
 	}
 }

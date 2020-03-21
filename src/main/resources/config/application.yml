@@ -50,3 +50,4 @@ cheese:
   timeout: 21600
   slack-app-token: ${CHEESE_SLACK_APP_TOKEN:}
   slack-contact-channel: contact
+  aes-key: ${CHEESE_AES_KEY:}
