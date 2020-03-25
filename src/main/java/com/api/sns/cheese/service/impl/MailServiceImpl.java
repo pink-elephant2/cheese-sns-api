@@ -64,7 +64,7 @@ public class MailServiceImpl implements MailService {
 		MimeMessagePreparator message = createMimeMessagePreparator(form.getMail(), "アカウント登録完了のお知らせ", context,
 				MAIL_TEMPLATE_ACCOUNT_REGIST_COMPLETE);
 
-		javaMailSender.send(message);
+//		javaMailSender.send(message);
 
 		return true;
 	}
@@ -87,7 +87,7 @@ public class MailServiceImpl implements MailService {
 		MimeMessagePreparator message = createMimeMessagePreparator(form.getMail(), "お問い合わせ受付のお知らせ", context,
 				MAIL_TEMPLATE_CONTACT_COMPLETE);
 
-		javaMailSender.send(message);
+//		javaMailSender.send(message);
 
 		return true;
 	}
@@ -110,7 +110,7 @@ public class MailServiceImpl implements MailService {
 		MimeMessagePreparator message = createMimeMessagePreparator(mail, "パスワードの変更リクエスト受付のお知らせ", context,
 				MAIL_TEMPLATE_ACCOUNT_PASSWORD_REMINDER);
 
-		javaMailSender.send(message);
+//		javaMailSender.send(message);
 
 		return true;
 	}
