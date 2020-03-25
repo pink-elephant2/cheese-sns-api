@@ -2,7 +2,7 @@
 <configuration scan="true" scanPeriod="60 seconds">
 
 	<property name="logFilePath" value="/home/ec2-user/project/logs/" />
-	<property name="logFileName" value="cheese-sns-api" />
+	<property name="logFileName" value="demo-ts-api" />
 
 	<!-- Simple file output -->
 	<appender name="FILE"
