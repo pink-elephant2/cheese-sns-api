@@ -40,7 +40,7 @@ public class S3ServiceImpl implements S3Service {
 	@Override
 	public String upload(DocumentTypeEnum documentType, String fileName, MultipartFile inputFile) throws IOException {
 		String filePath = createFilePath(documentType, fileName);
-		amazonS3.putObject(createRequest("assets/" + filePath, inputFile.getBytes()));
+		amazonS3.putObject(createRequest("assets/" + filePath, inputFile));
 
 		return appConfig.getCloudHostUrl() + "/" + filePath;
 	}
@@ -50,14 +50,17 @@ public class S3ServiceImpl implements S3Service {
 	 *
 	 * @param fileName
 	 *            ファイル名
-	 * @param file
-	 *            バイトデータ
+	 * @param inputFile
+	 *            マルチパートファイル
+	 * @throws IOException
 	 */
-	private PutObjectRequest createRequest(String filePath, byte[] file) {
+	private PutObjectRequest createRequest(String filePath, MultipartFile inputFile) throws IOException {
 		// バイト長設定
+		byte[] file = inputFile.getBytes();
 		ObjectMetadata metaData = new ObjectMetadata();
 		metaData.setContentLength(file.length);
 		metaData.setCacheControl("max-age=2592000");
+		metaData.setContentType(inputFile.getContentType());
 
 		// アップロード対象のオブジェクトを作成
 		PutObjectRequest putRequest = new PutObjectRequest(appConfig.getS3Bucket(), filePath,
