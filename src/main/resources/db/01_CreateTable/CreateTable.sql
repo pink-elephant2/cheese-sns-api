@@ -138,6 +138,7 @@ create table t_photo (
   , photo_cd VARCHAR(128) not null comment '写真コード'
   , caption VARCHAR(1000) comment '説明'
   , img_url VARCHAR(1000) not null comment '画像パス'
+  , video_url VARCHAR(1000) comment '動画パス'
   , account_id INT(10) not null comment 'アカウントID'
   , like_count INT(10) default 0 comment 'いいね件数'
   , comment_id BIGINT comment 'コメントID'

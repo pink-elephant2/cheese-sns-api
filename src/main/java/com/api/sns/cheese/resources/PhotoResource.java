@@ -33,6 +33,9 @@ public class PhotoResource {
 	/** 画像パス */ // TODO 画像情報クラス
 	private String imgUrl;
 
+	/** 動画パス */
+	private String videoUrl;
+
 	/** 投稿日時 */
 	private Date createdAt;
 

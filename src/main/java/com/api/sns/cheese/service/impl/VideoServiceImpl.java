@@ -59,16 +59,16 @@ import com.api.sns.cheese.service.VideoService;
 public class VideoServiceImpl implements VideoService {
 
 	@Autowired
-	private TPhotoRepository tPhotoRepository;	// TODO videoに変換
+	private TPhotoRepository tPhotoRepository; // TODO videoに変換
 
 	@Autowired
-	private TPhotoLikeRepository tPhotoLikeRepository;	// TODO videoに変換
+	private TPhotoLikeRepository tPhotoLikeRepository; // TODO videoに変換
 
 	@Autowired
-	private TPhotoCommentRepository tPhotoCommentRepository;	// TODO videoに変換
+	private TPhotoCommentRepository tPhotoCommentRepository; // TODO videoに変換
 
 	@Autowired
-	private TPhotoCommentLikeRepository tPhotoCommentLikeRepository;	// TODO videoに変換
+	private TPhotoCommentLikeRepository tPhotoCommentLikeRepository; // TODO videoに変換
 
 	@Autowired
 	private TAccountRepository tAccountRepository;
@@ -202,14 +202,14 @@ public class VideoServiceImpl implements VideoService {
 			String cd = RandomStringUtils.randomAlphanumeric(10);
 
 			// S3に保存、URLを設定する
-			String fileName = cd + form.getUpfile().getOriginalFilename()
-					.substring(form.getUpfile().getOriginalFilename().lastIndexOf("."));
+			String fileName = cd + ".m3u8"; // HLS形式
 			String filePath = s3Service.upload(DocumentTypeEnum.VIDEO, fileName, form.getUpfile());
 
 			// レコード追加
 			TPhoto photo = mapper.map(form, TPhoto.class);
 			photo.setPhotoCd(cd);
-			photo.setImgUrl(filePath);
+			photo.setImgUrl(filePath.substring(0, filePath.lastIndexOf(".")) + "-00001.png"); // サムネイルはAETで作成する
+			photo.setVideoUrl(filePath);
 			photo.setAccountId(SessionInfoContextHolder.getSessionInfo().getAccountId());
 			tPhotoRepository.create(photo);
 
