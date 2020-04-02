@@ -34,6 +34,7 @@ import com.api.sns.cheese.enums.ActivityTypeEnum;
 import com.api.sns.cheese.enums.DocumentTypeEnum;
 import com.api.sns.cheese.enums.ReportReasonEnum;
 import com.api.sns.cheese.enums.ReportTargetEnum;
+import com.api.sns.cheese.exception.MultipartException;
 import com.api.sns.cheese.exception.NotFoundException;
 import com.api.sns.cheese.form.VideoForm;
 import com.api.sns.cheese.repository.TAccountRepository;
@@ -201,15 +202,23 @@ public class VideoServiceImpl implements VideoService {
 			// 新規動画
 			String cd = RandomStringUtils.randomAlphanumeric(10);
 
+			// 拡張子チェック
+			String extension = form.getUpfile().getOriginalFilename()
+					.substring(form.getUpfile().getOriginalFilename().lastIndexOf("."));
+			if (!".mp4".equals(extension)) {
+				throw new MultipartException("MP4ファイルをアップロードしてください");
+			}
+
 			// S3に保存、URLを設定する
-			String fileName = cd + ".m3u8"; // HLS形式
+			String fileName = cd + extension; // MP4
 			String filePath = s3Service.upload(DocumentTypeEnum.VIDEO, fileName, form.getUpfile());
+			filePath = filePath.substring(0, filePath.lastIndexOf(".")); // 拡張子をはずす
 
 			// レコード追加
 			TPhoto photo = mapper.map(form, TPhoto.class);
 			photo.setPhotoCd(cd);
-			photo.setImgUrl(filePath.substring(0, filePath.lastIndexOf(".")) + "-00001.png"); // サムネイルはAETで作成する
-			photo.setVideoUrl(filePath);
+			photo.setImgUrl(filePath + "-00001.png"); // サムネイルはAETで作成する
+			photo.setVideoUrl(filePath + ".m3u8"); // HLS形式
 			photo.setAccountId(SessionInfoContextHolder.getSessionInfo().getAccountId());
 			tPhotoRepository.create(photo);
 
