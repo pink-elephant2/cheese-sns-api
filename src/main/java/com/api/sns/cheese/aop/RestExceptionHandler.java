@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.api.sns.cheese.exception.MultipartException;
 import com.api.sns.cheese.exception.NotFoundException;
 
 /**
@@ -16,6 +17,15 @@ import com.api.sns.cheese.exception.NotFoundException;
  */
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+
+	/**
+	 * マルチパートファイルエラーを処理(400)
+	 */
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(MultipartException.class)
+	public ResponseEntity<Object> handleMaltipartException(MultipartException ex, HttpServletResponse response) {
+		return new ResponseEntity<Object>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+	}
 
 	/**
 	 * NotFoundを処理(404)
