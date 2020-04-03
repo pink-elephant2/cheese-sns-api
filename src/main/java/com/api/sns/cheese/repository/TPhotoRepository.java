@@ -26,4 +26,9 @@ public interface TPhotoRepository extends BaseRepository<TPhotoKey, TPhoto, TPho
 	 */
 	public Long lastInsertId();
 
+	/**
+	 * レコードを登録してIDを返却する
+	 */
+	public Long createReturnId(TPhoto photo);
+
 }

@@ -6,4 +6,9 @@ import com.api.sns.cheese.domain.TTagKey;
 import com.api.sns.common.business.repository.BaseMapper;
 
 public interface TTagMapper extends BaseMapper<TTagKey, TTag, TTagExample> {
+
+	/**
+	 * レコードを登録してIDを返却する
+	 */
+	public Long insertReturnId(TTag tTag);
 }

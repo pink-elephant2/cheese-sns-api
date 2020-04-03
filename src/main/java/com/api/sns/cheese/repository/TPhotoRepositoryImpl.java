@@ -61,4 +61,13 @@ public class TPhotoRepositoryImpl implements TPhotoRepository {
 	public Long lastInsertId() {
 		return null;
 	}
+
+	/**
+	 * レコードを登録してIDを返却する
+	 */
+	@Override
+	public Long createReturnId(TPhoto photo) {
+		this.beforeInsert(photo);
+		return tPhotoMapper.insertReturnId(photo);
+	}
 }

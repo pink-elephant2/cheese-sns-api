@@ -1,5 +1,7 @@
 package com.api.sns.cheese.form;
 
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -20,4 +22,7 @@ public class PhotoForm {
 	/** キャプション */
 	@Size(max = 1000)
 	private String caption;
+
+	/** タグ */
+	private List<String> tags;
 }

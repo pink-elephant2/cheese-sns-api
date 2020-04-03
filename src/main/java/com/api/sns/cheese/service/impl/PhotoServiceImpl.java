@@ -1,6 +1,7 @@
 package com.api.sns.cheese.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +34,9 @@ import com.api.sns.cheese.domain.TPhotoCommentLikeExample;
 import com.api.sns.cheese.domain.TPhotoExample;
 import com.api.sns.cheese.domain.TPhotoLike;
 import com.api.sns.cheese.domain.TPhotoLikeExample;
+import com.api.sns.cheese.domain.TTag;
+import com.api.sns.cheese.domain.TTagExample;
+import com.api.sns.cheese.domain.TTagPhoto;
 import com.api.sns.cheese.enums.ActivityTypeEnum;
 import com.api.sns.cheese.enums.DocumentTypeEnum;
 import com.api.sns.cheese.enums.ReportReasonEnum;
@@ -47,6 +51,8 @@ import com.api.sns.cheese.repository.TPhotoCommentLikeRepository;
 import com.api.sns.cheese.repository.TPhotoCommentRepository;
 import com.api.sns.cheese.repository.TPhotoLikeRepository;
 import com.api.sns.cheese.repository.TPhotoRepository;
+import com.api.sns.cheese.repository.TTagPhotoRepository;
+import com.api.sns.cheese.repository.TTagRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.resources.CommentResource;
 import com.api.sns.cheese.resources.PhotoResource;
@@ -71,6 +77,12 @@ public class PhotoServiceImpl implements PhotoService {
 
 	@Autowired
 	private TPhotoCommentLikeRepository tPhotoCommentLikeRepository;
+
+	@Autowired
+	private TTagRepository tTagRepository;
+
+	@Autowired
+	private TTagPhotoRepository tTagPhotoRepository;
 
 	@Autowired
 	private TAccountRepository tAccountRepository;
@@ -103,7 +115,7 @@ public class PhotoServiceImpl implements PhotoService {
 		example.createCriteria().andPhotoCdEqualTo(cd).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		TPhoto photo = tPhotoRepository.findOneBy(example);
 		if (photo == null) {
-			 throw new NotFoundException("写真が存在しません");
+			throw new NotFoundException("写真が存在しません");
 		}
 
 		PhotoResource resource = mapper.map(photo, PhotoResource.class);
@@ -213,12 +225,12 @@ public class PhotoServiceImpl implements PhotoService {
 			photo.setPhotoCd(cd);
 			photo.setImgUrl(filePath);
 			photo.setAccountId(SessionInfoContextHolder.getSessionInfo().getAccountId());
-			tPhotoRepository.create(photo);
+			tPhotoRepository.createReturnId(photo); // photoIdがセットされる
 
 			// TODO コードが重複した場合、ランダム文字列を再生成してリトライする
 
-			// 新規写真ID
-			photo.setPhotoId(tPhotoRepository.lastInsertId());
+			// タグを登録
+			saveTag(photo.getPhotoId(), form.getTags());
 
 			// フォローワーにアクティビティ登録
 			createActivity(photo.getPhotoId());
@@ -230,6 +242,67 @@ public class PhotoServiceImpl implements PhotoService {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
+		}
+	}
+
+	/**
+	 * タグを登録する
+	 *
+	 * @param photoId
+	 * @param tagList
+	 */
+	private void saveTag(Long photoId, List<String> tagList) {
+		// タグを取得
+		List<TTag> tTagList;
+		if (tagList == null || tagList.isEmpty()) {
+			tagList = new ArrayList<>();
+			tTagList = new ArrayList<>();
+		} else {
+			TTagExample tTagExample = new TTagExample();
+			tTagExample.createCriteria().andTagNameIn(tagList).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+			tTagList = tTagRepository.findAllBy(tTagExample);
+		}
+
+		// なければ登録
+		tagList.stream().forEach(tag -> {
+			if (tTagList.stream().filter(t -> t.getTagName().equals(tag)).count() == 0) {
+				TTag tTag = new TTag();
+				tTag.setTagName(tag);
+				tTag.setDeleted(CommonConst.DeletedFlag.OFF);
+				tTagRepository.createReturnId(tTag); // tagIdがセットされる
+
+				tTagList.add(tTag);
+			}
+		});
+
+		// タグを取得
+		List<TTagPhoto> photoTagList = tTagPhotoRepository.findAllByPhotoId(photoId);
+		if (photoTagList.size() < tagList.size()) {
+			// 新規登録分が多い場合
+			int n = tagList.size() - photoTagList.size();
+			for (int i = 0; i < n; i++) {
+				TTagPhoto tagPhoto = new TTagPhoto();
+				tagPhoto.setPhotoId(photoId);
+				photoTagList.add(tagPhoto);
+			}
+		} else if (photoTagList.size() > tagList.size()) {
+			// 既存分が多い場合
+			for (int i = photoTagList.size(); i >= tagList.size(); i--) {
+				photoTagList.get(i - 1).setDeleted(CommonConst.DeletedFlag.ON);
+				tagList.add(null);
+			}
+		}
+
+		// 登録/更新
+		for (int i = 0; i < photoTagList.size(); i++) {
+			TTagPhoto tagPhoto = photoTagList.get(i);
+			tagPhoto.setTagId(tTagList.get(i).getTagId());
+
+			if (tagPhoto.getTagPhotoId() == null) {
+				tTagPhotoRepository.create(tagPhoto);
+			} else {
+				tTagPhotoRepository.updatePartially(tagPhoto);
+			}
 		}
 	}
 
