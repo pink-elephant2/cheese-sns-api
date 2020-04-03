@@ -1,8 +1,11 @@
 package com.api.sns.cheese.service.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -476,5 +479,17 @@ public class PhotoServiceImpl implements PhotoService {
 				.andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId())
 				.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		return BooleanUtils.toBoolean(tPhotoRepository.updatePartiallyBy(entity, example));
+	}
+
+	/**
+	 * サジェスト用キーワードを取得する
+	 *
+	 * @param keyword
+	 *            検索文字列
+	 */
+	@Override
+	public List<String> findSuggest(@NotNull String keyword) {
+		// TODO 実装
+		return Arrays.asList("Apple", "Banana", "アップル", "ばなな", "なし");
 	}
 }

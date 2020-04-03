@@ -1,5 +1,7 @@
 package com.api.sns.cheese.api.v1;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -71,5 +73,15 @@ public class PhotoController {
 	public boolean report(@PathVariable("cd") String cd, @RequestBody @Validated PhotoReportForm form) {
 		// 写真を通報する
 		return photoService.report(cd, form.getReason());
+	}
+
+	/**
+	 * 検索サジェスト
+	 *
+	 * @parm keyword 検索文字列
+	 */
+	@GetMapping("/suggest/{keyword}")
+	public List<String> suggest(@PathVariable("keyword") String keyword) {
+		return photoService.findSuggest(keyword);
 	}
 }

@@ -32,6 +32,7 @@
 | 写真削除API								| DELETE	| /api/v1/user/{loginId}/photo									| ○ |
 | 写真通報API								| POST		| /api/v1/photo/{cd}/report										| - |
 | 動画登録API								| POST		| /api/v1/user/{loginId}/video									| ○ |
+| 検索サジェストAPI							| GET		| /api/v1/photo/suggest/{keyword}								| - |
 | いいねAPI									| POST		| /api/v1/user/{loginId}/photo/{cd}/like						| ○ |
 | いいね解除API								| POST		| /api/v1/user/{loginId}/photo/{cd}/dislike						| ○ |
 | コメントいいねAPI							| POST		| /api/v1/user/{loginId}/photo/{cd}/comment/{commentCd}/like	| ○ |

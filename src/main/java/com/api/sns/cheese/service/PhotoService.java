@@ -1,5 +1,9 @@
 package com.api.sns.cheese.service;
 
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -89,4 +93,12 @@ public interface PhotoService {
 	 *            コード
 	 */
 	public boolean remove(String cd);
+
+	/**
+	 * サジェスト用キーワードを取得する
+	 *
+	 * @param keyword
+	 *            検索文字列
+	 */
+	public List<String> findSuggest(@NotNull String keyword);
 }
