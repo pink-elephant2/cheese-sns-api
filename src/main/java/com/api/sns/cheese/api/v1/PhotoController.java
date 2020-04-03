@@ -2,6 +2,8 @@ package com.api.sns.cheese.api.v1;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -80,8 +82,8 @@ public class PhotoController {
 	 *
 	 * @parm keyword 検索文字列
 	 */
-	@GetMapping("/suggest/{keyword}")
-	public List<String> suggest(@PathVariable("keyword") String keyword) {
+	@GetMapping("/suggest")
+	public List<String> suggest(@Validated @NotNull String keyword) {
 		return photoService.findSuggest(keyword);
 	}
 }

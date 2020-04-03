@@ -2,7 +2,6 @@ package com.api.sns.cheese.service.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -562,7 +561,9 @@ public class PhotoServiceImpl implements PhotoService {
 	 */
 	@Override
 	public List<String> findSuggest(@NotNull String keyword) {
-		// TODO 実装
-		return Arrays.asList("Apple", "Banana", "アップル", "ばなな", "なし");
+		// TODO 性能改善
+		TTagExample example = new TTagExample();
+		example.createCriteria().andTagNameLike("%" + keyword + "%").andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		return tTagRepository.findAllBy(example).stream().map(TTag::getTagName).collect(Collectors.toList());
 	}
 }
