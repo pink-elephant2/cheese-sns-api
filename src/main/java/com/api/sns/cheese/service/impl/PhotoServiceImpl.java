@@ -564,6 +564,8 @@ public class PhotoServiceImpl implements PhotoService {
 		// TODO 性能改善
 		TTagExample example = new TTagExample();
 		example.createCriteria().andTagNameLike("%" + keyword + "%").andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-		return tTagRepository.findAllBy(example).stream().map(TTag::getTagName).collect(Collectors.toList());
+		return tTagRepository.findAllBy(example).stream().map(tag -> {
+			return "#" + tag.getTagName();
+		}).collect(Collectors.toList());
 	}
 }
