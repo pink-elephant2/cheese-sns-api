@@ -1,5 +1,5 @@
 -- Project Name : チーズSNS
--- Date/Time    : 2019/05/26 14:52:53
+-- Date/Time    : 2020/04/07 19:58:03
 -- Author       : チーズSNS
 -- RDBMS Type   : MySQL
 -- Application  : A5:SQL Mk-2
@@ -142,6 +142,8 @@ create table t_photo (
   , account_id INT(10) not null comment 'アカウントID'
   , like_count INT(10) default 0 comment 'いいね件数'
   , comment_id BIGINT comment 'コメントID'
+  , location GEOMETRY  comment '緯度経度'
+  , address VARCHAR(1000) comment '住所'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
   , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
@@ -150,7 +152,7 @@ create table t_photo (
   , constraint t_photo_PKC primary key (photo_id)
 ) comment '写真' ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-alter table t_photo add unique `コード` (photo_cd) ;
+alter table t_photo add unique photo_cd (photo_cd) ;
 
 -- 写真コメント
 drop table if exists t_photo_comment cascade;

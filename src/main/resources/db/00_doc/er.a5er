@@ -2,7 +2,7 @@
 # A5:ER ENCODING:UTF8
 # A5:ER Mk-1 Copyright (C)2007 m.matsubara
 # A5:SQL Mk-2 Copyright (C)1997 m.matsubara
-#  http://www.wind.sannet.ne.jp/m_matsu/developer/a5m2/
+#  https://a5m2.mmatsubara.com
 
 [Manager]
 ProjectName=チーズSNS
@@ -338,14 +338,17 @@ Field="写真ID","photo_id","BIGINT","NOT NULL",0,"","",$FFFFFFFF,"AUTO_INCREMEN
 Field="写真コード","photo_cd","VARCHAR(128)","NOT NULL",,"","",$FFFFFFFF,""
 Field="説明","caption","VARCHAR(1000)",,,"","",$FFFFFFFF,""
 Field="画像パス","img_url","VARCHAR(1000)","NOT NULL",,"","",$FFFFFFFF,""
+Field="動画パス","video_url","VARCHAR(1000)",,,"","",$FFFFFFFF,""
 Field="アカウントID","account_id","INT(10)","NOT NULL",,"","",$FFFFFFFF,""
 Field="いいね件数","like_count","INT(10)",,,"0","",$FFFFFFFF,""
 Field="コメントID","comment_id","BIGINT",,,"","",$FFFFFFFF,""
-Index=コード=2,photo_cd
+Field="緯度経度","location","GEOMETRY ",,,"","",$FFFFFFFF,""
+Field="住所","address","VARCHAR(1000)",,,"","",$FFFFFFFF,""
+Index=photo_cd=2,photo_cd
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20190415220402
+ModifiedDateTime=20200407195744
 Position="TABLE",1800,700
 ZOrder=12
 
