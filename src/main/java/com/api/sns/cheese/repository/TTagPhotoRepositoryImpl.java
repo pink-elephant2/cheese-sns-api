@@ -24,6 +24,19 @@ public class TTagPhotoRepositoryImpl implements TTagPhotoRepository {
 	}
 
 	/**
+	 * タグIDからレコードを取得する
+	 *
+	 * @param tagId タグID
+	 */
+	@Override
+	public List<TTagPhoto> findAllByTagId(List<Long> tagId) {
+		TTagPhotoExample tagPhotoExample = new TTagPhotoExample();
+		tagPhotoExample.createCriteria().andTagIdIn(tagId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		List<TTagPhoto> tagPhotoList = findAllBy(tagPhotoExample);
+		return tagPhotoList;
+	}
+
+	/**
 	 * 写真IDからレコードを取得する
 	 *
 	 * @param photoId 写真ID

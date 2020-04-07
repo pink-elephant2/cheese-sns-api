@@ -53,15 +53,19 @@ public class PhotoController {
 	 *
 	 * @param loginId
 	 *            ログインID
+	 * @param q
+	 *            検索キーワード
+	 * @param tag
+	 *            検索タグ
 	 * @param pageable
 	 *            ページ情報
 	 */
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public Page<PhotoResource> findList(String loginId, @SortDefault.SortDefaults({
+	public Page<PhotoResource> findList(String loginId, String q, String tag, @SortDefault.SortDefaults({
 			@SortDefault(sort = "photo_id", direction = Direction.DESC) }) Pageable pageable) {
 		// 写真一覧を取得する
-		return photoService.findList(loginId, pageable);
+		return photoService.findList(loginId, q, tag, pageable);
 	}
 
 	/**

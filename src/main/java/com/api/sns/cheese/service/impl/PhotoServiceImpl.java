@@ -31,6 +31,7 @@ import com.api.sns.cheese.domain.TPhotoCommentExample;
 import com.api.sns.cheese.domain.TPhotoCommentLike;
 import com.api.sns.cheese.domain.TPhotoCommentLikeExample;
 import com.api.sns.cheese.domain.TPhotoExample;
+import com.api.sns.cheese.domain.TPhotoExample.Criteria;
 import com.api.sns.cheese.domain.TPhotoLike;
 import com.api.sns.cheese.domain.TPhotoLikeExample;
 import com.api.sns.cheese.domain.TTag;
@@ -176,20 +177,43 @@ public class PhotoServiceImpl implements PhotoService {
 	 *
 	 * @param loginId
 	 *            ログインID
+	 * @param keyword
+	 *            検索ワード
+	 * @param tag
+	 *            検索タグ
 	 * @param pageable
 	 *            ページ情報
 	 * @param 写真一覧
 	 */
 	@Override
-	public Page<PhotoResource> findList(String loginId, Pageable pageable) {
+	public Page<PhotoResource> findList(String loginId, String keyword, String tag, Pageable pageable) {
 		TPhotoExample example = new TPhotoExample();
+		Criteria criteria = example.createCriteria();
 		if (!StringUtils.isEmpty(loginId)) {
 			// 指定されたユーザーの写真一覧
 			Integer accountId = tAccountRepository.findOneByLoginId(loginId).getAccountId();
-			example.createCriteria().andAccountIdEqualTo(accountId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+			criteria.andAccountIdEqualTo(accountId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		} else {
-			example.createCriteria().andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+			criteria.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		}
+
+		// 検索
+		if (!StringUtils.isEmpty(keyword)) {
+			criteria.andCaptionLike("%" + keyword + "%"); // TODO 性能改善
+		}
+
+		// タグ検索
+		if (!StringUtils.isEmpty(tag)) {
+			List<Long> photoIdList = findPhotoIdByTag(tag);
+			if (!photoIdList.isEmpty()) {
+				criteria.andPhotoIdIn(photoIdList);
+			} else {
+				return Page.empty(pageable);
+			}
+		}
+
+
+		example.or(criteria);
 		return tPhotoRepository.findPageBy(example, pageable).map(tPhoto -> {
 			PhotoResource resource = mapper.map(tPhoto, PhotoResource.class);
 
@@ -303,6 +327,29 @@ public class PhotoServiceImpl implements PhotoService {
 				tTagPhotoRepository.updatePartially(tagPhoto);
 			}
 		}
+	}
+
+	/**
+	 * タグから画像IDを検索する
+	 * @param tag
+	 * @return photoId
+	 */
+	private List<Long> findPhotoIdByTag(String tag) {
+		// TODO 性能改善
+
+		// タグ取得
+		TTagExample example = new TTagExample();
+		example.createCriteria().andTagNameEqualTo(tag).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		List<Long> tagIdList = tTagRepository.findAllBy(example).stream().map(TTag::getTagId)
+				.collect(Collectors.toList());
+
+		List<Long> photoIdList = new ArrayList<>();
+		if (!tagIdList.isEmpty()) {
+			// 画像ID取得
+			List<TTagPhoto> tagPhotoList = tTagPhotoRepository.findAllByTagId(tagIdList);
+			photoIdList = tagPhotoList.stream().map(TTagPhoto::getPhotoId).collect(Collectors.toList());
+		}
+		return photoIdList;
 	}
 
 	/**

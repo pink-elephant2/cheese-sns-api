@@ -31,11 +31,15 @@ public interface PhotoService {
 	 *
 	 * @param loginId
 	 *            ログインID
+	 * @param keyword
+	 *            検索ワード
+	 * @param tag
+	 *            検索タグ
 	 * @param pageable
 	 *            ページ情報
 	 * @param 写真一覧
 	 */
-	public Page<PhotoResource> findList(String loginId, Pageable pageable);
+	public Page<PhotoResource> findList(String loginId, String keyword, String tag, Pageable pageable);
 
 	/**
 	 * 写真を登録する
