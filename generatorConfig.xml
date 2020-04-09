@@ -53,7 +53,7 @@
     <table tableName="t_follow_tag" modelType="hierarchical"></table>
     <table tableName="t_login_history" modelType="hierarchical"></table>
     <table tableName="t_photo" modelType="hierarchical">
-        <columnOverride column="location" javaType="java.lang.String" />
+        <ignoreColumn column="location" />
     </table>
     <table tableName="t_photo_comment" modelType="hierarchical"></table>
     <table tableName="t_photo_comment_like" modelType="hierarchical"></table>
