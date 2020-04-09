@@ -51,4 +51,13 @@ public class PhotoResource {
 
 	/** コメント */
 	private List<CommentResource> comments;
+
+	/** 緯度 */
+	private Double lat;
+
+	/** 経度 */
+	private Double lng;
+
+	/** 住所 */
+	private String address;
 }
