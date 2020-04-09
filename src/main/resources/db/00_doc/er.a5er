@@ -343,12 +343,14 @@ Field="アカウントID","account_id","INT(10)","NOT NULL",,"","",$FFFFFFFF,""
 Field="いいね件数","like_count","INT(10)",,,"0","",$FFFFFFFF,""
 Field="コメントID","comment_id","BIGINT",,,"","",$FFFFFFFF,""
 Field="緯度経度","location","GEOMETRY ",,,"","",$FFFFFFFF,""
+Field="緯度","lat","DOUBLE(8,6)",,,"","",$FFFFFFFF,""
+Field="経度","lng","DOUBLE(9,6)",,,"","",$FFFFFFFF,""
 Field="住所","address","VARCHAR(1000)",,,"","",$FFFFFFFF,""
 Index=photo_cd=2,photo_cd
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20200407195744
+ModifiedDateTime=20200409084212
 Position="TABLE",1800,700
 ZOrder=12
 

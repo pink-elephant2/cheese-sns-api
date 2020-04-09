@@ -1,5 +1,5 @@
 -- Project Name : チーズSNS
--- Date/Time    : 2020/04/07 19:58:03
+-- Date/Time    : 2020/04/09 8:42:39
 -- Author       : チーズSNS
 -- RDBMS Type   : MySQL
 -- Application  : A5:SQL Mk-2
@@ -143,6 +143,8 @@ create table t_photo (
   , like_count INT(10) default 0 comment 'いいね件数'
   , comment_id BIGINT comment 'コメントID'
   , location GEOMETRY  comment '緯度経度'
+  , lat DOUBLE(8,6) comment '緯度'
+  , lng DOUBLE(9,6) comment '経度'
   , address VARCHAR(1000) comment '住所'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
