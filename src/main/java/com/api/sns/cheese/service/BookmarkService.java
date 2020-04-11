@@ -24,9 +24,8 @@ public interface BookmarkService {
 	 *
 	 * @param photoCd
 	 *            写真コード
-	 * @return ブックマーク情報
 	 */
-	public PhotoResource create(String photoCd);
+	public boolean create(String photoCd);
 
 	/**
 	 * ブックマークを削除する

@@ -65,10 +65,9 @@ public class BookmarkServiceImpl implements BookmarkService {
 	 *
 	 * @param photoCd
 	 *            写真コード
-	 * @return ブックマーク情報
 	 */
 	@Override
-	public PhotoResource create(String photoCd) {
+	public boolean create(String photoCd) {
 		Integer accountId = SessionInfoContextHolder.getSessionInfo().getAccountId();
 
 		// 写真を取得する
@@ -80,19 +79,20 @@ public class BookmarkServiceImpl implements BookmarkService {
 				.andAccountIdEqualTo(accountId);
 		TBookmark tBookmark = tBookmarkRepository.findOneBy(example);
 
+		boolean ret;
 		if (tBookmark == null) {
 			// 登録
 			tBookmark = new TBookmark();
 			tBookmark.setAccountId(accountId);
 			tBookmark.setPhotoId(tPhoto.getPhotoId());
 			tBookmark.setDeleted(CommonConst.DeletedFlag.OFF);
-			tBookmarkRepository.create(tBookmark);
+			ret = tBookmarkRepository.create(tBookmark);
 		} else {
 			// 更新
 			tBookmark.setDeleted(CommonConst.DeletedFlag.OFF);
-			tBookmarkRepository.update(tBookmark);
+			ret = tBookmarkRepository.update(tBookmark);
 		}
-		return mapper.map(tPhoto, PhotoResource.class);
+		return ret;
 	}
 
 	/**

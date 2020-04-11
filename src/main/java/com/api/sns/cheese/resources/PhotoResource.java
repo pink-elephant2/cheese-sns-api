@@ -49,6 +49,10 @@ public class PhotoResource {
 	@JsonProperty("isLike")
 	private boolean isLike;
 
+	/** 自分がブックマークしているか */
+	@JsonProperty("isBookmark")
+	private boolean isBookmark;
+
 	/** コメント */
 	private List<CommentResource> comments;
 

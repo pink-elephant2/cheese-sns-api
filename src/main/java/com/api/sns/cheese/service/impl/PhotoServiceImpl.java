@@ -23,6 +23,8 @@ import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.domain.TActivity;
 import com.api.sns.cheese.domain.TActivityExample;
 import com.api.sns.cheese.domain.TBanReport;
+import com.api.sns.cheese.domain.TBookmark;
+import com.api.sns.cheese.domain.TBookmarkExample;
 import com.api.sns.cheese.domain.TFollow;
 import com.api.sns.cheese.domain.TFollowExample;
 import com.api.sns.cheese.domain.TPhoto;
@@ -46,6 +48,7 @@ import com.api.sns.cheese.form.PhotoForm;
 import com.api.sns.cheese.repository.TAccountRepository;
 import com.api.sns.cheese.repository.TActivityRepository;
 import com.api.sns.cheese.repository.TBanReportRepository;
+import com.api.sns.cheese.repository.TBookmarkRepository;
 import com.api.sns.cheese.repository.TFollowRepository;
 import com.api.sns.cheese.repository.TPhotoCommentLikeRepository;
 import com.api.sns.cheese.repository.TPhotoCommentRepository;
@@ -95,6 +98,9 @@ public class PhotoServiceImpl implements PhotoService {
 
 	@Autowired
 	private TBanReportRepository tBanReportRepository;
+
+	@Autowired
+	private TBookmarkRepository tBookmarkRepository;
 
 	@Autowired
 	private S3Service s3Service;
@@ -169,6 +175,14 @@ public class PhotoServiceImpl implements PhotoService {
 			}).collect(Collectors.toList()));
 		}
 
+		// 自分がブックマークしているか
+		if (SessionInfoContextHolder.isAuthenticated()) {
+			TBookmarkExample bookmarkExample = new TBookmarkExample();
+			bookmarkExample.createCriteria().andPhotoIdEqualTo(photo.getPhotoId()).andAccountIdEqualTo(accountId)
+					.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+			TBookmark tBookmark = tBookmarkRepository.findOneBy(bookmarkExample);
+			resource.setBookmark(tBookmark != null);
+		}
 		return resource;
 	}
 
@@ -211,7 +225,6 @@ public class PhotoServiceImpl implements PhotoService {
 				return Page.empty(pageable);
 			}
 		}
-
 
 		example.or(criteria);
 		return tPhotoRepository.findPageBy(example, pageable).map(tPhoto -> {
