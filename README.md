@@ -37,7 +37,6 @@
 | いいね解除API								| POST		| /api/v1/user/{loginId}/photo/{cd}/dislike						| ○ |
 | コメントいいねAPI							| POST		| /api/v1/user/{loginId}/photo/{cd}/comment/{commentCd}/like	| ○ |
 | コメントいいね解除API						| POST		| /api/v1/user/{loginId}/photo/{cd}/comment/{commentCd}/dislike	| ○ |
-| ブックマーク取得API						| GET		| /api/v1/user/{loginId}/bookmark/{cd}							| ○ |
 | ブックマーク一覧取得API					| GET		| /api/v1/user/{loginId}/bookmark								| ○ |
-| ブックマーク登録API						| POST		| /api/v1/user/{loginId}/bookmark/{cd}							| ○ |
-| ブックマーク削除API						| DELETE	| /api/v1/user/{loginId}/bookmark/{cd}							| ○ |
+| ブックマーク登録API						| POST		| /api/v1/user/{loginId}/bookmark								| ○ |
+| ブックマーク削除API						| DELETE	| /api/v1/user/{loginId}/bookmark/{id}							| ○ |

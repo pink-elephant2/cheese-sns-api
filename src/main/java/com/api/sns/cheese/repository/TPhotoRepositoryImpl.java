@@ -26,6 +26,7 @@ public class TPhotoRepositoryImpl implements TPhotoRepository {
 	 * 写真IDからレコードを取得する
 	 *
 	 * @param photoId 写真ID
+	 * @throws NotFoundException
 	 */
 	@Override
 	public TPhoto findOneById(Long photoId) {
@@ -42,6 +43,7 @@ public class TPhotoRepositoryImpl implements TPhotoRepository {
 	 * 写真CDからレコードを取得する
 	 *
 	 * @param photoCd 写真CD
+	 * @throws NotFoundException
 	 */
 	@Override
 	public TPhoto findOneByCd(String photoCd) {
