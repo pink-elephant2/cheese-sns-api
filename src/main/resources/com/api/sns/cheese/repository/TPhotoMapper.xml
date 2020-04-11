@@ -159,13 +159,13 @@
       like_count, comment_id, lat,
       lng, address, deleted,
       created_at, created_by, updated_at,
-      updated_by)
+      updated_by, `location`)
     values (#{photoId,jdbcType=BIGINT}, #{photoCd,jdbcType=VARCHAR}, #{caption,jdbcType=VARCHAR},
       #{imgUrl,jdbcType=VARCHAR}, #{videoUrl,jdbcType=VARCHAR}, #{accountId,jdbcType=INTEGER},
       #{likeCount,jdbcType=INTEGER}, #{commentId,jdbcType=BIGINT}, #{lat,jdbcType=DOUBLE},
       #{lng,jdbcType=DOUBLE}, #{address,jdbcType=VARCHAR}, #{deleted,jdbcType=VARCHAR},
       #{createdAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, #{updatedAt,jdbcType=TIMESTAMP},
-      #{updatedBy,jdbcType=VARCHAR})
+      #{updatedBy,jdbcType=VARCHAR}, GeomFromText('POINT(#{lng,jdbcType=DOUBLE} #{lat,jdbcType=DOUBLE})'))
   </insert>
   <insert id="insertSelective" parameterType="com.api.sns.cheese.domain.TPhoto">
     <!--
@@ -222,6 +222,9 @@
       <if test="updatedBy != null">
         updated_by,
       </if>
+      <if test="lat != null and lng != null">
+        `location`,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="photoId != null">
@@ -272,6 +275,9 @@
       <if test="updatedBy != null">
         #{updatedBy,jdbcType=VARCHAR},
       </if>
+      <if test="lat != null and lng != null">
+        GeomFromText('POINT(#{lng,jdbcType=DOUBLE} #{lat,jdbcType=DOUBLE})'),
+      </if>
     </trim>
   </insert>
   <insert id="insertReturnId" parameterType="com.api.sns.cheese.domain.TPhoto">
@@ -280,13 +286,13 @@
       like_count, comment_id, lat,
       lng, address, deleted,
       created_at, created_by, updated_at,
-      updated_by)
+      updated_by, `location`)
     values (#{photoId,jdbcType=BIGINT}, #{photoCd,jdbcType=VARCHAR}, #{caption,jdbcType=VARCHAR},
       #{imgUrl,jdbcType=VARCHAR}, #{videoUrl,jdbcType=VARCHAR}, #{accountId,jdbcType=INTEGER},
       #{likeCount,jdbcType=INTEGER}, #{commentId,jdbcType=BIGINT}, #{lat,jdbcType=DOUBLE},
       #{lng,jdbcType=DOUBLE}, #{address,jdbcType=VARCHAR}, #{deleted,jdbcType=VARCHAR},
       #{createdAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, #{updatedAt,jdbcType=TIMESTAMP},
-      #{updatedBy,jdbcType=VARCHAR})
+      #{updatedBy,jdbcType=VARCHAR}, GeomFromText('POINT(#{lng,jdbcType=DOUBLE} #{lat,jdbcType=DOUBLE})'))
     <selectKey resultType="java.lang.Long" keyProperty="photoId" order="AFTER">
       select @@IDENTITY
     </selectKey>
@@ -356,6 +362,9 @@
       <if test="record.updatedBy != null">
         updated_by = #{record.updatedBy,jdbcType=VARCHAR},
       </if>
+      <if test="record.lat != null and record.lng != null">
+        `location` = GeomFromText('POINT(#{record.lng,jdbcType=DOUBLE} #{record.lat,jdbcType=DOUBLE})'),
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -382,7 +391,8 @@
       created_at = #{record.createdAt,jdbcType=TIMESTAMP},
       created_by = #{record.createdBy,jdbcType=VARCHAR},
       updated_at = #{record.updatedAt,jdbcType=TIMESTAMP},
-      updated_by = #{record.updatedBy,jdbcType=VARCHAR}
+      updated_by = #{record.updatedBy,jdbcType=VARCHAR},
+      `location` = GeomFromText('POINT(#{record.lng,jdbcType=DOUBLE} #{record.lat,jdbcType=DOUBLE})')
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -439,6 +449,9 @@
       <if test="updatedBy != null">
         updated_by = #{updatedBy,jdbcType=VARCHAR},
       </if>
+      <if test="record.lat != null and record.lng != null">
+        `location` = GeomFromText('POINT(#{record.lng,jdbcType=DOUBLE} #{record.lat,jdbcType=DOUBLE})'),
+      </if>
     </set>
     where photo_id = #{photoId,jdbcType=BIGINT}
   </update>
@@ -462,7 +475,8 @@
       created_at = #{createdAt,jdbcType=TIMESTAMP},
       created_by = #{createdBy,jdbcType=VARCHAR},
       updated_at = #{updatedAt,jdbcType=TIMESTAMP},
-      updated_by = #{updatedBy,jdbcType=VARCHAR}
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      `location` = GeomFromText('POINT(#{lng,jdbcType=DOUBLE} #{lat,jdbcType=DOUBLE})')
     where photo_id = #{photoId,jdbcType=BIGINT}
   </update>
 </mapper>
