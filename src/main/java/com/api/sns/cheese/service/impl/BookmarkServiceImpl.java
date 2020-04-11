@@ -14,8 +14,10 @@ import com.api.sns.cheese.domain.TBookmark;
 import com.api.sns.cheese.domain.TBookmarkExample;
 import com.api.sns.cheese.domain.TPhoto;
 import com.api.sns.cheese.exception.NotFoundException;
+import com.api.sns.cheese.repository.TAccountRepository;
 import com.api.sns.cheese.repository.TBookmarkRepository;
 import com.api.sns.cheese.repository.TPhotoRepository;
+import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.resources.PhotoResource;
 import com.api.sns.cheese.service.BookmarkService;
 
@@ -31,6 +33,9 @@ public class BookmarkServiceImpl implements BookmarkService {
 
 	@Autowired
 	private TPhotoRepository tPhotoRepository;
+
+	@Autowired
+	private TAccountRepository tAccountRepository;
 
 	@Autowired
 	private Mapper mapper;
@@ -51,8 +56,17 @@ public class BookmarkServiceImpl implements BookmarkService {
 		example.createCriteria().andAccountIdEqualTo(accountId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
 		return tBookmarkRepository.findPageBy(example, pageable).map(tBookmark -> {
 			try {
+				// TODO 性能改善
+
+				// 写真を取得
 				TPhoto tPhoto = tPhotoRepository.findOneById(tBookmark.getPhotoId());
-				return mapper.map(tPhoto, PhotoResource.class);
+				PhotoResource resource = mapper.map(tPhoto, PhotoResource.class);
+
+				// TODO 投稿ユーザー View または キャッシュ
+				resource.setAccount(
+						mapper.map(tAccountRepository.findOneById(tPhoto.getAccountId()), AccountResource.class));
+
+				return resource;
 			} catch (NotFoundException e) {
 				// null
 			}
