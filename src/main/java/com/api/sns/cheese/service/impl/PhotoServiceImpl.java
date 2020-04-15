@@ -59,6 +59,7 @@ import com.api.sns.cheese.repository.TTagRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.resources.CommentResource;
 import com.api.sns.cheese.resources.PhotoResource;
+import com.api.sns.cheese.service.AccountService;
 import com.api.sns.cheese.service.PhotoService;
 import com.api.sns.cheese.service.S3Service;
 
@@ -103,6 +104,9 @@ public class PhotoServiceImpl implements PhotoService {
 	private TBookmarkRepository tBookmarkRepository;
 
 	@Autowired
+	private AccountService accountService;
+
+	@Autowired
 	private S3Service s3Service;
 
 	@Autowired
@@ -127,7 +131,7 @@ public class PhotoServiceImpl implements PhotoService {
 		PhotoResource resource = mapper.map(photo, PhotoResource.class);
 
 		// TODO 投稿ユーザー View または キャッシュ
-		resource.setAccount(mapper.map(tAccountRepository.findOneById(photo.getAccountId()), AccountResource.class));
+		resource.setAccount(accountService.find(photo.getAccountId()));
 
 		// ログインユーザー
 		Integer accountId = SessionInfoContextHolder.isAuthenticated()
@@ -231,9 +235,7 @@ public class PhotoServiceImpl implements PhotoService {
 			PhotoResource resource = mapper.map(tPhoto, PhotoResource.class);
 
 			// TODO 投稿ユーザー View または キャッシュ
-			resource.setAccount(
-					mapper.map(tAccountRepository.findOneById(tPhoto.getAccountId()), AccountResource.class));
-
+			resource.setAccount(accountService.find(tPhoto.getAccountId()));
 			return resource;
 		});
 	}

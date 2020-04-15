@@ -33,6 +33,15 @@ public interface AccountService {
 	public AccountResource find(String loginId);
 
 	/**
+	 * アカウントを取得する
+	 *
+	 * @param accountId
+	 *            アカウントID
+	 * @return アカウント情報
+	 */
+	public AccountResource find(Integer accountId);
+
+	/**
 	 * アカウントを通報する
 	 *
 	 * @param loginId

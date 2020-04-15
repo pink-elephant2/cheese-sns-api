@@ -111,26 +111,61 @@ public class AccountServiceImpl implements AccountService {
 		// ログイン済みの場合
 		if (SessionInfoContextHolder.isAuthenticated()
 				&& !SessionInfoContextHolder.getSessionInfo().getAccountId().equals(account.getAccountId())) {
-			// フォローしているか
-			TFollowExample followExample = new TFollowExample();
-			followExample.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId())
-					.andFollowAccountIdEqualTo(account.getAccountId()).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
-			TFollow follow = tFollowRepository.findOneBy(followExample);
-
-			resource.setFollow(follow != null);
-
-			// フォローされているか
-			TFollowExample followerExample = new TFollowExample();
-			followerExample.createCriteria().andAccountIdEqualTo(account.getAccountId())
-					.andFollowAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId());
-			TFollow follower = tFollowRepository.findOneBy(followerExample);
-
-			if (follower != null) {
-				resource.setFollower(CommonConst.DeletedFlag.OFF.equals(follower.getDeleted()));
-				resource.setBlocked(BooleanUtils.toBoolean(follower.getBlockFlag()));
-			}
+			// フォロー情報を取得する
+			resource = getFollow(account.getAccountId(), resource);
 		}
 
+		return resource;
+	}
+
+	/**
+	 * アカウントを取得する
+	 *
+	 * @param accountId
+	 *            アカウントID
+	 * @return アカウント情報
+	 */
+	@Override
+	public AccountResource find(Integer accountId) {
+		TAccount account = tAccountRepository.findOneById(accountId);
+
+		if (account == null) {
+			throw new NotFoundException("アカウントが存在しません");
+		}
+		AccountResource resource = mapper.map(account, AccountResource.class);
+
+		// ログイン済みの場合
+		if (SessionInfoContextHolder.isAuthenticated()
+				&& !SessionInfoContextHolder.getSessionInfo().getAccountId().equals(account.getAccountId())) {
+			// フォロー情報を取得する
+			resource = getFollow(account.getAccountId(), resource);
+		}
+
+		return resource;
+	}
+
+	/**
+	 * フォロー情報を取得する
+	 */
+	private AccountResource getFollow(Integer accountId, AccountResource resource) {
+		// フォローしているか
+		TFollowExample followExample = new TFollowExample();
+		followExample.createCriteria().andAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId())
+				.andFollowAccountIdEqualTo(accountId).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		TFollow follow = tFollowRepository.findOneBy(followExample);
+
+		resource.setFollow(follow != null);
+
+		// フォローされているか
+		TFollowExample followerExample = new TFollowExample();
+		followerExample.createCriteria().andAccountIdEqualTo(accountId)
+				.andFollowAccountIdEqualTo(SessionInfoContextHolder.getSessionInfo().getAccountId());
+		TFollow follower = tFollowRepository.findOneBy(followerExample);
+
+		if (follower != null) {
+			resource.setFollower(CommonConst.DeletedFlag.OFF.equals(follower.getDeleted()));
+			resource.setBlocked(BooleanUtils.toBoolean(follower.getBlockFlag()));
+		}
 		return resource;
 	}
 
