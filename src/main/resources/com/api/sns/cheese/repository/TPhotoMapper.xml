@@ -281,18 +281,113 @@
     </trim>
   </insert>
   <insert id="insertReturnId" parameterType="com.api.sns.cheese.domain.TPhoto">
-    insert into t_photo (photo_id, photo_cd, caption,
-      img_url, video_url, account_id,
-      like_count, comment_id, lat,
-      lng, address, deleted,
-      created_at, created_by, updated_at,
-      updated_by, `location`)
-    values (#{photoId,jdbcType=BIGINT}, #{photoCd,jdbcType=VARCHAR}, #{caption,jdbcType=VARCHAR},
-      #{imgUrl,jdbcType=VARCHAR}, #{videoUrl,jdbcType=VARCHAR}, #{accountId,jdbcType=INTEGER},
-      #{likeCount,jdbcType=INTEGER}, #{commentId,jdbcType=BIGINT}, #{lat,jdbcType=DOUBLE},
-      #{lng,jdbcType=DOUBLE}, #{address,jdbcType=VARCHAR}, #{deleted,jdbcType=VARCHAR},
-      #{createdAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, #{updatedAt,jdbcType=TIMESTAMP},
-      #{updatedBy,jdbcType=VARCHAR}, GeomFromText('POINT(#{lng,jdbcType=DOUBLE} #{lat,jdbcType=DOUBLE})'))
+    insert into t_photo
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="photoId != null">
+        photo_id,
+      </if>
+      <if test="photoCd != null">
+        photo_cd,
+      </if>
+      <if test="caption != null">
+        caption,
+      </if>
+      <if test="imgUrl != null">
+        img_url,
+      </if>
+      <if test="videoUrl != null">
+        video_url,
+      </if>
+      <if test="accountId != null">
+        account_id,
+      </if>
+      <if test="likeCount != null">
+        like_count,
+      </if>
+      <if test="commentId != null">
+        comment_id,
+      </if>
+      <if test="lat != null">
+        lat,
+      </if>
+      <if test="lng != null">
+        lng,
+      </if>
+      <if test="address != null">
+        address,
+      </if>
+      <if test="deleted != null">
+        deleted,
+      </if>
+      <if test="createdAt != null">
+        created_at,
+      </if>
+      <if test="createdBy != null">
+        created_by,
+      </if>
+      <if test="updatedAt != null">
+        updated_at,
+      </if>
+      <if test="updatedBy != null">
+        updated_by,
+      </if>
+      <if test="lat != null and lng != null">
+        `location`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="photoId != null">
+        #{photoId,jdbcType=BIGINT},
+      </if>
+      <if test="photoCd != null">
+        #{photoCd,jdbcType=VARCHAR},
+      </if>
+      <if test="caption != null">
+        #{caption,jdbcType=VARCHAR},
+      </if>
+      <if test="imgUrl != null">
+        #{imgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="videoUrl != null">
+        #{videoUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="accountId != null">
+        #{accountId,jdbcType=INTEGER},
+      </if>
+      <if test="likeCount != null">
+        #{likeCount,jdbcType=INTEGER},
+      </if>
+      <if test="commentId != null">
+        #{commentId,jdbcType=BIGINT},
+      </if>
+      <if test="lat != null">
+        #{lat,jdbcType=DOUBLE},
+      </if>
+      <if test="lng != null">
+        #{lng,jdbcType=DOUBLE},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="deleted != null">
+        #{deleted,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null">
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedAt != null">
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null">
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="lat != null and lng != null">
+        GeomFromText('POINT(#{lng,jdbcType=DOUBLE} #{lat,jdbcType=DOUBLE})'),
+      </if>
+    </trim>
     <selectKey resultType="java.lang.Long" keyProperty="photoId" order="AFTER">
       select @@IDENTITY
     </selectKey>
