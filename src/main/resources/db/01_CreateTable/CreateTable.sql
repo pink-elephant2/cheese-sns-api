@@ -1,5 +1,5 @@
 -- Project Name : チーズSNS
--- Date/Time    : 2020/04/09 8:42:39
+-- Date/Time    : 2020/04/17 15:45:04
 -- Author       : チーズSNS
 -- RDBMS Type   : MySQL
 -- Application  : A5:SQL Mk-2
@@ -146,6 +146,8 @@ create table t_photo (
   , lat DOUBLE(8,6) comment '緯度'
   , lng DOUBLE(9,6) comment '経度'
   , address VARCHAR(1000) comment '住所'
+  , moderation_result ENUM('UNCENSORED', 'OK', 'NG') comment '検閲結果'
+  , moderation_labels VARCHAR(128) comment '検閲詳細'
   , deleted VARCHAR(1) default '0' not null comment '削除フラグ'
   , created_at DATETIME default CURRENT_TIMESTAMP not null comment '作成日時'
   , created_by VARCHAR(20) default 'SYSTEM' not null comment '作成者'
