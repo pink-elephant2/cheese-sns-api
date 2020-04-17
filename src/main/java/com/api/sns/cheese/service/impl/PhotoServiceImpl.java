@@ -41,6 +41,7 @@ import com.api.sns.cheese.domain.TTagExample;
 import com.api.sns.cheese.domain.TTagPhoto;
 import com.api.sns.cheese.enums.ActivityTypeEnum;
 import com.api.sns.cheese.enums.DocumentTypeEnum;
+import com.api.sns.cheese.enums.ModerationResultEnum;
 import com.api.sns.cheese.enums.ReportReasonEnum;
 import com.api.sns.cheese.enums.ReportTargetEnum;
 import com.api.sns.cheese.exception.NotFoundException;
@@ -263,6 +264,7 @@ public class PhotoServiceImpl implements PhotoService {
 			photo.setPhotoCd(cd);
 			photo.setImgUrl(filePath);
 			photo.setAccountId(SessionInfoContextHolder.getSessionInfo().getAccountId());
+			photo.setModerationResult(ModerationResultEnum.UNCENSORED);
 			tPhotoRepository.createReturnId(photo); // photoIdがセットされる
 
 			// TODO コードが重複した場合、ランダム文字列を再生成してリトライする
