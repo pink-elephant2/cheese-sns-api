@@ -1,5 +1,6 @@
 package com.api.sns.cheese.domain;
 
+import com.api.sns.cheese.enums.ModerationResultEnum;
 import com.api.sns.common.business.domain.BaseExample;
 import java.util.ArrayList;
 import java.util.Date;
@@ -962,6 +963,146 @@ public class TPhotoExample implements BaseExample {
             return (Criteria) this;
         }
 
+        public Criteria andModerationResultIsNull() {
+            addCriterion("moderation_result is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationResultIsNotNull() {
+            addCriterion("moderation_result is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationResultEqualTo(ModerationResultEnum value) {
+            addCriterion("moderation_result =", value, "moderationResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationResultNotEqualTo(ModerationResultEnum value) {
+            addCriterion("moderation_result <>", value, "moderationResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationResultGreaterThan(ModerationResultEnum value) {
+            addCriterion("moderation_result >", value, "moderationResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationResultGreaterThanOrEqualTo(ModerationResultEnum value) {
+            addCriterion("moderation_result >=", value, "moderationResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationResultLessThan(ModerationResultEnum value) {
+            addCriterion("moderation_result <", value, "moderationResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationResultLessThanOrEqualTo(ModerationResultEnum value) {
+            addCriterion("moderation_result <=", value, "moderationResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationResultLike(ModerationResultEnum value) {
+            addCriterion("moderation_result like", value, "moderationResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationResultNotLike(ModerationResultEnum value) {
+            addCriterion("moderation_result not like", value, "moderationResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationResultIn(List<ModerationResultEnum> values) {
+            addCriterion("moderation_result in", values, "moderationResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationResultNotIn(List<ModerationResultEnum> values) {
+            addCriterion("moderation_result not in", values, "moderationResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationResultBetween(ModerationResultEnum value1, ModerationResultEnum value2) {
+            addCriterion("moderation_result between", value1, value2, "moderationResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationResultNotBetween(ModerationResultEnum value1, ModerationResultEnum value2) {
+            addCriterion("moderation_result not between", value1, value2, "moderationResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationLabelsIsNull() {
+            addCriterion("moderation_labels is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationLabelsIsNotNull() {
+            addCriterion("moderation_labels is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationLabelsEqualTo(String value) {
+            addCriterion("moderation_labels =", value, "moderationLabels");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationLabelsNotEqualTo(String value) {
+            addCriterion("moderation_labels <>", value, "moderationLabels");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationLabelsGreaterThan(String value) {
+            addCriterion("moderation_labels >", value, "moderationLabels");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationLabelsGreaterThanOrEqualTo(String value) {
+            addCriterion("moderation_labels >=", value, "moderationLabels");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationLabelsLessThan(String value) {
+            addCriterion("moderation_labels <", value, "moderationLabels");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationLabelsLessThanOrEqualTo(String value) {
+            addCriterion("moderation_labels <=", value, "moderationLabels");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationLabelsLike(String value) {
+            addCriterion("moderation_labels like", value, "moderationLabels");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationLabelsNotLike(String value) {
+            addCriterion("moderation_labels not like", value, "moderationLabels");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationLabelsIn(List<String> values) {
+            addCriterion("moderation_labels in", values, "moderationLabels");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationLabelsNotIn(List<String> values) {
+            addCriterion("moderation_labels not in", values, "moderationLabels");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationLabelsBetween(String value1, String value2) {
+            addCriterion("moderation_labels between", value1, value2, "moderationLabels");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationLabelsNotBetween(String value1, String value2) {
+            addCriterion("moderation_labels not between", value1, value2, "moderationLabels");
+            return (Criteria) this;
+        }
+
         public Criteria andDeletedIsNull() {
             addCriterion("deleted is null");
             return (Criteria) this;
@@ -1314,6 +1455,11 @@ public class TPhotoExample implements BaseExample {
 
         public Criteria andAddressLikeInsensitive(String value) {
             addCriterion("upper(address) like", value.toUpperCase(), "address");
+            return (Criteria) this;
+        }
+
+        public Criteria andModerationLabelsLikeInsensitive(String value) {
+            addCriterion("upper(moderation_labels) like", value.toUpperCase(), "moderationLabels");
             return (Criteria) this;
         }
 

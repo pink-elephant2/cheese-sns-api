@@ -54,6 +54,7 @@
     <table tableName="t_login_history" modelType="hierarchical"></table>
     <table tableName="t_photo" modelType="hierarchical">
         <ignoreColumn column="location" />
+        <columnOverride column="moderation_result" javaType="com.api.sns.cheese.enums.ModerationResultEnum" />
     </table>
     <table tableName="t_photo_comment" modelType="hierarchical"></table>
     <table tableName="t_photo_comment_like" modelType="hierarchical"></table>
