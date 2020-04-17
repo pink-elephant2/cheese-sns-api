@@ -17,6 +17,7 @@ public class AccountCreateForm {
 
 	/** ログインID */
 	@NotNull
+	@Size(min = 6)
 	@Size(max = 30)
 	private String loginId;
 
@@ -31,6 +32,7 @@ public class AccountCreateForm {
 
 	/** パスワード */
 	@NotNull
+	@Size(min = 8)
 	@Size(max = 30)
 	private String password;
 
