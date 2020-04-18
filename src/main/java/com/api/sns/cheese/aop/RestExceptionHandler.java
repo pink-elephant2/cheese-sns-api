@@ -1,6 +1,7 @@
 package com.api.sns.cheese.aop;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ValidationException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,15 @@ import com.api.sns.cheese.exception.NotFoundException;
  */
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+
+	/**
+	 * バリデーションエラーを処理(400)
+	 */
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(ValidationException.class)
+	public ResponseEntity<Object> handleValidationException(ValidationException ex, HttpServletResponse response) {
+		return new ResponseEntity<Object>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+	}
 
 	/**
 	 * マルチパートファイルエラーを処理(400)

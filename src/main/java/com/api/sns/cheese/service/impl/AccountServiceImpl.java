@@ -2,7 +2,9 @@ package com.api.sns.cheese.service.impl;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
+import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -74,6 +76,15 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Override
 	public boolean create(AccountCreateForm form) {
+		// 既存ユーザー存在チェック
+		TAccountExample example = new TAccountExample();
+		example.or().andLoginIdEqualTo(form.getLoginId()).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		example.or().andMailEqualTo(form.getMail()).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		List<TAccount> accountList = tAccountRepository.findAllBy(example);
+		if (!accountList.isEmpty()) {
+			throw new ValidationException("既に登録されています");
+		}
+
 		// アカウントを登録する
 		TAccount account = mapper.map(form, TAccount.class);
 		account.setName(form.getLoginId());
