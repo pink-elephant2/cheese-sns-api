@@ -12,6 +12,7 @@ import com.api.sns.cheese.domain.TActivity;
 import com.api.sns.cheese.domain.TActivityExample;
 import com.api.sns.cheese.domain.TPhoto;
 import com.api.sns.cheese.enums.ActivityTypeEnum;
+import com.api.sns.cheese.exception.NotFoundException;
 import com.api.sns.cheese.repository.TAccountRepository;
 import com.api.sns.cheese.repository.TActivityRepository;
 import com.api.sns.cheese.repository.TPhotoRepository;
@@ -78,30 +79,34 @@ public class ActivityServiceImpl implements ActivityService {
 	 * @return ActivityResource
 	 */
 	private ActivityResource mapResource(TActivity tActivity) {
-		switch (tActivity.getActivityType()) {
+		try {
+			switch (tActivity.getActivityType()) {
 
-		// コメントされた
-		case COMMENT:
-			return mapResourceComment(tActivity);
+			// コメントされた
+			case COMMENT:
+				return mapResourceComment(tActivity);
 
-		// フォローされた
-		case FOLLOW:
-			return mapResourceFollow(tActivity);
+			// フォローされた
+			case FOLLOW:
+				return mapResourceFollow(tActivity);
 
-		// いいねされた
-		case LIKE:
-			return mapResourceLike(tActivity);
+			// いいねされた
+			case LIKE:
+				return mapResourceLike(tActivity);
 
-		// 投稿された
-		case NEW_POST:
-			return mapResourceNewPost(tActivity);
+			// 投稿された
+			case NEW_POST:
+				return mapResourceNewPost(tActivity);
 
-		// コメントにいいねされた
-		case COMMENT_LIKE:
-			return mapResourceCommentLike(tActivity);
+			// コメントにいいねされた
+			case COMMENT_LIKE:
+				return mapResourceCommentLike(tActivity);
 
-		default:
-			break;
+			default:
+				break;
+			}
+		} catch (NotFoundException e) {
+			return null;
 		}
 		return null;
 	}

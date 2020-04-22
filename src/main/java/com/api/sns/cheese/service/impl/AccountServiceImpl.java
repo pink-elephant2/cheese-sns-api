@@ -12,6 +12,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -146,8 +147,9 @@ public class AccountServiceImpl implements AccountService {
 		AccountResource resource = mapper.map(account, AccountResource.class);
 
 		// ログイン済みの場合
-		if (SessionInfoContextHolder.isAuthenticated()
-				&& !SessionInfoContextHolder.getSessionInfo().getAccountId().equals(account.getAccountId())) {
+		if (!(SecurityContextHolder.getContext() == null
+				|| SecurityContextHolder.getContext().getAuthentication() == null
+				|| SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken)) {
 			// フォロー情報を取得する
 			resource = getFollow(account.getAccountId(), resource);
 		}
