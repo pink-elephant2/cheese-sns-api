@@ -1,6 +1,7 @@
 package com.api.sns.cheese.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,8 @@ import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.domain.TActivity;
 import com.api.sns.cheese.domain.TActivityExample;
 import com.api.sns.cheese.domain.TBanReport;
+import com.api.sns.cheese.domain.TBookmark;
+import com.api.sns.cheese.domain.TBookmarkExample;
 import com.api.sns.cheese.domain.TFollow;
 import com.api.sns.cheese.domain.TFollowExample;
 import com.api.sns.cheese.domain.TPhoto;
@@ -30,6 +33,9 @@ import com.api.sns.cheese.domain.TPhotoCommentLikeExample;
 import com.api.sns.cheese.domain.TPhotoExample;
 import com.api.sns.cheese.domain.TPhotoLike;
 import com.api.sns.cheese.domain.TPhotoLikeExample;
+import com.api.sns.cheese.domain.TTag;
+import com.api.sns.cheese.domain.TTagExample;
+import com.api.sns.cheese.domain.TTagPhoto;
 import com.api.sns.cheese.enums.ActivityTypeEnum;
 import com.api.sns.cheese.enums.DocumentTypeEnum;
 import com.api.sns.cheese.enums.ReportReasonEnum;
@@ -40,14 +46,18 @@ import com.api.sns.cheese.form.VideoForm;
 import com.api.sns.cheese.repository.TAccountRepository;
 import com.api.sns.cheese.repository.TActivityRepository;
 import com.api.sns.cheese.repository.TBanReportRepository;
+import com.api.sns.cheese.repository.TBookmarkRepository;
 import com.api.sns.cheese.repository.TFollowRepository;
 import com.api.sns.cheese.repository.TPhotoCommentLikeRepository;
 import com.api.sns.cheese.repository.TPhotoCommentRepository;
 import com.api.sns.cheese.repository.TPhotoLikeRepository;
 import com.api.sns.cheese.repository.TPhotoRepository;
+import com.api.sns.cheese.repository.TTagPhotoRepository;
+import com.api.sns.cheese.repository.TTagRepository;
 import com.api.sns.cheese.resources.AccountResource;
 import com.api.sns.cheese.resources.CommentResource;
 import com.api.sns.cheese.resources.VideoResource;
+import com.api.sns.cheese.service.AccountService;
 import com.api.sns.cheese.service.S3Service;
 import com.api.sns.cheese.service.VideoService;
 
@@ -72,6 +82,12 @@ public class VideoServiceImpl implements VideoService {
 	private TPhotoCommentLikeRepository tPhotoCommentLikeRepository; // TODO videoに変換
 
 	@Autowired
+	private TTagRepository tTagRepository;
+
+	@Autowired
+	private TTagPhotoRepository tTagPhotoRepository;
+
+	@Autowired
 	private TAccountRepository tAccountRepository;
 
 	@Autowired
@@ -82,6 +98,12 @@ public class VideoServiceImpl implements VideoService {
 
 	@Autowired
 	private TBanReportRepository tBanReportRepository;
+
+	@Autowired
+	private TBookmarkRepository tBookmarkRepository;
+
+	@Autowired
+	private AccountService accountService;
 
 	@Autowired
 	private S3Service s3Service;
@@ -108,7 +130,7 @@ public class VideoServiceImpl implements VideoService {
 		VideoResource resource = mapper.map(photo, VideoResource.class);
 
 		// TODO 投稿ユーザー View または キャッシュ
-		resource.setAccount(mapper.map(tAccountRepository.findOneById(photo.getAccountId()), AccountResource.class));
+		resource.setAccount(accountService.find(photo.getAccountId()));
 
 		// ログインユーザー
 		Integer accountId = SessionInfoContextHolder.isAuthenticated()
@@ -156,6 +178,14 @@ public class VideoServiceImpl implements VideoService {
 			}).collect(Collectors.toList()));
 		}
 
+		// 自分がブックマークしているか
+		if (SessionInfoContextHolder.isAuthenticated()) {
+			TBookmarkExample bookmarkExample = new TBookmarkExample();
+			bookmarkExample.createCriteria().andPhotoIdEqualTo(photo.getPhotoId()).andAccountIdEqualTo(accountId)
+					.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+			TBookmark tBookmark = tBookmarkRepository.findOneBy(bookmarkExample);
+			resource.setBookmark(tBookmark != null);
+		}
 		return resource;
 	}
 
@@ -182,9 +212,7 @@ public class VideoServiceImpl implements VideoService {
 			VideoResource resource = mapper.map(tPhoto, VideoResource.class);
 
 			// TODO 投稿ユーザー View または キャッシュ
-			resource.setAccount(
-					mapper.map(tAccountRepository.findOneById(tPhoto.getAccountId()), AccountResource.class));
-
+			resource.setAccount(accountService.find(tPhoto.getAccountId()));
 			return resource;
 		});
 	}
@@ -220,12 +248,12 @@ public class VideoServiceImpl implements VideoService {
 			photo.setImgUrl(filePath + "-00001.png"); // サムネイルはAETで作成する
 			photo.setVideoUrl(filePath + ".m3u8"); // HLS形式
 			photo.setAccountId(SessionInfoContextHolder.getSessionInfo().getAccountId());
-			tPhotoRepository.create(photo);
+			tPhotoRepository.createReturnId(photo); // photoIdがセットされる
 
 			// TODO コードが重複した場合、ランダム文字列を再生成してリトライする
 
-			// 新規動画ID
-			photo.setPhotoId(tPhotoRepository.lastInsertId());
+			// タグを登録
+			saveTag(photo.getPhotoId(), form.getTags());
 
 			// フォローワーにアクティビティ登録
 			createActivity(photo.getPhotoId());
@@ -237,6 +265,67 @@ public class VideoServiceImpl implements VideoService {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
+		}
+	}
+
+	/**
+	 * タグを登録する
+	 *
+	 * @param photoId
+	 * @param tagList
+	 */
+	private void saveTag(Long photoId, List<String> tagList) {
+		// タグを取得
+		List<TTag> tTagList;
+		if (tagList == null || tagList.isEmpty()) {
+			tagList = new ArrayList<>();
+			tTagList = new ArrayList<>();
+		} else {
+			TTagExample tTagExample = new TTagExample();
+			tTagExample.createCriteria().andTagNameIn(tagList).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+			tTagList = tTagRepository.findAllBy(tTagExample);
+		}
+
+		// なければ登録
+		tagList.stream().forEach(tag -> {
+			if (tTagList.stream().filter(t -> t.getTagName().equals(tag)).count() == 0) {
+				TTag tTag = new TTag();
+				tTag.setTagName(tag);
+				tTag.setDeleted(CommonConst.DeletedFlag.OFF);
+				tTagRepository.createReturnId(tTag); // tagIdがセットされる
+
+				tTagList.add(tTag);
+			}
+		});
+
+		// タグを取得
+		List<TTagPhoto> photoTagList = tTagPhotoRepository.findAllByPhotoId(photoId);
+		if (photoTagList.size() < tagList.size()) {
+			// 新規登録分が多い場合
+			int n = tagList.size() - photoTagList.size();
+			for (int i = 0; i < n; i++) {
+				TTagPhoto tagPhoto = new TTagPhoto();
+				tagPhoto.setPhotoId(photoId);
+				photoTagList.add(tagPhoto);
+			}
+		} else if (photoTagList.size() > tagList.size()) {
+			// 既存分が多い場合
+			for (int i = photoTagList.size(); i >= tagList.size(); i--) {
+				photoTagList.get(i - 1).setDeleted(CommonConst.DeletedFlag.ON);
+				tagList.add(null);
+			}
+		}
+
+		// 登録/更新
+		for (int i = 0; i < photoTagList.size(); i++) {
+			TTagPhoto tagPhoto = photoTagList.get(i);
+			tagPhoto.setTagId(tTagList.get(i).getTagId());
+
+			if (tagPhoto.getTagPhotoId() == null) {
+				tTagPhotoRepository.create(tagPhoto);
+			} else {
+				tTagPhotoRepository.updatePartially(tagPhoto);
+			}
 		}
 	}
 

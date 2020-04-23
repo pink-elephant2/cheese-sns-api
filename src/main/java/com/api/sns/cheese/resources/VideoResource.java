@@ -49,6 +49,19 @@ public class VideoResource {
 	@JsonProperty("isLike")
 	private boolean isLike;
 
+	/** 自分がブックマークしているか */
+	@JsonProperty("isBookmark")
+	private boolean isBookmark;
+
 	/** コメント */
 	private List<CommentResource> comments;
+
+	/** 緯度 */
+	private Double lat;
+
+	/** 経度 */
+	private Double lng;
+
+	/** 住所 */
+	private String address;
 }
