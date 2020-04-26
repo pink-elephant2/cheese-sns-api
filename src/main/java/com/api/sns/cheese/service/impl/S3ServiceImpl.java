@@ -1,6 +1,7 @@
 package com.api.sns.cheese.service.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,26 @@ public class S3ServiceImpl implements S3Service {
 	}
 
 	/**
+	 * アップロード
+	 *
+	 * @param fileName
+	 *            ファイル名
+	 * @param OutputStream
+	 *            バイトストリーム
+	 * @param contentType
+	 *            コンテンツタイプ
+	 * @return ファイルパス
+	 */
+	@Override
+	public String upload(DocumentTypeEnum documentType, String fileName, ByteArrayOutputStream outputStream,
+			String contentType) {
+		String filePath = createFilePath(documentType, fileName);
+		amazonS3.putObject(createRequest("assets/" + filePath, outputStream.toByteArray(), contentType));
+
+		return appConfig.getCloudHostUrl() + "/" + filePath;
+	}
+
+	/**
 	 * リクエスト情報を生成する
 	 *
 	 * @param fileName
@@ -55,12 +76,23 @@ public class S3ServiceImpl implements S3Service {
 	 * @throws IOException
 	 */
 	private PutObjectRequest createRequest(String filePath, MultipartFile inputFile) throws IOException {
+		return createRequest(filePath, inputFile.getBytes(), inputFile.getContentType());
+	}
+
+	/**
+	 * リクエスト情報を生成する
+	 *
+	 * @param fileName
+	 *            ファイル名
+	 * @param inputFile
+	 *            マルチパートファイル
+	 */
+	private PutObjectRequest createRequest(String filePath, byte[] file, String contentType) {
 		// バイト長設定
-		byte[] file = inputFile.getBytes();
 		ObjectMetadata metaData = new ObjectMetadata();
 		metaData.setContentLength(file.length);
 		metaData.setCacheControl("max-age=2592000");
-		metaData.setContentType(inputFile.getContentType());
+		metaData.setContentType(contentType);
 
 		// アップロード対象のオブジェクトを作成
 		PutObjectRequest putRequest = new PutObjectRequest(appConfig.getS3Bucket(), filePath,
