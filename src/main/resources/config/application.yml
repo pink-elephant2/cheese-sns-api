@@ -51,3 +51,5 @@ cheese:
   slack-app-token: ${CHEESE_SLACK_APP_TOKEN:}
   slack-contact-channel: contact
   aes-key: ${CHEESE_AES_KEY:}
+  cron:
+    sitemap: 0 0 0 * * ?

@@ -50,7 +50,7 @@ public class TaskServiceImpl implements TaskService {
 	/**
 	 * サイトマップXMLを生成する
 	 */
-	@Scheduled(cron = "0 35 22 * * ? ")
+	@Scheduled(cron = "${cheese.cron.sitemap}")
 	@Override
 	public void createSitemapXml() {
 		log.info("Start createSitemapXml()");
