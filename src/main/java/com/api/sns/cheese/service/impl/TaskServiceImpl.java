@@ -15,10 +15,12 @@ import com.api.sns.cheese.config.AppConfig;
 import com.api.sns.cheese.consts.CommonConst;
 import com.api.sns.cheese.domain.TAccountExample;
 import com.api.sns.cheese.domain.TPhotoExample;
+import com.api.sns.cheese.domain.TTagExample;
 import com.api.sns.cheese.enums.DocumentTypeEnum;
 import com.api.sns.cheese.enums.ModerationResultEnum;
 import com.api.sns.cheese.repository.TAccountRepository;
 import com.api.sns.cheese.repository.TPhotoRepository;
+import com.api.sns.cheese.repository.TTagRepository;
 import com.api.sns.cheese.service.S3Service;
 import com.api.sns.cheese.service.TaskService;
 import com.api.sns.common.business.sitemap.Url;
@@ -42,6 +44,9 @@ public class TaskServiceImpl implements TaskService {
 	private TPhotoRepository tPhotoRepository;
 
 	@Autowired
+	private TTagRepository tTagRepository;
+
+	@Autowired
 	private S3Service s3Service;
 
 	@Autowired
@@ -57,6 +62,7 @@ public class TaskServiceImpl implements TaskService {
 
 		createSitemapAccount();
 		createSitemapPhoto();
+		createSitemapHashtag();
 
 		log.info("End createSitemapXml()");
 	}
@@ -121,4 +127,33 @@ public class TaskServiceImpl implements TaskService {
 		log.info("End createSitemapPhotoXml()");
 	}
 
+	/**
+	 * ハッシュタグサイトマップXMLを生成する
+	 */
+	private void createSitemapHashtag() {
+		log.info("Start createSitemapHashtagXml()");
+
+		// すべてのタグを取得
+		TTagExample example = new TTagExample();
+		example.createCriteria()
+				.andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
+		List<Url> urlList = tTagRepository.findAllBy(example).stream().map(tTag -> {
+			Url url = new Url(
+					appConfig.getUrl() + "hashtag/" + tTag.getTagName(),
+					DateUtils.formatDate(tTag.getUpdatedAt(), "yyyy-MM-dd"), // TODO 最終投稿があった日時
+					"always",
+					0.8);
+			return url;
+		}).collect(Collectors.toList());
+
+		// XML生成
+		Urlset urlset = new Urlset(urlList);
+		ByteArrayOutputStream xml = new ByteArrayOutputStream();
+		JAXB.marshal(urlset, xml);
+
+		// S3に格納
+		s3Service.upload(DocumentTypeEnum.SITEMAP, "sitemap-hashtag.xml", xml, "application/xml");
+
+		log.info("End createSitemapHashtagXml()");
+	}
 }

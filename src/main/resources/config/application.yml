@@ -53,3 +53,4 @@ cheese:
   aes-key: ${CHEESE_AES_KEY:}
   cron:
     sitemap: 0 0 0 * * ?
+#    sitemap: 0 * * * * ?
