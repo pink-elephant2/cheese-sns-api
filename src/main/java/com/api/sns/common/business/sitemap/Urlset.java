@@ -19,7 +19,7 @@ public class Urlset {
 
 	@XmlAttribute
 	public String getXmlns() {
-		return "http://www.sitemaps.org/schemassitemap/0.9";
+		return "http://www.sitemaps.org/schemas/sitemap/0.9";
 	}
 
 	@XmlAttribute(name = "xmlns:xsi")
