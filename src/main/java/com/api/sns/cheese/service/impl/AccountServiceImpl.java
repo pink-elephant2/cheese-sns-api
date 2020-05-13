@@ -88,7 +88,6 @@ public class AccountServiceImpl implements AccountService {
 
 		// アカウントを登録する
 		TAccount account = mapper.map(form, TAccount.class);
-		account.setName(form.getLoginId());
 
 		// パスワード生成
 		account.setPassword(passwordEncoder.encode(form.getPassword()));

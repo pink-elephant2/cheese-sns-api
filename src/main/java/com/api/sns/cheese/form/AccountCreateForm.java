@@ -22,6 +22,7 @@ public class AccountCreateForm {
 	private String loginId;
 
 	/** アカウント名 */
+	@NotNull
 	@Size(max = 30)
 	private String name;
 

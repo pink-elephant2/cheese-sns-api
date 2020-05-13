@@ -8,8 +8,9 @@
 		<p>下記の内容でアカウント登録が完了いたしましたので、お知らせいたします。</p>
 		<br>
 		<ul style="padding: 0">
-			<li th:inline="text">Email：[[${mail}]]</li>
+			<li th:inline="text">ログインID：[[${loginId}]]</li>
 			<li th:inline="text">パスワード：[[${password}]]（セキュリティ保護のため非表示）</li>
+			<li th:inline="text">Email：[[${mail}]]</li>
 		</ul>
 		<br>
 		<p th:inline="text">以上、引き続き『[[${app_title}]]』をお楽しみくださいませ。</p>

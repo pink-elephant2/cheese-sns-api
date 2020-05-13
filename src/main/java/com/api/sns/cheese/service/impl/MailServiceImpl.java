@@ -57,8 +57,9 @@ public class MailServiceImpl implements MailService {
 		Context context = new Context();
 		context.setVariable("app_title", appConfig.getAppName());
 		context.setVariable("app_contact_url", getContactUrl());
-		context.setVariable("name", form.getLoginId());
+		context.setVariable("name", form.getName());
 		context.setVariable("mail", form.getMail());
+		context.setVariable("loginId", form.getLoginId());
 		context.setVariable("password", form.getPasswordMasked());
 
 		MimeMessagePreparator message = createMimeMessagePreparator(form.getMail(), "アカウント登録完了のお知らせ", context,
