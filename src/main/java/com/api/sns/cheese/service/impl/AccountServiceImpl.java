@@ -1,6 +1,7 @@
 package com.api.sns.cheese.service.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -69,6 +70,9 @@ public class AccountServiceImpl implements AccountService {
 	@Autowired
 	private S3Service s3Service;
 
+	/** 不許可アカウント */
+	private List<String> RESERVED_ACCOUNT_LIST = Arrays.asList("admin", "torochee");
+
 	/**
 	 * アカウントを登録する
 	 *
@@ -77,6 +81,12 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Override
 	public boolean create(AccountCreateForm form) {
+		// 不許可アカウント
+		if (RESERVED_ACCOUNT_LIST.stream().filter(loginId -> form.getLoginId().toLowerCase().indexOf(loginId) != -1)
+				.count() > 0) {
+			throw new ValidationException("既に登録されています");
+		}
+
 		// 既存ユーザー存在チェック
 		TAccountExample example = new TAccountExample();
 		example.or().andLoginIdEqualTo(form.getLoginId()).andDeletedEqualTo(CommonConst.DeletedFlag.OFF);
