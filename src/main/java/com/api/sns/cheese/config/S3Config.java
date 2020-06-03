@@ -1,5 +1,6 @@
 package com.api.sns.cheese.config;
 
+import org.socialsignin.spring.data.dynamodb.repository.config.EnableDynamoDBRepositories;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,8 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
@@ -17,6 +20,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
  * アプリケーション固有定義 AWS S3定義
  */
 @Configuration
+@EnableDynamoDBRepositories(basePackages = "com.api.sns.cheese.repository")
 public class S3Config {
 
 	@Autowired
@@ -45,5 +49,12 @@ public class S3Config {
 		// S3アクセスクライアントの生成
 		return AmazonS3ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentials))
 				.withClientConfiguration(clientConfig).withEndpointConfiguration(endpointConfiguration).build();
+	}
+
+	@Bean
+	public AmazonDynamoDB amazonDynamoDB() {
+		AmazonDynamoDB amazonDynamoDB = new AmazonDynamoDBClient(basicAWSCredentials());
+		amazonDynamoDB.setEndpoint(appConfig.getDynamodbEndpoint());
+		return amazonDynamoDB;
 	}
 }

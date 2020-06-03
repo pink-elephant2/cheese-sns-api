@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.api.sns.cheese.domain.DTranscodeResult;
 import com.api.sns.cheese.domain.Test;
 import com.api.sns.cheese.domain.TestExample;
+import com.api.sns.cheese.repository.DTranscodeResultRepository;
 import com.api.sns.cheese.repository.TestMapper;
 
 @CrossOrigin
@@ -33,5 +35,23 @@ public class HelloController {
 		example.createCriteria().andIdIsNotNull();
 
 		return testMapper.selectByExample(example);
+	}
+
+	@Autowired
+	private DTranscodeResultRepository repository;
+
+	@RequestMapping("/trans")
+	public String trans() {
+		List<DTranscodeResult> result = repository.findByFileKey("1QQtEcKD0u");
+		result.stream().forEach(r -> {
+			System.out.println(r.getId());
+			System.out.println(r.getFileKey());
+			System.out.println(r.getInputKey());
+			System.out.println(r.getOutputKey());
+			System.out.println(r.getCreatedAt());
+		});
+		System.out.println(String.valueOf(result.size()));
+
+		return String.valueOf(repository.count());
 	}
 }

@@ -34,6 +34,9 @@ public class AppConfig {
 	/** クラウドフロントホスト */
 	private String cloudHostUrl;
 
+	/** DynamoDBエンドポイント */
+	private String dynamodbEndpoint;
+
 	/** AWSアクセス時のタイムアウト時間(ms) */
 	private Integer timeout;
 
